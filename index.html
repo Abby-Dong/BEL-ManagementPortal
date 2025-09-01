@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEL Management Portal</title>
+    
+    <!-- External Dependencies -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+    
+    <!-- Local Styles -->
+    <link rel="stylesheet" href="src/css/main.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="bel-header">
+        <i class="bel-hamburger-menu fas fa-bars" id="bel-hamburger-btn"></i>
+        <div class="bel-header-content">
+            <div class="bel-sidebar-logo">
+                <img src="https://irp.cdn-website.com/56869327/dms3rep/multi/iotmart-logo.svg" alt="logo">
+                <span>BEL Management Portal</span>
+            </div>
+            <div class="bel-header-right">
+                <div class="bel-notification-bell" id="notification-bell">
+                    <i class="fas fa-bell"></i>
+                    <div class="dot"></div>
+                </div>
+                <div class="bel-notification-panel" id="notification-panel">
+                    <div class="bel-notification-header">Announcements</div>
+                    <ul class="bel-notification-list">
+                        <!-- Notifications will be populated by JavaScript -->
+                    </ul>
+                </div>
+                <div class="bel-user-profile">
+                    <img src="" alt="User Avatar" style="display: none;">
+                </div>
+                <div class="user-profile-panel" id="user-profile-panel">
+                    <div class="panel-content">
+                        <div class="user-info">
+                            <span class="user-name">Abby Dong</span>
+                            <span class="user-email">Abby.dong@advantech.com</span>
+                        </div>
+                        <div class="user-level">
+                            <span class="bel-badge admin">Admin</span>
+                        </div>
+                        <hr class="divider">
+                        <a href="#" class="panel-link">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="bel-container">
+        <!-- Sidebar Navigation -->
+        <aside class="bel-sidebar" id="bel-sidebar">
+            <div class="bel-sidebar-menu-title">MAIN MENU</div>
+            <nav class="bel-sidebar-nav">
+                <a href="#dashboard" class="bel-sidebar-nav-link active">
+                    <i class="fas fa-tachometer-alt fa-fw"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#BEL-board" class="bel-sidebar-nav-link">
+                    <i class="fas fa-user-circle fa-fw"></i>
+                    <span>BEL Board</span>
+                </a>
+                <a href="#payouts-order" class="bel-sidebar-nav-link">
+                    <i class="fas fa-wallet fa-fw"></i>
+                    <span>Payouts</span>
+                </a>
+                <a href="#orders" class="bel-sidebar-nav-link">
+                    <i class="fas fa-shopping-cart fa-fw"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="#content" class="bel-sidebar-nav-link">
+                    <i class="fas fa-folder fa-fw"></i>
+                    <span>Content</span>
+                </a>
+            </nav>
+            <div class="bel-sidebar-menu-title">HELP & SUPPORT</div>
+            <nav class="bel-sidebar-nav">
+                <a href="#contact-support" class="bel-sidebar-nav-link">
+                    <i class="fas fa-headset fa-fw"></i>
+                    <span>Contact Support</span>
+                </a>
+                <a href="#announcements" class="bel-sidebar-nav-link">
+                    <i class="fas fa-bullhorn fa-fw"></i>
+                    <span>Announcements</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="bel-main-content" id="bel-main-content">
+            
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section active">
+                <h1 class="bel-h1">Dashboard</h1>
+                
+                <!-- Summary Statistics Cards -->
+                <div class="bel-stats-cards grid-cols-3">
+                    <!-- Cards will be populated by JavaScript -->
+                </div>
+                
+                <!-- BEL Performance by Level -->
+                <h3 class="bel-h3">BEL Level Distribution & Performance</h3>
+                <div class="bel-panel">
+                    <div class="performance-grid">
+                        <div>
+                            <div class="chart-container pie-chart-container" >
+                                <canvas id="level-pie-chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="flex-center" style="display: flex; flex-direction: column;">
+                            <div class="view-switcher" id="payout-view-switcher">
+                               <button class="view-btn active" data-view="chart">
+                                   <i class="fas fa-chart-bar"></i> Chart View
+                               </button>
+                               <button class="view-btn" data-view="table">
+                                   <i class="fas fa-list"></i> List View
+                               </button>
+                            </div>
+                            
+                            <div class="scrollable-table-container view-content" id="performance-table-view" style="display: none;">
+                                <table class="bel-table">
+                                    <thead>
+                                        <tr>
+                                            <th data-sortable data-type="string">Level</th>
+                                            <th data-sortable data-type="number">Total Clicks</th>
+                                            <th data-sortable data-type="number">Revenue</th>
+                                            <th data-sortable data-type="number">Orders</th>
+                                            <th data-sortable data-type="number">Conv. Rate</th>
+                                            <th data-sortable data-type="number">AOV</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Performance data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="view-content" id="performance-chart-view" style="display: block; width: 100%; height: 300px;">
+                                <canvas id="performance-percentage-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top 10 BEL Performance Leaderboard -->
+                <h3 class="bel-h3">Top 10 BEL Performance Leaderboard</h3>
+                <div class="bel-panel">
+                    <div class="scrollable-table-container">
+                        <table class="bel-table" id="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th data-sortable>Referral ID</th>
+                                    <th data-sortable>Name</th>
+                                    <th data-sortable>Level</th>
+                                    <th data-sortable data-type="number">Clicks</th>
+                                    <th data-sortable data-type="number">Orders</th>
+                                    <th data-sortable data-type="number">Revenue</th>
+                                    <th data-sortable data-type="number">Conv. Rate</th>
+                                    <th data-sortable data-type="number">AOV</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Leaderboard data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Product Sales Analysis -->
+                <div class="section-title">
+                    <h3>Product Sales Analysis</h3>
+                </div>
+                <div class="bel-panel">
+                    <div class="product-sales-grid">
+                         <div>
+                            <h4 style="font-size: 1rem; margin-bottom: 10px;">Top 5 Product Category Analysis</h4>
+                            <div class="chart-container bar-chart-container">
+                                <canvas id="product-category-chart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 1rem; margin-bottom: 10px;">Top 20 Products</h4>
+                            <div class="scrollable-table-container" style="max-height: 350px;">
+                                <table class="bel-table" style="margin-top:0;">
+                                    <thead>
+                                        <tr>
+                                            <th data-sortable data-type="number" style="width:24px;">Rank</th>
+                                            <th data-sortable data-type="string" style="width:160px;">Product</th>
+                                            <th data-sortable data-type="number">Price</th>
+                                            <th data-sortable data-type="number">Units</th>
+                                            <th data-sortable data-type="number">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Product data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BEL Board Section -->
+            <div id="BEL-board" class="content-section">
+                <h1 class="bel-h1">BEL Board</h1>
+
+                <!-- Filters Panel -->
+                <div class="bel-panel">
+                    <h3 class="bel-h3" style="margin-top:0; font-size: 1.25rem;">Filters</h3>
+                    <form id="bel-filters" class="filters-grid">
+                        <div class="bel-form-group">
+                            <label for="f-keyword">Keyword</label>
+                            <input id="f-keyword" class="bel-input" type="search" placeholder="Search name, ID, or code" />
+                        </div>
+                        <div class="bel-form-group">
+                            <label for="f-level">Level</label>
+                            <select id="f-level" class="bel-select">
+                                <option value="">All Levels</option>
+                                <option value="Builder">Builder</option>
+                                <option value="Enabler">Enabler</option>
+                                <option value="Explorer">Explorer</option>
+                                <option value="Leader">Leader</option>
+                            </select>
+                        </div>
+                        <div class="bel-form-group">
+                            <label for="f-region">Region</label>
+                            <select id="f-region" class="bel-select">
+                                <option value="">All Regions</option>
+                                <!-- Regions will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div class="bel-form-group">
+                            <label for="f-start">Registered From</label>
+                            <input id="f-start" class="bel-input" type="date" />
+                        </div>
+                        <div class="bel-form-group">
+                            <label for="f-end">Registered To</label>
+                            <input id="f-end" class="bel-input" type="date" />
+                        </div>
+                        <div class="bel-form-group">
+                            <label for="f-activity">Last 30 Days Activity</label>
+                            <select id="f-activity" class="bel-select">
+                                <option value="">Any activity</option>
+                                <option value="clicks">Has clicks only</option>
+                                <option value="orders">Has orders</option>
+                                <option value="none">No activity</option>
+                            </select>
+                        </div>
+                        <div class="filters-actions">
+                            <button type="button" id="apply-filters" class="bel-btn primary">
+                                <i class="fas fa-filter"></i> Apply
+                            </button>
+                            <button type="reset" id="reset-filters" class="bel-btn secondary">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Batch Actions -->
+                <div class="batch-actions">
+                    <div class="left">
+                        <input type="checkbox" id="select-all-page" style="transform: scale(1.2); margin-right: 4px;"/>
+                        <label for="select-all-page">Select all</label>
+                        <span class="text-muted" id="selected-count">0 selected</span>
+                    </div>
+                    <div class="right">
+                        <button class="bel-btn secondary" id="export-csv">
+                            <i class="fas fa-file-export"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BEL Table -->
+                <div class="scrollable-table-container">
+                    <table class="bel-table" id="bel-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="th-select" aria-label="Select all on this page" /></th>
+                                <th data-sortable="id">Referral ID</th>
+                                <th data-sortable="name">Name</th>
+                                <th data-sortable="level">Level</th>
+                                <th data-sortable="joined">Joined</th>
+                                <th data-sortable="clicks30" style="text-align: right;">Clicks</th>
+                                <th data-sortable="orders30" style="text-align: right;">Orders</th>
+                                <th data-sortable="revenue30" style="text-align: right;">Revenue</th>
+                                <th style="text-align: right;">Conv. Rate</th>
+                                <th style="text-align: right;">AOV</th>
+                                <th data-sortable="country">Region</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- BEL data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-bar">
+                    <div class="rows-select">
+                        <label for="rows-per-page">Rows per page</label>
+                        <select id="rows-per-page" class="bel-select" style="width: 70px;">
+                            <option>10</option>
+                            <option selected>20</option>
+                            <option>50</option>
+                        </select>
+                    </div>
+                    <div class="pagination-controls">
+                        <span id="range-label" class="text-muted">0–0 of 0</span>
+                        <button class="bel-btn secondary" id="prev-page" aria-label="Previous page">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="bel-btn secondary" id="next-page" aria-label="Next page">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payouts & Orders Section -->
+            <div id="payouts-order" class="content-section">
+                <!-- Content will be dynamically injected by JavaScript -->
+            </div>
+
+            <!-- Orders Section -->
+            <div id="orders" class="content-section">
+                <!-- Content will be dynamically injected by JavaScript -->
+            </div>
+
+            <!-- Content Section -->
+            <div id="content" class="content-section">
+                <!-- Content will be dynamically injected by JavaScript -->
+            </div>
+
+            <!-- Contact Support Section -->
+            <div id="contact-support" class="content-section">
+                <!-- Content will be dynamically injected by JavaScript -->
+            </div>
+
+            <!-- Announcements Section -->
+            <div id="announcements" class="content-section">
+                <!-- Content will be dynamically injected by JavaScript -->
+            </div>
+        </div>
+    </main>
+    
+    <!-- BEL Details Modal -->
+    <div class="modal-overlay" id="bel-details-modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <div class="bel-profile-identifier">
+                    <img src="" alt="User Avatar" class="modal-avatar-small" style="display: none;">
+                    <div class="bel-profile-info">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <h3 id="modal-bel-name">Maxwell Walker</h3>
+                            <span id="modal-bel-level-badge" class="bel-badge explorer">Explorer</span>
+                        </div>
+                        <p style="margin-top:4px" id="modal-bel-info">Referral ID: KTWADVANT | Email: maxwell.walker@advantech.com</p>
+                    </div>
+                </div>
+                <button class="close-button">&times;</button>
+            </div>
+
+            <div class="modal-body-grid" style="height: 600px;">
+                <div class="modal-left-pane">
+                    <div class="tab-navigation">
+                        <button class="tab-link active" data-tab="overview">
+                            <i class="fas fa-chart-line"></i> Performance
+                        </button>
+                        <button class="tab-link" data-tab="payouts">
+                            <i class="fas fa-wallet"></i> Finance
+                        </button>
+                        <button class="tab-link" data-tab="payout">
+                            <i class="fas fa-dollar-sign"></i> Payout
+                        </button>
+                        <button class="tab-link" data-tab="insights">
+                            <i class="fas fa-lightbulb"></i> Customer Insights
+                        </button>
+                    </div>
+
+                    <div class="tab-content active" id="overview">
+                        <h4>Performance Metrics (All Time)</h4>
+                        <div class="metric-cards-grid">
+                            <div class="metric-card"><span>Total Clicks</span><strong id="modal-total-clicks">12,830</strong></div>
+                            <div class="metric-card"><span>Total Orders</span><strong id="modal-total-orders">98</strong></div>
+                            <div class="metric-card"><span>Total Revenue</span><strong id="modal-total-revenue">$98.5k</strong></div>
+                            <div class="metric-card"><span>Conv. Rate</span><strong id="modal-conv-rate">7.6%</strong></div>
+                            <div class="metric-card"><span>AOV</span><strong id="modal-aov">$1,005</strong></div>
+                        </div>
+                        
+                        <!-- Performance Trend Chart -->
+                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Performance Trend (Last 6 Months)</h4>
+                        <div class="chart-container" style="height: 250px; margin-bottom: 2rem;">
+                            <canvas id="bel-performance-trend-chart"></canvas>
+                        </div>
+                        
+                        <!-- Individual BEL Performance Chart -->
+                        <h4 style="margin-bottom: 1rem;">Individual Performance Breakdown</h4>
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="bel-individual-performance-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="payouts">
+                        <!-- Banking Information Section - moved to top -->
+                        <h4>Banking Information 
+                            <button class="bel-btn secondary" id="edit-banking-btn" style="margin-left: 10px; font-size: 0.8rem;">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="bel-btn secondary" id="banking-history-btn" style="margin-left: 5px; font-size: 0.8rem;">
+                                <i class="fas fa-history"></i> History
+                            </button>
+                        </h4>
+                        <div class="banking-info-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 24px;">
+                            <div class="bel-form-group">
+                                <label>Bank Name</label>
+                                <div class="banking-display" id="bank-name-display">Chase Bank</div>
+                                <input type="text" id="bank-name-edit" class="bel-input banking-edit" style="display: none;" value="Chase Bank">
+                            </div>
+                            <div class="bel-form-group">
+                                <label>SWIFT Code</label>
+                                <div class="banking-display" id="swift-code-display">CHASUS33</div>
+                                <input type="text" id="swift-code-edit" class="bel-input banking-edit" style="display: none;" value="CHASUS33">
+                            </div>
+                            <div class="bel-form-group">
+                                <label>Account Holder Name (Passport Name)</label>
+                                <div class="banking-display" id="account-holder-display">Maxwell Walker</div>
+                                <input type="text" id="account-holder-edit" class="bel-input banking-edit" style="display: none;" value="Maxwell Walker">
+                            </div>
+                            <div class="bel-form-group">
+                                <label>Phone Number</label>
+                                <div class="banking-display" id="phone-display">+1-555-0123</div>
+                                <input type="tel" id="phone-edit" class="bel-input banking-edit" style="display: none;" value="+1-555-0123">
+                            </div>
+                            <div class="bel-form-group" style="grid-column: 1 / -1;">
+                                <label>Address</label>
+                                <div class="banking-display" id="address-display">123 Main Street, New York, NY 10001, USA</div>
+                                <textarea id="address-edit" class="bel-input banking-edit" style="display: none; min-height: 80px;">123 Main Street, New York, NY 10001, USA</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Save/Cancel buttons for banking info -->
+                        <div class="banking-edit-actions" style="display: none; margin-bottom: 24px;">
+                            <button class="bel-btn secondary" id="cancel-banking-btn">Cancel</button>
+                            <button class="bel-btn primary" id="save-banking-btn" style="margin-left: 10px;">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="payout">
+                         <div class="bel-grid-container grid-cols-2" style="margin-bottom: 24px;">
+                            <div class="bel-card blue-bg">
+                                <div class="bel-card-title">Total Payouts</div>
+                                <div class="bel-card-value" style="font-size: 1.5rem;">$7,500</div>
+                            </div>
+                            <div class="bel-card red-bg">
+                                <div class="bel-card-title">To Be Payout</div>
+                                <div class="bel-card-value" style="font-size: 1.5rem;">$1,250</div>
+                            </div>
+                        </div>
+                        
+                        <h4>Recent Payout History</h4>
+                        <div class="scrollable-table-container">
+                             <table class="bel-table">
+                                 <thead>
+                                     <tr>
+                                         <th data-sortable data-type="date">Date</th>
+                                         <th data-sortable data-type="number">Amount</th>
+                                         <th data-sortable data-type="string">Status</th>
+                                     </tr>
+                                 </thead>
+                                 <tbody>
+                                     <tr>
+                                         <td>2025-08-05</td>
+                                         <td>$1,520.00</td>
+                                         <td><span class="bel-badge completed">Completed</span></td>
+                                     </tr>
+                                     <tr>
+                                         <td>2025-07-05</td>
+                                         <td>$1,330.00</td>
+                                         <td><span class="bel-badge completed">Completed</span></td>
+                                     </tr>
+                                     <tr>
+                                         <td>2025-06-05</td>
+                                         <td>$800.00</td>
+                                         <td><span class="bel-badge completed">Completed</span></td>
+                                     </tr>
+                                 </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="insights">
+                        <h4>Top Purchased Categories</h4>
+                        <div class="tags-container">
+                            <span class="insight-tag">Smart Home</span>
+                            <span class="insight-tag">Sensors</span>
+                            <span class="insight-tag">Industrial PC</span>
+                        </div>
+
+                        <h4>Top 10 Products Purchased by Referrals</h4>
+                        <ol class="product-list">
+                            <li>Smart Lock Pro</li>
+                            <li>Environment Sensor Gen 2</li>
+                            <li>Smart Bulb Kit</li>
+                            <li>ADAM-6017</li>
+                            <li>UNO-2271G</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="modal-right-pane">
+                    <h4>Management</h4>
+                    <div class="bel-form-group">
+                        <label for="level-adjustment">Adjust Level</label>
+                        <select id="level-adjustment" class="bel-select">
+                            <option value="Builder">Builder</option>
+                            <option value="Enabler">Enabler</option>
+                            <option value="Explorer" selected>Explorer</option>
+                            <option value="Leader">Leader</option>
+                        </select>
+                    </div>
+                     <div class="modal-actions">
+                        <button class="bel-btn primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                    
+                    <hr class="divider">
+
+                    <h4>Internal Notes (Audit Trail)</h4>
+                    <div class="notes-history">
+                        <div class="note-item">
+                            <p>Contacted to confirm partnership interest, samples will be sent.</p>
+                            <span><strong>Admin</strong> - 2025-08-15 10:30</span>
+                        </div>
+                        <div class="note-item">
+                            <p>Observed high community engagement rate, recommend designating as a key partner.</p>
+                            <span><strong>Manager</strong> - 2025-07-20 15:00</span>
+                        </div>
+                    </div>
+                    <div class="add-note-form">
+                        <textarea id="add-note-textarea" placeholder="Add a new note..."></textarea>
+                        <button id="add-note-btn" class="bel-btn secondary" style="width: 100%;">Add Note</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript -->
+    <script src="src/js/data-loader.js"></script>
+    <script src="src/js/app.js"></script>
+</body>
+</html>

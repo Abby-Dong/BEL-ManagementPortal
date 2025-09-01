@@ -1,0 +1,75 @@
+{
+  "payoutDayMessage": "Payout Day: 5th of each month",
+  "history": [
+    {
+      "date": "2025-08-05",
+      "total": 15420.50,
+      "belCount": 45,
+      "details": [
+        {
+          "payoutId": "RP-000001",
+          "referralId": "KTWADVANT",
+          "belName": "Maxwell Walker",
+          "gross": 850.25,
+          "fees": 17.01,
+          "tax": 42.51,
+          "net": 790.73,
+          "paid": true,
+          "status": "Success"
+        },
+        {
+          "payoutId": "RP-000002",
+          "referralId": "KUSOLVACE",
+          "belName": "Olivia Chen",
+          "gross": 720.50,
+          "fees": 14.41,
+          "tax": 36.03,
+          "net": 670.06,
+          "paid": true,
+          "status": "Success"
+        },
+        {
+          "payoutId": "RP-000003",
+          "referralId": "KDEIMULER",
+          "belName": "Liam Müller",
+          "gross": 612.80,
+          "fees": 12.26,
+          "tax": 30.64,
+          "net": 569.90,
+          "paid": false,
+          "status": "Failed"
+        }
+      ]
+    },
+    {
+      "date": "2025-07-05",
+      "total": 12350.75,
+      "belCount": 38,
+      "details": [
+        {
+          "payoutId": "RP-000004",
+          "referralId": "KUSOLVACE",
+          "belName": "Olivia Chen",
+          "gross": 720.50,
+          "fees": 14.41,
+          "tax": 36.03,
+          "net": 670.06,
+          "paid": true,
+          "status": "Success"
+        },
+        {
+          "payoutId": "RP-000005",
+          "referralId": "KFRDUBOIS",
+          "belName": "Sophia Dubois",
+          "gross": 580.30,
+          "fees": 11.61,
+          "tax": 29.02,
+          "net": 539.67,
+          "paid": true,
+          "status": "Success"
+        }
+      ]
+    }
+  ],
+  "description": "支付歷史記錄與支付規則相關資料"
+}

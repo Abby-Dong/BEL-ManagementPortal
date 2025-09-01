@@ -1,0 +1,47 @@
+{
+  "description": "BEL Management Portal 資料載入配置",
+  "version": "1.0.0",
+  "lastUpdated": "2025-08-30",
+  "dataFiles": [
+    {
+      "name": "userProfile",
+      "file": "userProfile.json",
+      "description": "當前登入用戶的基本資料，包含身份資訊與權限等級"
+    },
+    {
+      "name": "header",
+      "file": "header.json",
+      "description": "頁首配置與系統通知資料，管理品牌標誌與即時通知"
+    },
+    {
+      "name": "dashboard",
+      "file": "dashboard.json",
+      "description": "儀表板核心數據，包含統計卡片、圖表數據與排行榜"
+    },
+    {
+      "name": "payoutsAndOrders",
+      "file": "payoutsAndOrders.json",
+      "description": "支付與訂單管理系統資料，管理財務流程與訂單追蹤"
+    },
+    {
+      "name": "content",
+      "file": "content.json",
+      "description": "內容管理系統資料，管理行銷素材與產品文件"
+    },
+    {
+      "name": "supportAndComm",
+      "file": "supportAndComm.json",
+      "description": "客戶支援與溝通系統資料，管理票券與系統公告"
+    }
+  ],
+  "loadingInstructions": {
+    "method": "async",
+    "loadOrder": ["userProfile", "header", "dashboard", "payoutsAndOrders", "content", "supportAndComm"],
+    "errorHandling": "graceful",
+    "caching": true
+  },
+  "usage": {
+    "example": "const userData = await loadDataFile('userProfile.json');",
+    "integration": "Replace original APP_DATA object with async data loading from these JSON files"
+  }
+}

@@ -1,0 +1,242 @@
+{
+  "summaryStats": {
+    "belCount": {
+      "title": "BEL Count",
+      "value": "152",
+      "icon": "fas fa-users",
+      "trend": "+5.1%",
+      "trendText": "Since last month",
+      "status": "positive"
+    },
+    "totalClicks": {
+      "title": "Total Clicks",
+      "value": "13,492",
+      "icon": "fas fa-mouse-pointer",
+      "trend": "+12.3%",
+      "trendText": "Since last month",
+      "status": "positive"
+    },
+    "totalOrders": {
+      "title": "Total Orders",
+      "value": "851",
+      "icon": "fas fa-shopping-cart",
+      "trend": "+8.2%",
+      "trendText": "Since last month",
+      "status": "positive"
+    },
+    "revenue": {
+      "title": "Revenue",
+      "value": "$120k",
+      "icon": "fas fa-dollar-sign",
+      "trend": "+15.8%",
+      "trendText": "Since last month",
+      "status": "positive"
+    },
+    "convRate": {
+      "title": "Conv Rate",
+      "value": "6.31%",
+      "icon": "fas fa-bullseye",
+      "trend": "-0.5%",
+      "trendText": "Since last month",
+      "status": "negative"
+    },
+    "aov": {
+      "title": "AOV",
+      "value": "$141.5",
+      "icon": "fas fa-file-invoice-dollar",
+      "trend": "+2.1%",
+      "trendText": "Since last month",
+      "status": "positive"
+    }
+  },
+  "performanceByLevel": {
+    "distribution": {
+      "labels": ["Builder", "Enabler", "Explorer", "Leader"],
+      "data": [75, 45, 25, 7],
+      "colors": ["#006EFF", "#00893a", "#f39800", "#db3a3a"]
+    },
+    "details": [
+      {
+        "level": "Builder",
+        "clicks": "8,000",
+        "revenue": "$65,000",
+        "orders": 510,
+        "convRate": "6.8%",
+        "aov": "$127.45"
+      },
+      {
+        "level": "Enabler",
+        "clicks": "3,500",
+        "revenue": "$35,000",
+        "orders": 255,
+        "convRate": "6.1%",
+        "aov": "$137.25"
+      },
+      {
+        "level": "Explorer",
+        "clicks": "1,500",
+        "revenue": "$15,000",
+        "orders": 75,
+        "convRate": "5.5%",
+        "aov": "$200.00"
+      },
+      {
+        "level": "Leader",
+        "clicks": "492",
+        "revenue": "$5,000",
+        "orders": 11,
+        "convRate": "5.1%",
+        "aov": "$454.55"
+      }
+    ]
+  },
+  "leaderboard": [
+    {
+      "id": "A8C1E3F",
+      "name": "Maxwell Walker",
+      "email": "maxwell.walker@advantech.com",
+      "level": "Explorer",
+      "clicks": 1280,
+      "orders": 35,
+      "revenue": 8500,
+      "convRate": "2.73%",
+      "aov": 242.86
+    },
+    {
+      "id": "B2D5G8H",
+      "name": "Olivia Chen",
+      "email": "olivia.chen@tech-solutions.com",
+      "level": "Builder",
+      "clicks": 1150,
+      "orders": 32,
+      "revenue": 7800,
+      "convRate": "2.78%",
+      "aov": 243.75
+    },
+    {
+      "id": "C4E6H1J",
+      "name": "Liam Müller",
+      "email": "liam.muller@industrie4.de",
+      "level": "Enabler",
+      "clicks": 980,
+      "orders": 28,
+      "revenue": 7200,
+      "convRate": "2.86%",
+      "aov": 257.14
+    },
+    {
+      "id": "D9F8K2L",
+      "name": "Sophia Dubois",
+      "email": "sophia.dubois@automation-fr.com",
+      "level": "Builder",
+      "clicks": 950,
+      "orders": 25,
+      "revenue": 6500,
+      "convRate": "2.63%",
+      "aov": 260.00
+    },
+    {
+      "id": "E3G7J9M",
+      "name": "Kenji Tanaka",
+      "email": "kenji.tanaka@iot-japan.co.jp",
+      "level": "Leader",
+      "clicks": 880,
+      "orders": 22,
+      "revenue": 6100,
+      "convRate": "2.50%",
+      "aov": 277.27
+    },
+    {
+      "id": "F1H5L3N",
+      "name": "Isabella Rossi",
+      "email": "isabella.rossi@smart-italy.eu",
+      "level": "Enabler",
+      "clicks": 820,
+      "orders": 21,
+      "revenue": 5800,
+      "convRate": "2.56%",
+      "aov": 276.19
+    },
+    {
+      "id": "G6J2M4P",
+      "name": "Noah Kim",
+      "email": "noah.kim@korean-tech.kr",
+      "level": "Builder",
+      "clicks": 790,
+      "orders": 20,
+      "revenue": 5500,
+      "convRate": "2.53%",
+      "aov": 275.00
+    },
+    {
+      "id": "H8K4N6R",
+      "name": "Ava Schmidt",
+      "email": "ava.schmidt@automation-gmbh.de",
+      "level": "Builder",
+      "clicks": 750,
+      "orders": 18,
+      "revenue": 5100,
+      "convRate": "2.40%",
+      "aov": 283.33
+    },
+    {
+      "id": "J2M7P9S",
+      "name": "Lucas Garcia",
+      "email": "lucas.garcia@industria-es.com",
+      "level": "Explorer",
+      "clicks": 710,
+      "orders": 17,
+      "revenue": 4800,
+      "convRate": "2.39%",
+      "aov": 282.35
+    },
+    {
+      "id": "K5N8R1T",
+      "name": "Mia Wang",
+      "email": "mia.wang@smart-manufacturing.cn",
+      "level": "Enabler",
+      "clicks": 680,
+      "orders": 15,
+      "revenue": 4500,
+      "convRate": "2.21%",
+      "aov": 300.00
+    }
+  ],
+  "productAnalysis": {
+    "categoryData": {
+      "Remote IO & Communication": [
+        { "product": "ADAM-6017", "units": 20 },
+        { "product": "WISE-4012E", "units": 11 }
+      ],
+      "Wireless Sensing & Solutions": [
+        { "product": "WISE-2410", "units": 8 },
+        { "product": "WISE-2200-M", "units": 5 }
+      ],
+      "Embedded Computers": [
+        { "product": "UNO-2271G", "units": 4 },
+        { "product": "ARK-1220", "units": 6 }
+      ],
+      "Panel PC, HMI & Displays": [
+        { "product": "TPC-1551T", "units": 3 },
+        { "product": "PPC-3150", "units": 2 }
+      ],
+      "Edge AI Solutions": [
+        { "product": "AIR-101", "units": 2 },
+        { "product": "MIC-730AI", "units": 1 }
+      ]
+    },
+    "topProducts": [
+      { "rank": 1, "product": "ADAM-6017", "price": "$150", "units": 20, "total": "$3000" },
+      { "rank": 2, "product": "AIM-68G0", "price": "$280", "units": 8, "total": "$2,240" },
+      { "rank": 3, "product": "ARK-1220", "price": "$410", "units": 6, "total": "$2,460" },
+      { "rank": 4, "product": "PCE-5129", "price": "$520", "units": 5, "total": "$2,600" },
+      { "rank": 5, "product": "UNO-2271G", "price": "$350", "units": 4, "total": "$1,400" },
+      { "rank": 6, "product": "EKI-2525", "price": "$90", "units": 15, "total": "$1,350" },
+      { "rank": 7, "product": "WISE-4012E", "price": "$120", "units": 11, "total": "$1,320" },
+      { "rank": 8, "product": "TPC-1551T", "price": "$800", "units": 3, "total": "$2,400" },
+      { "rank": 9, "product": "MIC-770", "price": "$1,200", "units": 2, "total": "$2,400" },
+      { "rank": 10, "product": "ADAM-6250", "price": "$210", "units": 7, "total": "$1,470" }
+    ]
+  },
+  "description": "儀表板核心數據，包含統計卡片、等級分析、排行榜與產品銷售分析"
+}

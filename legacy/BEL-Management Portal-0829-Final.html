@@ -1,0 +1,3662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEL Management Portal</title>
+    <style>
+        /* CSS Reset and Global Styles */
+        :root {
+            --bel-primary-blue: #006EFF;
+            --bel-primary-orange:#F39800;
+            --bel-light-gray: #F6F7F9;
+            --bel-dark-gray: #434447;
+            --bel-text-color: #0C0C0C;
+            --bel-sidebar-width: 250px;
+            --bel-header-height: 56px;
+
+            --ds-color-brand-dark: #003160;
+            --bel-background-color: #F6F7F9;
+            --bel-card-bg: #FFFFFF;
+            --bel-border-color: #E0E0E0;
+            --bel-sidebar-bg: var(--ds-color-brand-dark);
+            --bel-sidebar-text: #A8B1D1;
+            --bel-sidebar-active-bg: #405282;
+            --bel-sidebar-active-text: #FFFFFF;
+            --bel-header-bg: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            font-family:"heebo","General Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+            line-height: 1.6;
+            color: var(--bel-text-color);
+            background-color: var(--bel-background-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--bel-primary-blue);
+        }
+        
+        a.bel-id-link {
+            color: var(--bel-primary-blue);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        a.bel-id-link:hover {
+            text-decoration: underline;
+        }
+
+
+        /* ===== Thin Scrollbars ===== */
+        :root{
+            --scrollbar-size: 8px;
+            --scrollbar-thumb: #C2CAD6;
+            --scrollbar-thumb-hover: #AAB4C2;
+            --scrollbar-track: transparent;
+        }
+
+        body, .bel-sidebar, .scrollable-table-container {
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+        }
+
+        body::-webkit-scrollbar,
+        .bel-sidebar::-webkit-scrollbar,
+        .scrollable-table-container::-webkit-scrollbar {
+            width: var(--scrollbar-size);
+            height: var(--scrollbar-size);
+        }
+
+        body::-webkit-scrollbar-thumb,
+        .bel-sidebar::-webkit-scrollbar-thumb,
+        .scrollable-table-container::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb);
+            border-radius: 999px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        body::-webkit-scrollbar-thumb:hover,
+        .bel-sidebar::-webkit-scrollbar-thumb:hover,
+        .scrollable-table-container::-webkit-scrollbar-thumb:hover {
+            background-color: var(--scrollbar-thumb-hover);
+        }
+
+        body::-webkit-scrollbar-track,
+        .bel-sidebar::-webkit-scrollbar-track,
+        .scrollable-table-container::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+        }
+
+        /* Top Header */
+        .bel-header {
+            width: calc(100% - var(--bel-sidebar-width));
+            margin-left: var(--bel-sidebar-width);
+            height: var(--bel-header-height);
+            background-color: var(--bel-header-bg);
+            border-bottom: 1px solid var(--bel-border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .bel-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .bel-header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            position: relative;
+            margin-left: auto;
+        }
+
+        .bel-user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .bel-user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--bel-primary-blue);
+        }
+        .bel-user-profile span {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 15px;
+            background-color: #fff3e0;
+            color: #ff9800;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .level-badge i {
+            font-size: 1rem;
+        }
+        .bel-notification-bell {
+            font-size: 1.2rem;
+            color: var(--bel-dark-gray);
+            cursor: pointer;
+            position: relative;
+        }
+        .bel-notification-bell .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #e91e63;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            right: 0;
+            border: 1px solid var(--bel-header-bg);
+        }
+
+        .bel-notification-panel {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 320px;
+            background-color: var(--bel-card-bg);
+            border: 1px solid var(--bel-border-color);
+            border-radius: 4px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 1001;
+        }
+        .bel-notification-panel.show { display: block; }
+        .bel-notification-header {
+            padding: 12px 16px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--bel-border-color);
+        }
+        .bel-notification-list {
+            list-style: none;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .bel-notification-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+        }
+        .bel-notification-item:last-child { border-bottom: none; }
+        .bel-notification-item:hover { background-color: var(--bel-light-gray); }
+        .bel-notification-item .title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        .bel-notification-item .tag {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+        .bel-notification-item .tag.important { background-color: #fce4ec; color: #e91e63; }
+        .bel-notification-item .tag.new-product { background-color: #e3f2fd; color: #2196f3; }
+        .bel-notification-item .date {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        /* User Profile Panel Styles */
+        .user-profile-panel {
+            display: none;
+            position: absolute;
+            top: 60px; /* Adjust as needed */
+            right: 0;
+            width: 280px;
+            background-color: var(--bel-card-bg);
+            border: 1px solid var(--bel-border-color);
+            border-radius: 4px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 1001;
+            overflow: hidden;
+        }
+        .user-profile-panel.show {
+            display: block;
+        }
+        .user-profile-panel .panel-content {
+            padding: 15px;
+        }
+        .user-profile-panel .user-info {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .user-profile-panel .user-name {
+            display: block;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .user-profile-panel .user-email {
+            display: block;
+            font-size: 0.9rem;
+            color: #777;
+        }
+        .user-profile-panel .user-level {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        .user-profile-panel .level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 15px;
+            background-color: #fff3e0;
+            color: #ff9800;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .user-profile-panel .level-badge i {
+            font-size: 1rem;
+        }
+        .user-profile-panel .divider {
+            border: none;
+            border-top: 1px solid var(--bel-border-color);
+            margin: 10px 0;
+        }
+        .user-profile-panel .panel-link {
+            display: block;
+            padding: 12px 15px;
+            color: var(--bel-dark-gray);
+            font-weight: 500;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        .user-profile-panel .panel-link:hover {
+            background-color: var(--bel-light-gray);
+            color: var(--bel-text-color);
+        }
+
+        .bel-hamburger-menu {
+            display: none !important;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--bel-dark-gray);
+        }
+
+        /* Main Container */
+        .bel-container {
+            display: flex;
+            flex-grow: 1;
+            padding-top: var(--bel-header-height);
+        }
+
+        /* Left Sidebar */
+        .bel-sidebar {
+            width: var(--bel-sidebar-width);
+            background-color: var(--bel-sidebar-bg);
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .bel-sidebar-logo {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .bel-sidebar-logo img {
+            padding: 4px;
+            border-radius: 2px;
+            width: 240px;
+        }
+
+        .bel-sidebar-logo span {
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 0.05rem;
+            margin-top: 8px;
+            color: #b6b6b6;
+        }
+
+        @media (max-width: 768px) {
+            .bel-sidebar-logo img {
+                width: 160px;
+            }
+            .bel-sidebar-logo span {
+            font-size: 12px;
+            }
+        }
+
+        .bel-sidebar-menu-title {
+            color: var(--bel-sidebar-text);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 12px;
+            margin-bottom: 12px;
+            padding-left: 15px;
+        }
+
+        .bel-sidebar-nav-link {
+            color: var(--bel-sidebar-text);
+            font-size: 1rem;
+            padding: 12px 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            border-radius: 4px;
+            text-align: start;
+            margin-bottom: 5px;
+        }
+
+        .bel-sidebar-nav-link i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .bel-sidebar-nav-link.active {
+            background-color: var(--bel-sidebar-active-bg);
+            color: var(--bel-sidebar-active-text);
+            font-weight: 600;
+        }
+        .bel-sidebar-nav-link:hover {
+            background-color: var(--bel-sidebar-active-bg);
+            color: var(--bel-sidebar-active-text);
+        }
+
+        /* View Switcher Styles */
+        .section-header-with-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        .section-header-with-controls .bel-h3 {
+            margin: 0 !important;
+        }
+        .view-switcher {
+            display: flex;
+            background-color: var(--bel-light-gray);
+            border-radius: 4px;
+            padding: 5px;
+        }
+        .view-switcher .view-btn {
+            padding: 8px 15px;
+            border: none;
+            background-color: transparent;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s ease-in-out;
+            color: var(--bel-dark-gray);
+        }
+        .view-switcher .view-btn.active {
+            background-color: #DFEBF7;
+            color: var(--bel-primary-blue);
+        }
+        .view-switcher .view-btn i {
+            margin-right: 5px;
+        }
+
+        /* Main Content Area */
+        .bel-main-content {
+            margin-left: var(--bel-sidebar-width);
+            padding: 30px;
+            flex-grow: 1;
+            max-width: calc(100% - var(--bel-sidebar-width));
+            overflow-x: hidden;
+        }
+
+        .bel-h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-top: 0;
+            line-height: 1.2;
+            text-align: start;
+            color: var(--bel-text-color);
+            margin-bottom: 24px;
+        }
+
+        .bel-h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-align: start;
+            margin-top: 2rem;
+            margin-bottom: 0.8rem;
+            color: var(--bel-text-color);
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--bel-text-color);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .section-title select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--bel-border-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+
+        .bel-grid-container {
+            display: grid;
+            gap: 24px;
+        }
+
+        .bel-stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+            margin-bottom: 24px;
+        }
+
+        .bel-card, .bel-panel {
+            background-color: var(--bel-card-bg);
+            border-radius: 4px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .bel-card-content {
+            flex-grow: 1;
+            display: flex; /* Make it a flex container */
+            flex-direction: column; /* Stack children vertically */
+        }
+
+        .bel-card-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--bel-text-color);
+            margin-bottom: 10px;
+        }
+
+        .bel-card-value {
+            font-size: 2.3rem;
+            font-weight: 800;
+            color: var(--bel-text-color);
+            line-height: 1.1;
+        }
+        .bel-card .trend-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .bel-card .trend-indicator.positive { color: #28a745; }
+        .bel-card .trend-indicator.negative { color: #dc3545; }
+        .bel-card .trend-indicator i { font-size: 0.8rem; }
+        .bel-card .trend-indicator-text {
+            font-weight: normal;
+            color: #999;
+        }
+
+
+        .bel-card-icon {
+            font-size: 1.5rem;
+            color: var(--bel-primary-orange);
+            background-color: #FAF3E6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bel-table {
+            width: 100%;
+            border-spacing: 0;
+            /* REMOVED table-layout: fixed; to allow natural column sizing */
+            word-wrap: break-word;
+        }
+        .bel-table th, .bel-table td {
+            padding: 8px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+
+        }
+
+
+        .bel-table th {
+            background-color: #DFEBF7;
+            font-weight: 600;
+            color: var(--bel-dark-gray);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+        .bel-table thead tr th:first-child {
+            border-top-left-radius: 4px;
+        }
+        .bel-table thead tr th:last-child {
+            border-top-right-radius: 4px;
+        }
+        .bel-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .bel-table tbody tr:hover { background-color: #F8F9FA; }
+        .bel-table th[data-sortable] {
+            cursor: pointer;
+            position: relative;
+            padding-right: 30px; /* Space for icon */
+        }
+        .bel-table th[data-sortable]::after {
+            content: '↕';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 0.8em;
+        }
+        .bel-table th[data-sort-dir="asc"]::after {
+            content: '↑';
+            color: var(--bel-primary-blue);
+        }
+        .bel-table th[data-sort-dir="desc"]::after {
+            content: '↓';
+            color: var(--bel-primary-blue);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+        }
+        .pie-chart-container {
+            max-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .line-chart-container {
+            aspect-ratio: 2 / 1;
+            max-height: 300px;
+        }
+        .bar-chart-container {
+            min-height: 350px;
+        }
+        .table-controls {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .table-controls .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .date-filter {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .date-filter i {
+            position: absolute;
+            left: 15px;
+            color: #999;
+        }
+        .date-filter input {
+            border: 1px solid var(--bel-border-color);
+            border-radius: 4px;
+            padding: 8px 15px 8px 40px;
+            font-weight: 500;
+            width: 250px;
+            background-color: var(--bel-card-bg);
+        }
+
+        .bel-form-group { margin-bottom: 0px; }
+        .bel-form-group label { display: block; margin-bottom: 2px; font-weight: 600; font-size: 0.9rem; color: #777;}
+        .bel-form-group input, .bel-form-group select {
+            width: 100%;
+            height: 44px;
+            padding: 8px 12px;
+            border: 1px solid var(--bel-border-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            background-color: var(--bel-card-bg);
+            transition: all 0.2s ease;
+        }
+
+        .editable-panel .bel-form-group input[readonly] {
+            border-color: transparent;
+            background-color: transparent;
+            padding-left: 0;
+            color: var(--bel-text-color);
+            cursor: default;
+        }
+        .editable-panel .save-cancel-buttons {
+            display: none;
+        }
+        .editable-panel.edit-mode .edit-button {
+            display: none;
+        }
+        .editable-panel.edit-mode .save-cancel-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .bel-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: var(--bel-primary-blue);
+            color: #fff !important;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            font-size: 1rem;
+        }
+        .bel-button:hover { background-color: #0262de; }
+
+        .bel-button.secondary {
+            background-color: #e8ecef;
+            color: var(--bel-dark-gray) !important;
+        }
+        .bel-button.secondary:hover { background-color: #CFD2D5; }
+
+        .bel-button.brand {
+            background-color: #F39800;
+            color: #FFFFFF !important;
+            font-size: 0.6rem;
+        }
+        .bel-button.brand:hover { background-color: #E57B03; }
+
+        .dashboard-welcome { font-size: 1.8rem; font-weight: 700; margin-bottom: 24px; color: var(--bel-text-color); }
+
+        .level-panel h4 { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; }
+        .level-panel p { color: #666; font-size: 0.9rem; line-height: 1.5; }
+        .referral-panel { display: flex; flex-direction: row; gap: 20px; align-items: center; }
+        .referral-panel .qr-code {
+        flex-shrink: 0;
+        width: 140px;
+        height: 140px;
+        border-radius: 4px;
+        border: 1px solid var(--bel-border-color);
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        }
+
+        .referral-panel .qr-code img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 4px;
+        }
+        .referral-panel .links { flex-grow: 1; display: flex; flex-direction: column; gap: 15px; width: 100%; }
+        .referral-input-group { position: relative; }
+        .referral-input-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
+        .referral-input-group input { width: 100%; padding: 10px 100px 10px 15px; border-radius: 4px; border: 1px solid var(--bel-border-color); background-color: #fafafa; font-family: monospace; font-size: 0.9rem; }
+        .referral-input-group .copy-button {  right: 5px; top: 31px; height: 34px; border: none; background-color: var(--ds-color-brand-dark); color: white; padding: 0 15px; border-radius: 4px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+        .referral-input-group .copy-button:hover { background-color: #004a99; }
+        .referral-inline {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        }
+        .referral-inline {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        }
+
+        .referral-inline input {
+        flex: 1;
+        padding: 10px 15px;
+        font-size: 0.9rem;
+        font-family: monospace;
+        border: 1px solid var(--bel-border-color);
+        border-radius: 4px;
+        background-color: #fafafa;
+        }
+
+        .referral-inline .copy-button {
+        height: 38px;
+        white-space: nowrap;
+        padding: 0 15px;
+        border: none;
+        border-radius: 4px;
+        background-color: var(--ds-color-brand-dark);
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        }
+
+        .referral-inline .copy-button:hover {
+        background-color: #004a99;
+        }
+
+        .scrollable-table-container {
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+
+        .level-milestone-container { padding: 10px 0; margin-top: 12px;}
+        .milestone-track { position: relative; height: 4px; background-color: #e0e0e0; border-radius: 4px; }
+        .milestone-progress { position: absolute; height: 100%; background-color: #ff9800; border-radius: 4px; width: 66.6%; }
+        .milestone-nodes { display: flex; justify-content: space-between; position: relative; top: -2px; }
+        .milestone-node { width: 8px; height: 8px; background-color: #fff; border: 3px solid #e0e0e0; border-radius: 50%; }
+        .milestone-node.completed { border-color: #ff9800; }
+        .milestone-node.active { border-color: #ff9800; background-color: #ff9800; }
+        .milestone-labels { display: flex; justify-content: space-between; padding: 0 10px; margin-top: 8px; }
+        .milestone-label { width: 60px; text-align: center; font-size: 0.8rem; font-weight: 600; color: #999; }
+        .milestone-label.active { color: #ff9800; }
+
+        .resource-filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-btn { background-color: var(--bel-light-gray); border: 1px solid var(--bel-border-color); padding: 8px 16px; border-radius: 50px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
+        .filter-btn:hover { background-color: #e0e0e0; }
+        .filter-btn.active { background-color: var(--bel-primary-blue); color: #fff; border-color: var(--bel-primary-blue); }
+        .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .resource-card { background-color: #FFFFFF;border-radius: 4px; transition: transform 0.6s;}
+        .resource-card:hover { transform: scale(1.02); }
+        .resource-card .thumbnail { position: relative; overflow: hidden; border-radius: 4px; height: fit-content;}
+        .resource-card .thumbnail img { width: 100%; object-fit: cover; }
+        .resource-card a {text-decoration: none; color: var(--bel-text-color); font-weight: 600;}
+        .resource-card p {padding-top: 4px;padding-left: 12px; padding-right: 12px; padding-bottom: 12px; text-decoration: none; color: var(--bel-text-color); font-weight: 600;}
+        .resource-card-copy { padding-left: 12px; padding-right: 12px; padding-bottom: 12px; display: flex; flex-direction: column; }
+        .resource-card-copy .bel-button { align-self: flex-end; /* Align the button to the end of the flex container */ }
+
+        .faq-item { border-bottom: 1px solid #e0e0e0; }
+        .faq-question { width: 100%; background: none; border: none; text-align: left; padding: 16px 0; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .faq-question::after { content: '\f078'; font-family: "Font Awesome 6 Free"; font-weight: 900; transition: transform 0.2s ease; }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; padding: 0 16px; }
+        .faq-item.active .faq-answer { max-height: 200px; padding-bottom: 16px; }
+        .faq-item.active .faq-question::after { transform: rotate(180deg); }
+
+        /* New Styles for Earnings Page */
+        .earnings-summary-panel {
+            text-align: center;
+        }
+        .earnings-summary-panel .total-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--bel-dark-gray);
+        }
+        .earnings-summary-panel .total-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #F39800;
+        }
+        .sub-earnings {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--bel-border-color);
+        }
+        .sub-earnings > div {
+            text-align: center;
+        }
+        .sub-earnings .sub-title {
+            font-size: 0.9rem;
+            color: #777;
+            font-weight: 600;
+        }
+        .sub-earnings .sub-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        /* Tooltip styles */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .tooltip-icon {
+            font-size: 0.9rem;
+            color: var(--bel-dark-gray);
+            vertical-align: middle;
+        }
+        .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: var(--bel-dark-gray);
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; /* Position above the icon */
+            left: 50%;
+            margin-left: -125px; /* Center the tooltip */
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            font-weight: 400;
+        }
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--bel-dark-gray) transparent transparent transparent;
+        }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .earnings-summary-panel .total-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-processing { background-color: #DFEBF7;color: #006EFF; }
+        .status-canceled { background-color: #FFEFEE;color: #B52F2F; }
+        .status-completed { background-color: #D0E6D4;color: #00893A; }
+        .order-info-panel {
+            background-color: #e9f5ff;
+            padding: 15px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+        }
+        .order-info-panel h4 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .order-info-panel p {
+            margin-bottom: 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .order-info-panel .status-badge {
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: 1fr 1fr ;
+        }
+        .grid-cols-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+        .grid-cols-6 {
+            grid-template-columns: repeat(6, 1fr);
+        }
+        
+        .performance-grid {
+            display: grid;
+            grid-template-columns: 3fr 7fr;
+            gap: 24px;
+            align-items: center;
+
+        }
+        .performance-charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .product-analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        
+        .flex-center {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .level-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-align: center;
+            min-width: 80px;
+        }
+        .level-tag-builder { background-color: #DFEBF7; color: #006EFF; }
+        .level-tag-enabler { background-color: #D0E6D4; color: #00893A; }
+        .level-tag-explorer { background-color: #FAF3E6; color: #F39800; }
+        .level-tag-leader { background-color: #FFEFEE; color: #DB3A3A; }
+
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .panel-header h3 { margin: 0; font-size: 1.2rem; }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 12px;
+            border-bottom: 1px solid var(--bel-border-color);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .settings-row:last-child { border-bottom: none; }
+        .settings-row:hover { background-color: var(--bel-light-gray); }
+        .settings-row .icon { font-size: 1.2rem; color: var(--bel-dark-gray); margin-right: 15px; width: 20px; text-align: center;}
+        .settings-row .text-content { flex-grow: 1; }
+        .settings-row .text-content h4 { font-size: 1rem; margin: 0; }
+        .settings-row .text-content p { font-size: 0.9rem; color: #777; margin: 0; }
+        .settings-row .current-value { font-size: 0.9rem; color: #555; margin-right: 15px; }
+        .settings-row .current-value .dot-password { font-family: monospace; font-size: 1.2rem; }
+        #language-select-group { display: none; align-items: center;}
+        .settings-row .arrow { color: #aaa; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 1100px; /* Adjusted width for new modal */
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bel-border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 { margin: 0; font-size: 1.4rem; }
+        .modal-header .close-button {
+            font-size: 1.8rem;
+            color: #aaa;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+
+        @media (max-width: 1200px) {
+             .bel-stats-cards {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+        @media (max-width: 992px) {
+            .grid-cols-2, .grid-cols-3, .grid-cols-6, .performance-grid {
+                grid-template-columns: 1fr;
+            }
+            .flex-center {
+                height: auto; /* Disable fixed height on stack */
+            }
+        }
+        @media (max-width: 768px) {
+            .bel-header { width: 100%; margin-left: 0; padding: 0 15px; justify-content: space-between; }
+            .bel-header-content { justify-content: flex-end; }
+            .bel-hamburger-menu { display: block !important; margin-right: auto; }
+            .bel-sidebar { transform: translateX(-100%); z-index: 999; top: 0; bottom: 0; left: 0; height: 100vh; padding-top: 90px; }
+            .bel-sidebar.open { transform: translateX(0); }
+            .bel-main-content { margin-left: 0; padding: 20px; max-width: 100%; }
+            .bel-grid-container { grid-template-columns: 1fr; }
+            .bel-stats-cards { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+            .referral-panel { flex-direction: column; }
+            .settings-row { flex-wrap: wrap; }
+            .settings-row .current-value { width: 100%; margin-top: 5px; }
+        }
+        @media (max-width: 576px) {
+            .grid-cols-2, .product-analysis-grid, .grid-cols-3, .grid-cols-6, .performance-charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* --- Optimized Modal Styles --- */
+        .modal-header .bel-profile-identifier {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .modal-avatar-small {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--bel-primary-blue);
+        }
+        .modal-header .bel-profile-info h3 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .modal-header .bel-profile-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .modal-body-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* 70% 30% split */
+            gap: 30px;
+            padding-top: 15px;
+        }
+
+        .modal-left-pane {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            border-bottom: 2px solid var(--bel-border-color);
+            margin-bottom: 20px;
+        }
+        .tab-link {
+            border: none;
+            background: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #777;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+        .tab-link i {
+            margin-right: 8px;
+        }
+        .tab-link:hover {
+            color: var(--bel-primary-blue);
+        }
+        .tab-link.active {
+            color: var(--bel-primary-blue);
+            border-bottom: 3px solid var(--bel-primary-blue);
+            margin-bottom: -2px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-content h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+        /* Metric Cards */
+        .metric-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        .metric-card {
+            background-color: var(--bel-light-gray);
+            border-radius: 4px;
+            padding: 15px;
+            text-align: center;
+        }
+        .metric-card span {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .metric-card strong {
+            display: block;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--bel-primary-blue);
+        }
+
+        /* Right Pane */
+        .modal-right-pane {
+            background-color: var(--bel-light-gray);
+            padding: 20px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .modal-right-pane h4 {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        .modal-right-pane .bel-form-group {
+            margin-bottom: 0;
+        }
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        /* Notes History */
+        .notes-history {
+            max-height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-right: 10px; /* for scrollbar */
+        }
+        .note-item {
+            background: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 3px solid var(--bel-primary-orange);
+            font-size: 0.85rem;
+        }
+        .note-item p { margin: 0 0 5px 0; }
+        .note-item span {
+            font-size: 0.75rem;
+            color: #777;
+        }
+        .add-note-form textarea {
+            width: 100%;
+            min-height: 80px;
+            border: 1px solid var(--bel-border-color);
+            border-radius: 4px;
+            padding: 8px;
+            resize: vertical;
+            margin-bottom: 8px;
+        }
+
+        /* Insights Tab */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .insight-tag {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .product-list {
+            padding-left: 20px;
+        }
+        .product-list li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+                /* --- UI Fine-tuning for BEL Board --- */
+        .filters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; align-items: end; }
+        .filters-grid .bel-form-group { gap: 4px; }
+        .bel-form-group label { font-size: 0.8rem; font-weight: 600; color: var(--bel-dark-gray); }
+        .bel-input, .bel-select {
+            width: 100%; padding: 8px 12px; border: 1px solid var(--bel-border-color); border-radius: 4px; font-size: 0.9rem; background-color: var(--bel-card-bg); transition: all 0.2s ease;
+        }
+        .filters-actions { grid-column: 1 / -1; display: flex; gap: 10px; justify-content: flex-end; }
+
+        .bel-btn {
+            display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; background-color: #e8ecef; color: var(--bel-dark-gray); border: none; border-radius: 4px; cursor: pointer; font-weight: 600; transition: background-color 0.2s ease; font-size: 0.8rem;
+        }
+        .bel-btn:hover { background-color: #CFD2D5; }
+        .bel-btn.primary { background-color: var(--bel-primary-blue); color: #fff; }
+        .bel-btn.primary:hover { background-color: #0262de; }
+
+        .batch-actions { display: flex; align-items: center; justify-content: space-between; margin: 24px 0 12px; font-size: 0.9rem; }
+        .batch-actions .left { display: flex; align-items: center; gap: 12px; }
+        .batch-actions .right { display: flex; gap: 10px; }
+
+        .scrollable-table-container { border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,.03); border: 1px solid var(--bel-border-color); }
+
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
+        .status-completed { background-color: #D0E6D4;color: #00893A; }
+        .status-pending { background-color: #FAF3E6; color: #F39800; }
+        .status-failed { background-color: #FFEFEE;color: #B52F2F; }
+        .status-approved { background-color: #dbeafe; color: #1e40af; }
+        .status-rejected { background-color: #fee2e2; color: #991b1b; }
+
+        .pagination-bar { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; font-size: 0.9rem; }
+        .pagination-controls { display: flex; align-items: center; gap: 8px; }
+        .rows-select { display: inline-flex; align-items: center; gap: 8px; }
+
+        /* Table Sorting Styles */
+        .bel-table th[data-sortable] {
+            cursor: pointer;
+            position: relative;
+            padding-right: 24px;
+        }
+        .bel-table th[data-sortable]::after {
+            content: ' ';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            border: 4px solid transparent;
+        }
+        .bel-table th[data-sortable]:hover {
+            background-color: #f0f2f5;
+        }
+        .bel-table th[data-sort-dir="asc"]::after {
+            content: ' ';
+            border-bottom-color: var(--bel-primary-blue);
+            margin-top: -6px;
+        }
+        .bel-table th[data-sort-dir="desc"]::after {
+            content: ' ';
+            border-top-color: var(--bel-primary-blue);
+            margin-top: -2px;
+        }
+
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+</head>
+<body>
+
+    <header class="bel-header">
+        <i class="bel-hamburger-menu fas fa-bars" id="bel-hamburger-btn"></i>
+        <div class="bel-header-content">
+            <div class="bel-sidebar-logo">
+                <img src="https://irp.cdn-website.com/56869327/dms3rep/multi/iotmart-logo.svg" alt="logo">
+                <span>BEL Management Portal</span>
+            </div>
+            <div class="bel-header-right">
+                <div class="bel-notification-bell" id="notification-bell">
+                    <i class="fas fa-bell"></i>
+                    <div class="dot"></div>
+                </div>
+                <div class="bel-notification-panel" id="notification-panel">
+                    <div class="bel-notification-header">Announcements</div>
+                    <ul class="bel-notification-list">
+                        <li class="bel-notification-item">
+                            <div class="title"><span class="tag important">Important</span>September Earnings Payout Postponed</div>
+                            <div class="date">2025-08-26</div>
+                        </li>
+                        <li class="bel-notification-item">
+                            <div class="title"><span class="tag new-product">New Campaign</span>ADAM Remote I/O Series are now available for promotion</div>
+                            <div class="date">2025-08-25</div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bel-user-profile">
+                    <img src="https://irp.cdn-website.com/56869327/dms3rep/multi/AVATAR-G.png" alt="User Avatar">
+                </div>
+                <div class="user-profile-panel" id="user-profile-panel">
+                    <div class="panel-content">
+                        <div class="user-info">
+                            <span class="user-name">Maxwell</span>
+                            <span class="user-email">Maxwell.Walker@example.com</span>
+                        </div>
+                        <div class="user-level">
+                            <span class="level-badge"><i class="fas fa-rocket"></i> Explorer</span>
+                        </div>
+                        <hr class="divider">
+                        <a href="#my-account" class="panel-link">My Account</a>
+                        <a href="#" class="panel-link">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="bel-container">
+        <aside class="bel-sidebar" id="bel-sidebar">
+            <div class="bel-sidebar-menu-title">MAIN MENU</div>
+            <nav class="bel-sidebar-nav">
+                <a href="#dashboard" class="bel-sidebar-nav-link"><i class="fas fa-tachometer-alt fa-fw"></i><span>Dashboard</span></a>
+                <a href="#BEL-board" class="bel-sidebar-nav-link active"><i class="fas fa-user-circle fa-fw"></i><span>BEL Board</span></a>
+                <a href="#payouts-order" class="bel-sidebar-nav-link"><i class="fas fa-wallet fa-fw"></i><span>Payouts & Orders</span></a>
+                <a href="#content" class="bel-sidebar-nav-link"><i class="fas fa-folder fa-fw"></i><span>Content</span></a>
+            </nav>
+            <div class="bel-sidebar-menu-title">HELP & SUPPORT</div>
+            <nav class="bel-sidebar-nav">
+                <a href="#support-comm" class="bel-sidebar-nav-link"><i class="fas fa-question-circle fa-fw"></i><span>Support & Comm</span></a>
+            </nav>
+        </aside>
+
+        <div class="bel-main-content" id="bel-main-content">
+            
+            <div id="dashboard" class="content-section active">
+                 <h1 class="bel-h1">Dashboard</h1>
+                                 <div class="bel-stats-cards grid-cols-3">
+                    <div class="bel-card">
+                        <div style="width: 100%;display: flex; flex-direction: row; justify-content: space-between;">
+                            <div>
+                                <div class="bel-card-title">BEL Count</div>
+                                <div class="bel-card-value">152</div>
+                            </div>
+                            <div class="bel-card-icon"><i class="fas fa-users"></i></div>
+                        </div>
+                        <div class="trend-indicator positive"><i class="fas fa-caret-up"></i> +5.1% <span class="trend-indicator-text">Since last month</span></div>
+                    </div>
+                    <div class="bel-card">
+                        <div style="width: 100%;display: flex; flex-direction: row; justify-content: space-between;">
+                            <div>
+                                <div class="bel-card-title">Total Clicks</div>
+                                <div class="bel-card-value">13,492</div>
+                            </div>
+                            <div class="bel-card-icon"><i class="fas fa-mouse-pointer"></i></div>
+                        </div>
+                        <div class="trend-indicator positive"><i class="fas fa-caret-up"></i> +12.3% <span class="trend-indicator-text">Since last month</span></div>
+                    </div>
+                    <div class="bel-card">
+                        <div style="width: 100%;display: flex; flex-direction: row; justify-content: space-between;">
+                            <div>
+                                <div class="bel-card-title">Total Orders</div>
+                                <div class="bel-card-value">851</div>
+                            </div>
+                            <div class="bel-card-icon"><i class="fas fa-shopping-cart"></i></div>
+                        </div>
+                        <div class="trend-indicator positive"><i class="fas fa-caret-up"></i> +8.2% <span class="trend-indicator-text">Since last month</span></div>
+                    </div>
+                    <div class="bel-card">
+                        <div style="width: 100%;display: flex; flex-direction: row; justify-content: space-between;">
+                            <div>
+                                <div class="bel-card-title">Revenue</div>
+                                <div class="bel-card-value">$120k</div>
+                            </div>
+                            <div class="bel-card-icon"><i class="fas fa-dollar-sign"></i></div>
+                        </div>
+                        <div class="trend-indicator positive"><i class="fas fa-caret-up"></i> +15.8% <span class="trend-indicator-text">Since last month</span></div>
+                    </div>
+                    <div class="bel-card">
+                        <div style="width: 100%;display: flex; flex-direction: row; justify-content: space-between;">
+                            <div>
+                                <div class="bel-card-title">Conv Rate</div>
+                                <div class="bel-card-value">6.31%</div>
+                            </div>
+                            <div class="bel-card-icon"><i class="fas fa-bullseye"></i></div>
+                        </div>
+                        <div class="trend-indicator negative"><i class="fas fa-caret-down"></i> -0.5% <span class="trend-indicator-text">Since last month</span></div>
+                    </div>
+                    <div class="bel-card">
+                        <div style="width: 100%;display: flex; flex-direction: row; justify-content: space-between;">
+                            <div>
+                                <div class="bel-card-title">AOV</div>
+                                <div class="bel-card-value">$141.5</div>
+                            </div>
+                            <div class="bel-card-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                        </div>
+                        <div class="trend-indicator positive"><i class="fas fa-caret-up"></i> +2.1% <span class="trend-indicator-text">Since last month</span></div>
+                    </div>
+                </div>
+                
+                <h3 class="bel-h3">BEL Performance by Level</h3>
+                <div class="bel-panel">
+                    <div class="performance-grid">
+                        <div style="width: 360px;">
+                            <h4 style="font-size: 1rem; margin-bottom: 20px; text-align: center;">BEL Level Distribution</h4>
+                            <div class="chart-container pie-chart-container" style="width: 360px;">
+                                <canvas id="level-pie-chart" style="width: 360px;"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="flex-center" style="display: flex; flex-direction: column;">
+                             <div class="view-toggle-buttons" style="margin-bottom: 1rem; align-self: flex-end;">
+                                <button class="bel-button secondary view-toggle-btn active" data-view="table">Table</button>
+                                <button class="bel-button secondary view-toggle-btn" data-view="chart">Chart</button>
+                            </div>
+                            
+                            <div class="scrollable-table-container view-content" id="performance-table-view">
+                                <table class="bel-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Level</th>
+                                            <th>Total Clicks</th>
+                                            <th>Revenue</th>
+                                            <th>Orders</th>
+                                            <th>Conv. Rate</th>
+                                            <th>AOV</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="level-tag level-tag-builder">Builder</span></td>
+                                            <td>8,000</td>
+                                            <td>$65,000</td>
+                                            <td>510</td>
+                                            <td>6.8%</td>
+                                            <td>$127.45</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="level-tag level-tag-enabler">Enabler</span></td>
+                                            <td>3,500</td>
+                                            <td>$35,000</td>
+                                            <td>255</td>
+                                            <td>6.1%</td>
+                                            <td>$137.25</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="level-tag level-tag-explorer">Explorer</span></td>
+                                            <td>1,500</td>
+                                            <td>$15,000</td>
+                                            <td>75</td>
+                                            <td>5.5%</td>
+                                            <td>$200.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="level-tag level-tag-leader">Leader</span></td>
+                                            <td>492</td>
+                                            <td>$5,000</td>
+                                            <td>11</td>
+                                            <td>5.1%</td>
+                                            <td>$454.55</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="view-content" id="performance-chart-view" style="display: none; width: 100%; height: 300px;">
+                                <canvas id="performance-percentage-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="bel-h3">Top 10 BEL Performance Leaderboard</h3>
+                <div class="bel-panel">
+                    <div class="scrollable-table-container">
+                        <table class="bel-table" id="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th data-sortable>Referral ID</th>
+                                    <th data-sortable>Name</th>
+                                    <th data-sortable>Level</th>
+                                    <th data-sortable data-type="number">Clicks</th>
+                                    <th data-sortable data-type="number">Orders</th>
+                                    <th data-sortable data-type="number">Revenue</th>
+                                    <th data-sortable data-type="number">Conv. Rate</th>
+                                    <th data-sortable data-type="number">AOV</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td ><a href="#" class="bel-id-link open-bel-popup">A8C1E3F</a></td>
+                                    <td>Maxwell Walker</td>
+                                    <td><span class="level-tag level-tag-explorer">Explorer</span></td>
+                                    <td >1,280</td>
+                                    <td >35</td>
+                                    <td >$8,500</td>
+                                    <td >2.73%</td>
+                                    <td >$242.86</td>
+                                </tr>
+                                <tr>
+                                    <td ><a href="#" class="bel-id-link open-bel-popup">B2D5G8H</a></td>
+                                    <td>Olivia Chen</td>
+                                    <td><span class="level-tag level-tag-builder">Builder</span></td>
+                                    <td >1,150</td>
+                                    <td >32</td>
+                                    <td >$7,800</td>
+                                    <td >2.78%</td>
+                                    <td >$243.75</td>
+                                </tr>
+                                <tr>
+                                    <td ><a href="#" class="bel-id-link open-bel-popup">C4E6H1J</a></td>
+                                    <td>Liam Müller</td>
+                                    <td><span class="level-tag level-tag-enabler">Enabler</span></td>
+                                    <td >980</td>
+                                    <td >28</td>
+                                    <td >$7,200</td>
+                                    <td >2.86%</td>
+                                    <td >$257.14</td>
+                                </tr>
+                                <tr>
+                                    <td ><a href="#" class="bel-id-link open-bel-popup">D9F8K2L</a></td>
+                                    <td>Sophia Dubois</td>
+                                    <td><span class="level-tag level-tag-builder">Builder</span></td>
+                                    <td >950</td>
+                                    <td >25</td>
+                                    <td >$6,500</td>
+                                    <td >2.63%</td>
+                                    <td >$260.00</td>
+                                </tr>
+                                <tr>
+                                    <td ><a href="#" class="bel-id-link open-bel-popup">E3G7J9M</a></td>
+                                    <td>Kenji Tanaka</td>
+                                    <td><span class="level-tag level-tag-leader">Leader</span></td>
+                                    <td >880</td>
+                                    <td >22</td>
+                                    <td >$6,100</td>
+                                    <td >2.50%</td>
+                                    <td >$277.27</td>
+                                </tr>
+                                 <tr>
+                                    <td ><a href="#" class="bel-id-link open-bel-popup">F1H5L3N</a></td>
+                                    <td>Isabella Rossi</td>
+                                    <td><span class="level-tag level-tag-enabler">Enabler</span></td>
+                                    <td >820</td>
+                                    <td >21</td>
+                                    <td >$5,800</td>
+                                    <td >2.56%</td>
+                                    <td >$276.19</td>
+                                </tr>
+                                <tr>
+                                    <td ><a href="#" class="bel-id-link open-bel-popup">G6J2M4P</a></td>
+                                    <td>Noah Kim</td>
+                                    <td><span class="level-tag level-tag-builder">Builder</span></td>
+                                    <td >790</td>
+                                    <td >20</td>
+                                    <td >$5,500</td>
+                                    <td >2.53%</td>
+                                    <td >$275.00</td>
+                                </tr>
+                                <tr>
+                                    <td ><a href="#" class="bel-id-link open-bel-popup">H8K4N6R</a></td>
+                                    <td>Ava Schmidt</td>
+                                    <td><span class="level-tag level-tag-builder">Builder</span></td>
+                                    <td >750</td>
+                                    <td >18</td>
+                                    <td >$5,100</td>
+                                    <td >2.40%</td>
+                                    <td >$283.33</td>
+                                </tr>
+                                <tr>
+                                    <td ><a href="#" class="bel-id-link open-bel-popup">J2M7P9S</a></td>
+                                    <td>Lucas Garcia</td>
+                                    <td><span class="level-tag level-tag-explorer">Explorer</span></td>
+                                    <td >710</td>
+                                    <td >17</td>
+                                    <td >$4,800</td>
+                                    <td >2.39%</td>
+                                    <td >$282.35</td>
+                                </tr>
+                                <tr>
+                                    <td ><a href="#" class="bel-id-link open-bel-popup">K5N8R1T</a></td>
+                                    <td>Mia Wang</td>
+                                    <td><span class="level-tag level-tag-enabler">Enabler</span></td>
+                                    <td >680</td>
+                                    <td >15</td>
+                                    <td >$4,500</td>
+                                    <td >2.21%</td>
+                                    <td >$300.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <h3>Product Sales Analysis</h3>
+                </div>
+                <div class="bel-panel">
+                    <div class="product-analysis-grid">
+                         <div>
+                            <h4 style="font-size: 1rem; margin-bottom: 10px;">Top 5 Product Category Analysis</h4>
+                            <div class="chart-container bar-chart-container">
+                                <canvas id="product-category-chart" style="width: 50%;"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 1rem; margin-bottom: 10px;">Top 20 Products</h4>
+                            <div class="scrollable-table-container" style="max-height: 350px;">
+                                <table class="bel-table" style="margin-top:0;">
+                                    <thead><tr><th style="width:24px;"></th><th style="width:160px;">Product</th><th>Price</th><th>Units</th><th>Total</th></tr></thead>
+                                    <tbody>
+                                        <tr><td>1</td><td>ADAM-6017</td><td>$150</td><td>20</td><td>$3000</td></tr>
+                                        <tr><td>2</td><td>AIM-68G0</td><td>$280</td><td>8</td><td>$2,240</td></tr>
+                                        <tr><td>3</td><td>ARK-1220</td><td>$410</td><td>6</td><td>$2,460</td></tr>
+                                        <tr><td>4</td><td>PCE-5129</td><td>$520</td><td>5</td><td>$2,600</td></tr>
+                                        <tr><td>5</td><td>UNO-2271G</td><td>$350</td><td>4</td><td>$1,400</td></tr>
+                                        <tr><td>6</td><td>EKI-2525</td><td>$90</td><td>15</td><td>$1,350</td></tr>
+                                        <tr><td>7</td><td>WISE-4012E</td><td>$120</td><td>11</td><td>$1,320</td></tr>
+                                        <tr><td>8</td><td>TPC-1551T</td><td>$800</td><td>3</td><td>$2,400</td></tr>
+                                        <tr><td>9</td><td>MIC-770</td><td>$1,200</td><td>2</td><td>$2,400</td></tr>
+                                        <tr><td>10</td><td>ADAM-6250</td><td>$210</td><td>7</td><td>$1,470</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="BEL-board" class="content-section">
+                <h1 class="bel-h1">BEL Board</h1>
+
+                <div class="bel-panel">
+                <h3 class="bel-h3" style="margin-top:0; font-size: 1.25rem;">Filters</h3>
+                <form id="bel-filters" class="filters-grid">
+                    <div class="bel-form-group">
+                    <label for="f-keyword">Keyword</label>
+                    <input id="f-keyword" class="bel-input" type="search" placeholder="Search name, ID, or code" />
+                    </div>
+                    <div class="bel-form-group">
+                    <label for="f-level">Level</label>
+                    <select id="f-level" class="bel-select">
+                        <option value="">All Levels</option>
+                        <option>Builder</option>
+                        <option>Enabler</option>
+                        <option>Explorer</option>
+                        <option>Leader</option>
+                    </select>
+                    </div>
+                    <div class="bel-form-group">
+                    <label for="f-region">Region</label>
+                    <select id="f-region" class="bel-select">
+                        <option value="">All Regions</option>
+                    </select>
+                    </div>
+                    <div class="bel-form-group">
+                    <label for="f-start">Registered From</label>
+                    <input id="f-start" class="bel-input" type="date" />
+                    </div>
+                    <div class="bel-form-group">
+                    <label for="f-end">Registered To</label>
+                    <input id="f-end" class="bel-input" type="date" />
+                    </div>
+                    <div class="bel-form-group">
+                    <label for="f-activity">Last 30 Days Activity</label>
+                    <select id="f-activity" class="bel-select">
+                        <option value="">Any activity</option>
+                        <option value="clicks">Has clicks only</option>
+                        <option value="orders">Has orders</option>
+                        <option value="none">No activity</option>
+                    </select>
+                    </div>
+                    <div class="filters-actions">
+                    <button type="button" id="apply-filters" class="bel-btn primary"><i class="fas fa-filter"></i> Apply</button>
+                    <button type="reset" id="reset-filters" class="bel-btn"><i class="fas fa-undo"></i> Reset</button>
+                    </div>
+                </form>
+                </div>
+
+                <div class="batch-actions">
+                <div class="left">
+                    <input type="checkbox" id="select-all-page" style="transform: scale(1.2); margin-right: 4px;"/>
+                    <label for="select-all-page">Select all</label>
+                    <span class="text-muted" id="selected-count">0 selected</span>
+                </div>
+                <div class="right">
+                    <button class="bel-btn" id="export-csv"><i class="fas fa-file-export"></i> Export CSV</button>
+                </div>
+                </div>
+
+                <div class="scrollable-table-container">
+                <table class="bel-table" id="bel-table">
+                    <thead>
+                    <tr>
+                        <th><input type="checkbox" id="th-select" aria-label="Select all on this page" /></th>
+                        <th data-sortable="id">Referral ID</th>
+                        <th data-sortable="name">Name</th>
+                        <th data-sortable="level">Level</th>
+                        <th data-sortable="joined">Joined</th>
+                        <th data-sortable="clicks30" style="text-align: right;">Clicks (30d)</th>
+                        <th data-sortable="orders30" style="text-align: right;">Orders (30d)</th>
+                        <th data-sortable="revenue30" style="text-align: right;">Revenue (30d)</th>
+                        <th style="text-align: right;">Conv. Rate</th>
+                        <th style="text-align: right;">AOV</th>
+                        <th data-sortable="country">Primary Market</th>
+                        <th data-sortable="status">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                </div>
+
+                <div class="pagination-bar">
+                <div class="rows-select">
+                    <label for="rows-per-page">Rows per page</label>
+                    <select id="rows-per-page" class="bel-select" style="width: 70px;">
+                    <option>10</option>
+                    <option selected>20</option>
+                    <option>50</option>
+                    </select>
+                </div>
+                <div class="pagination-controls">
+                    <span id="range-label" class="text-muted">0–0 of 0</span>
+                    <button class="bel-btn" id="prev-page" aria-label="Previous page"><i class="fas fa-chevron-left"></i></button>
+                    <button class="bel-btn" id="next-page" aria-label="Next page"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                </div>
+            </div>
+            <div id="payouts-order" class="content-section">
+                 <h1 class="bel-h1">Payouts & Orders</h1>
+                 <p>Payouts & Orders content will go here...</p>
+            </div>
+            <div id="content" class="content-section">
+                 <h1 class="bel-h1">Content</h1>
+                 <p>Content management will go here...</p>
+            </div>
+            <div id="support-comm" class="content-section">
+                 <h1 class="bel-h1">Support & Comm</h1>
+                 <p>Support & Communication content will go here...</p>
+            </div>
+        </div>
+    </main>
+    
+    <div class="modal-overlay" id="bel-details-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="bel-profile-identifier">
+                    <img src="https://irp.cdn-website.com/56869327/dms3rep/multi/AVATAR-G.png" alt="User Avatar" class="modal-avatar-small">
+                    <div class="bel-profile-info">
+                        <h3 id="modal-bel-name">Maxwell Walker</h3>
+                        <p id="modal-bel-info">ID: A8C1E3F • Joined: 2023-01-15 • Code: MAXWELL25</p>
+                    </div>
+                </div>
+                <button class="close-button">&times;</button>
+            </div>
+
+            <div class="modal-body-grid">
+                <div class="modal-left-pane">
+                    <div class="tab-navigation">
+                        <button class="tab-link active" data-tab="overview"><i class="fas fa-chart-line"></i> Performance</button>
+                        <button class="tab-link" data-tab="payouts"><i class="fas fa-wallet"></i> Payouts</button>
+                        <button class="tab-link" data-tab="insights"><i class="fas fa-lightbulb"></i> Customer Insights</button>
+                    </div>
+
+                    <div class="tab-content active" id="overview">
+                        <h4>Performance Metrics (All Time)</h4>
+                        <div class="metric-cards-grid">
+                            <div class="metric-card"><span>Total Clicks</span><strong>12,830</strong></div>
+                            <div class="metric-card"><span>Total Orders</span><strong>98</strong></div>
+                            <div class="metric-card"><span>Total Revenue</span><strong>$98.5k</strong></div>
+                        </div>
+                        <div class="chart-container" style="height: 250px; margin-top: 2rem;">
+                            <canvas id="bel-performance-trend-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="payouts">
+                        <h4>Financial Information</h4>
+                         <div class="bel-grid-container grid-cols-2" style="margin-bottom: 24px;">
+                            <div class="bel-card" style="padding: 16px; background-color: #e3f2fd;"><div class="bel-card-title">Total Payouts</div><div class="bel-card-value" style="font-size: 1.5rem;">$7,500</div></div>
+                            <div class="bel-card" style="padding: 16px; background-color: #fff3e0;"><div class="bel-card-title">Pending Payout</div><div class="bel-card-value" style="font-size: 1.5rem;">$1,250</div></div>
+                        </div>
+                        <h4>Recent Payout History</h4>
+                        <div class="scrollable-table-container">
+                             <table class="bel-table">
+                                <thead><tr><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+                                <tbody>
+                                    <tr><td>2025-08-05</td><td>$1,520.00</td><td><span class="status-badge status-completed">Completed</span></td></tr>
+                                    <tr><td>2025-07-05</td><td>$1,330.00</td><td><span class="status-badge status-completed">Completed</span></td></tr>
+                                    <tr><td>2025-06-05</td><td>$800.00</td><td><span class="status-badge status-completed">Completed</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="insights">
+                        <h4>Top Purchased Categories</h4>
+                        <div class="tags-container">
+                            <span class="insight-tag">Smart Home</span>
+                            <span class="insight-tag">Sensors</span>
+                            <span class="insight-tag">Industrial PC</span>
+                        </div>
+
+                        <h4>Top 5 Products Purchased by Referrals</h4>
+                        <ol class="product-list">
+                            <li>Smart Lock Pro</li>
+                            <li>Environment Sensor Gen 2</li>
+                            <li>Smart Bulb Kit</li>
+                            <li>ADAM-6017</li>
+                            <li>UNO-2271G</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="modal-right-pane">
+                    <h4>Management</h4>
+                    <div class="bel-form-group">
+                        <label for="level-adjustment">Adjust Level</label>
+                        <select id="level-adjustment">
+                            <option value="builder">Builder</option>
+                            <option value="enabler">Enabler</option>
+                            <option value="explorer" selected>Explorer</option>
+                            <option value="leader">Leader</option>
+                        </select>
+                    </div>
+                    <div class="bel-form-group">
+                        <label for="internal-tags">Tags</label>
+                        <input type="text" id="internal-tags" value="Potential Partner, Q4 Focus">
+                    </div>
+                     <div class="modal-actions">
+                        <button class="bel-button"><i class="fas fa-save"></i> Save Changes</button>
+                        <button class="bel-button secondary"><i class="fas fa-paper-plane"></i> Send Notification</button>
+                    </div>
+                    
+                    <hr class="divider">
+
+                    <h4>Internal Notes (Audit Trail)</h4>
+                    <div class="notes-history">
+                        <div class="note-item">
+                            <p>Contacted to confirm partnership interest, samples will be sent.</p>
+                            <span><strong>Admin</strong> - 2025-08-15 10:30</span>
+                        </div>
+                        <div class="note-item">
+                            <p>Observed high community engagement rate, recommend designating as a key partner.</p>
+                            <span><strong>Manager</strong> - 2025-07-20 15:00</span>
+                        </div>
+                    </div>
+                    <div class="add-note-form">
+                        <textarea placeholder="Add a new note..."></textarea>
+                        <button class="bel-button secondary" style="width: 100%;">Add Note</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+'use strict';
+document.addEventListener('DOMContentLoaded', () => {
+  /* --------------------------- Shell / Nav --------------------------- */
+  const sidebar = document.getElementById('bel-sidebar');
+  const hamburgerBtn = document.getElementById('bel-hamburger-btn');
+  const contentLinks = document.querySelectorAll('.bel-sidebar-nav-link');
+  const contentSections = document.querySelectorAll('.content-section');
+  const notificationBell = document.getElementById('notification-bell');
+  const notificationPanel = document.getElementById('notification-panel');
+  const userProfile = document.querySelector('.bel-user-profile');
+  const userProfilePanel = document.getElementById('user-profile-panel');
+
+  hamburgerBtn?.addEventListener('click', () => sidebar?.classList.toggle('open'));
+
+  function showContent(targetId) {
+    contentSections.forEach(s => s.classList.remove('active'));
+    const el = document.getElementById(targetId);
+    if (el) {
+      el.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  contentLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href').substring(1);
+      showContent(targetId);
+      contentLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      if (window.innerWidth <= 768) sidebar?.classList.remove('open');
+    });
+  });
+
+  notificationBell?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notificationPanel?.classList.toggle('show');
+  });
+  window.addEventListener('click', (e) => {
+    if (notificationPanel && !notificationPanel.contains(e.target) && !notificationBell?.contains(e.target)) {
+      notificationPanel.classList.remove('show');
+    }
+    if (userProfilePanel && !userProfilePanel.contains(e.target) && !userProfile?.contains(e.target)) {
+      userProfilePanel.classList.remove('show');
+    }
+  });
+  userProfile?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notificationPanel?.classList.remove('show');
+    userProfilePanel?.classList.toggle('show');
+  });
+
+  /* --------------------------- Mock Data / State --------------------------- */
+  const belData = [
+    { id: 'A8C1E3F', name: 'Maxwell Walker', code: 'MAXWELL25', level: 'Leader',  joined: '2023-01-15', clicks30: 890, orders30: 62, revenue30: 24850, region:'North America', country:'US', city:'New York', status:'Active',   tags:['Top Performer','EN'] },
+    { id: 'B2D9K7L', name: 'Olivia Chen',     code: 'OLIVIA10',   level: 'Explorer', joined: '2024-05-12', clicks30: 210, orders30: 12, revenue30: 3600,  region:'Asia',          country:'TW', city:'Taipei',   status:'Active',   tags:['APAC'] },
+    { id: 'C7H4P2Q', name: 'Luca Rossi',      code: 'ROSSI15',    level: 'Enabler',  joined: '2023-11-03', clicks30: 320, orders30: 20, revenue30: 9100,  region:'Europe',        country:'IT', city:'Milan',    status:'Active',   tags:['EU'] },
+    { id: 'D5N3V8X', name: 'Emma Johansson',  code: 'EMMA5',      level: 'Builder',  joined: '2024-02-19', clicks30: 95,  orders30: 3,  revenue30: 780,   region:'Europe',        country:'SE', city:'Stockholm',status:'Active',   tags:[] },
+    { id: 'E1Q6R9T', name: 'Pierre Dubois',   code: 'PIERRE20',   level: 'Leader',   joined: '2022-09-01', clicks30: 430, orders30: 25, revenue30: 12000, region:'Europe',        country:'FR', city:'Paris',    status:'Inactive', tags:['Re-engage'] },
+    { id: 'F3L2M5N', name: 'Sophia Martinez', code: 'SOPHIA12',   level: 'Explorer', joined: '2024-07-21', clicks30: 180, orders30: 9,  revenue30: 2700,  region:'North America', country:'US', city:'Austin',   status:'Active',   tags:[] },
+    { id: 'G9T8Y1U', name: "Liam O'Connor",   code: 'LIAM8',      level: 'Enabler',  joined: '2023-06-30', clicks30: 260, orders30: 17, revenue30: 6800,  region:'Europe',        country:'IE', city:'Dublin',   status:'Active',   tags:['EU'] },
+    { id: 'H4J7K2L', name: 'Hana Suzuki',     code: 'HANA7',      level: 'Builder',  joined: '2024-01-08', clicks30: 140, orders30: 5,  revenue30: 1250,  region:'Asia',          country:'JP', city:'Tokyo',    status:'Active',   tags:[] },
+    { id: 'J2M8N5B', name: 'Chen Wei',        code: 'CHEN9',      level: 'Enabler',  joined: '2023-12-10', clicks30: 310, orders30: 14, revenue30: 4200,  region:'Asia',          country:'CN', city:'Shanghai', status:'Active',   tags:[] },
+    { id: 'K6P4R1S', name: 'Ivan Petrov',     code: 'IVAN11',     level: 'Explorer', joined: '2022-12-22', clicks30: 80,  orders30: 2,  revenue30: 300,   region:'Europe',        country:'RU', city:'Moscow',   status:'Inactive', tags:['Dormant'] },
+  ];
+
+  const state = {
+    // BEL Board
+    page: 1,
+    rowsPerPage: 20,
+    selected: new Set(),
+    filters: { keyword: '', level: '', region: '', start: '', end: '', activity: '' },
+    sortBy: 'joined',
+    sortDir: 'desc',
+    currentBelId: null,
+    notes: {},
+
+    // Payout pagination
+    payoutPage: 1,
+    payoutRowsPerPage: 10,
+
+    // Content pagination
+    assetPage: 1,
+    assetRowsPerPage: 10,
+
+    // Order pagination
+    orderPage: 1,
+    orderRowsPerPage: 10,
+
+    // Support & Comm pagination
+    supportPage: 1,
+    supportRowsPerPage: 10,
+
+    // Announcements pagination
+    annPage: 1,
+    annRowsPerPage: 10,
+  };
+
+  /* --------------------------- Cache --------------------------- */
+  const el = {
+    // BEL Board
+    regionSel: document.getElementById('f-region'),
+    applyBtn: document.getElementById('apply-filters'),
+    resetBtn: document.getElementById('reset-filters'),
+    rowsPerPage: document.getElementById('rows-per-page'),
+    prevBtn: document.getElementById('prev-page'),
+    nextBtn: document.getElementById('next-page'),
+    rangeLabel: document.getElementById('range-label'),
+    table: document.getElementById('bel-table'),
+    thead: document.querySelector('#bel-table thead'),
+    tbody: document.querySelector('#bel-table tbody'),
+    thSelect: document.getElementById('th-select'),
+    selectAllPage: document.getElementById('select-all-page'),
+    selectedCount: document.getElementById('selected-count'),
+    exportBtn: document.getElementById('export-csv'),
+
+    // BEL Modal
+    modal: document.getElementById('bel-details-modal'),
+    modalClose: document.querySelector('#bel-details-modal .close-button'),
+    modalBelName: document.getElementById('modal-bel-name'),
+    modalBelInfo: document.getElementById('modal-bel-info'),
+    modalLevel: document.getElementById('level-adjustment'),
+    tagsInput: document.getElementById('internal-tags'),
+    notesHistory: document.querySelector('#bel-details-modal .notes-history'),
+    modalNote: document.querySelector('#bel-details-modal .add-note-form textarea'),
+    saveBtn: document.querySelector('#bel-details-modal .modal-actions .bel-button:not(.secondary)'),
+    addNoteBtn: document.querySelector('#bel-details-modal .add-note-form .bel-button'),
+  };
+
+  /* --------------------------- Utils --------------------------- */
+  const fmtMoney0 = (n) => `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  const fmtMoney2 = (n) => `$${(Math.round(n * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const fmtPct = (n) => `${(n * 100).toFixed(1)}%`;
+  const parseDate = (s) => (s ? new Date(s + 'T00:00:00') : null);
+  const pad6 = (n) => String(n).padStart(6, '0');
+
+  /* --------------------------- BEL Board render --------------------------- */
+  function getProcessedData() {
+    const { keyword, level, region, start, end, activity } = state.filters;
+    const startDate = parseDate(start);
+    const endDate = parseDate(end);
+
+    let filtered = belData.filter(r => {
+      const kw = keyword.trim().toLowerCase();
+      if (kw && !(r.id.toLowerCase().includes(kw) || r.name.toLowerCase().includes(kw) || r.code.toLowerCase().includes(kw))) return false;
+      if (level && r.level !== level) return false;
+      if (region && r.region !== region) return false;
+      if (startDate && new Date(r.joined) < startDate) return false;
+      if (endDate && new Date(r.joined) > endDate) return false;
+      if (activity === 'clicks' && !(r.clicks30 > 0 && r.orders30 === 0)) return false;
+      if (activity === 'orders' && !(r.orders30 > 0)) return false;
+      if (activity === 'none' && !((r.clicks30 + r.orders30) === 0)) return false;
+      return true;
+    });
+
+    const { sortBy, sortDir } = state;
+    filtered.sort((a, b) => {
+      const valA = a[sortBy];
+      const valB = b[sortBy];
+      let cmp = 0;
+      if (typeof valA === 'number') cmp = valA - valB;
+      else cmp = String(valA).localeCompare(String(valB));
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+
+    return filtered;
+  }
+
+  function renderTable() {
+    const processed = getProcessedData();
+    const total = processed.length;
+    const startIndex = (state.page - 1) * state.rowsPerPage;
+    const pageItems = processed.slice(startIndex, startIndex + state.rowsPerPage);
+
+    if (!el.tbody) return;
+
+    const rows = pageItems.map(r => {
+      const conv = r.clicks30 ? r.orders30 / r.clicks30 : 0;
+      const aov = r.orders30 ? r.revenue30 / r.orders30 : 0;
+      return `
+        <tr data-id="${r.id}">
+          <td><input type="checkbox" class="row-check" data-id="${r.id}" ${state.selected.has(r.id) ? 'checked' : ''} /></td>
+          <td><a href="#" class="bel-id-link" data-bel-id="${r.id}">${r.id}</a></td>
+          <td>${r.name}</td>
+          <td>${r.level}</td>
+          <td>${r.joined}</td>
+          <td style="text-align:right;">${r.clicks30.toLocaleString()}</td>
+          <td style="text-align:right;">${r.orders30.toLocaleString()}</td>
+          <td style="text-align:right;">${fmtMoney0(r.revenue30)}</td>
+          <td style="text-align:right;">${fmtPct(conv)}</td>
+          <td style="text-align:right;">${r.orders30 ? fmtMoney0(aov) : '-'}</td>
+          <td>${r.country} / ${r.city}</td>
+          <td><span class="status-badge ${r.status === 'Active' ? 'status-completed' : 'status-canceled'}">${r.status}</span></td>
+        </tr>
+      `;
+    }).join('');
+    el.tbody.innerHTML = rows;
+
+    const allOnPageSelected = pageItems.length > 0 && pageItems.every(r => state.selected.has(r.id));
+    el.thSelect && (el.thSelect.checked = allOnPageSelected);
+    el.selectAllPage && (el.selectAllPage.checked = allOnPageSelected);
+
+    const from = total === 0 ? 0 : startIndex + 1;
+    const to = Math.min(startIndex + state.rowsPerPage, total);
+    el.rangeLabel && (el.rangeLabel.textContent = `${from}–${to} of ${total}`);
+    el.prevBtn && (el.prevBtn.disabled = state.page === 1);
+    el.nextBtn && (el.nextBtn.disabled = to >= total);
+
+    el.selectedCount && (el.selectedCount.textContent = `${state.selected.size} selected`);
+
+    el.thead?.querySelectorAll('th[data-sortable]').forEach(th => {
+      const key = th.dataset.sortable;
+      th.removeAttribute('data-sort-dir');
+      if (key === state.sortBy) th.setAttribute('data-sort-dir', state.sortDir);
+    });
+  }
+
+  function applyFilters() {
+    state.page = 1;
+    state.selected.clear();
+    state.filters = {
+      keyword: document.getElementById('f-keyword')?.value || '',
+      level: document.getElementById('f-level')?.value || '',
+      region: el.regionSel?.value || '',
+      start: document.getElementById('f-start')?.value || '',
+      end: document.getElementById('f-end')?.value || '',
+      activity: document.getElementById('f-activity')?.value || '',
+    };
+    renderTable();
+  }
+  function resetFilters() {
+    document.getElementById('bel-filters')?.reset();
+    applyFilters();
+  }
+
+  /* --------------------------- BEL Modal --------------------------- */
+  function fillModal(r) {
+    if (!r) return;
+    el.modalBelName && (el.modalBelName.textContent = r.name || '—');
+    el.modalBelInfo && (el.modalBelInfo.textContent = `ID: ${r.id || '—'} • Joined: ${r.joined || '—'} • Code: ${r.code || '—'}`);
+    el.modalLevel && r.level && (el.modalLevel.value = r.level);
+    el.tagsInput && (el.tagsInput.value = (r.tags || []).join(', '));
+    const notes = state.notes[r.id] || [];
+    if (el.notesHistory) {
+      el.notesHistory.innerHTML = notes.length
+        ? notes.map(n => `<div class="note-item"><p>${n.text}</p><span>${n.time}</span></div>`).join('')
+        : '<p class="text-muted" style="padding:10px;">No notes yet.</p>';
+    }
+  }
+  function openBelModal(id, recordOverride = null) {
+    const record = recordOverride || belData.find(r => r.id === id);
+    if (!record) return;
+    state.currentBelId = record.id || id;
+    fillModal(record);
+    el.modal?.classList.add('show');
+  }
+  function closeModal() {
+    el.modal?.classList.remove('show');
+    state.currentBelId = null;
+  }
+  function saveAccountChanges() {
+    if (!state.currentBelId) return;
+    const r = belData.find(x => x.id === state.currentBelId);
+    if (!r) {
+      alert('This referral is not editable from BEL Board.');
+      closeModal();
+      return;
+    }
+    el.modalLevel && (r.level = el.modalLevel.value);
+    if (el.tagsInput) {
+      const list = el.tagsInput.value.split(',').map(s => s.trim()).filter(Boolean);
+      r.tags = list;
+    }
+    alert(`Saved changes for ${r.name}.`);
+    renderTable();
+    closeModal();
+  }
+  function addNote() {
+    if (!state.currentBelId) return;
+    const text = (el.modalNote?.value || '').trim();
+    if (!text) return;
+    const stamp = new Date().toLocaleString();
+    state.notes[state.currentBelId] = state.notes[state.currentBelId] || [];
+    state.notes[state.currentBelId].unshift({ text, time: stamp });
+    el.modalNote && (el.modalNote.value = '');
+    fillModal({ id: state.currentBelId, name: el.modalBelName?.textContent || '—' });
+  }
+  el.modalClose?.addEventListener('click', closeModal);
+  el.saveBtn?.addEventListener('click', saveAccountChanges);
+  el.addNoteBtn?.addEventListener('click', addNote);
+  el.modal?.addEventListener('click', (e) => { if (e.target === el.modal) closeModal(); });
+
+  // Modal Tabs
+  (function setupModalTabs(){
+    if (!el.modal) return;
+    const tabLinks = el.modal.querySelectorAll('.tab-link');
+    const tabContents = el.modal.querySelectorAll('.tab-content');
+    tabLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        const tabId = link.dataset.tab;
+        tabLinks.forEach(l => l.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        link.classList.add('active');
+        el.modal.querySelector(`#${tabId}`)?.classList.add('active');
+      });
+    });
+  })();
+
+  // Global: open BEL detail on any Referral link
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a.bel-id-link');
+    if (!link) return;
+    e.preventDefault();
+
+    const idText = (link.dataset.belId || link.textContent || '').trim();
+    let record = belData.find(r => r.id === idText);
+
+    // Fallback: build a lightweight record from row
+    if (!record) {
+      const tr = link.closest('tr');
+      const cells = tr ? Array.from(tr.children) : [];
+      const name = (cells[1]?.textContent || '').trim() || '—';
+      const level = (cells[2]?.textContent || '').trim() || 'Explorer';
+      const clicks = parseInt((cells[3]?.textContent || '').replace(/[^\d.-]/g,''), 10) || 0;
+      const orders = parseInt((cells[4]?.textContent || '').replace(/[^\d.-]/g,''), 10) || 0;
+      const revenue = parseFloat((cells[5]?.textContent || '').replace(/[^0-9.-]/g,'')) || 0;
+
+      record = {
+        id: idText || `DASH-${Date.now()}`,
+        name, code: '—', level, joined: '—',
+        clicks30: clicks, orders30: orders, revenue30: revenue,
+        region: '—', country: '—', city: '—', status: 'Active', tags: [],
+      };
+    }
+
+    openBelModal(record.id, record);
+  });
+
+  /* --------------------------- BEL Board controls --------------------------- */
+  el.applyBtn?.addEventListener('click', applyFilters);
+  el.resetBtn?.addEventListener('click', resetFilters);
+  el.rowsPerPage?.addEventListener('change', () => {
+    state.rowsPerPage = parseInt(el.rowsPerPage.value, 10) || 20;
+    state.page = 1;
+    renderTable();
+  });
+  el.prevBtn?.addEventListener('click', () => { if (state.page > 1) { state.page--; renderTable(); } });
+  el.nextBtn?.addEventListener('click', () => {
+    const total = getProcessedData().length;
+    if (state.page * state.rowsPerPage < total) { state.page++; renderTable(); }
+  });
+  const toggleSelectAll = (checked) => {
+    const pageItems = getProcessedData().slice((state.page - 1) * state.rowsPerPage, state.page * state.rowsPerPage);
+    pageItems.forEach(r => { if (checked) state.selected.add(r.id); else state.selected.delete(r.id); });
+    renderTable();
+  };
+  el.thSelect?.addEventListener('change', (e) => toggleSelectAll(e.target.checked));
+  el.selectAllPage?.addEventListener('change', (e) => toggleSelectAll(e.target.checked));
+  el.thead?.addEventListener('click', (e) => {
+    const header = e.target.closest('th[data-sortable]');
+    if (!header) return;
+    const key = header.dataset.sortable;
+    if (state.sortBy === key) state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+    else { state.sortBy = key; state.sortDir = 'asc'; }
+    renderTable();
+  });
+  el.exportBtn?.addEventListener('click', () => alert('Export CSV is a placeholder.'));
+  el.groupBtn?.addEventListener('click', () => alert('Create Group is a placeholder.'));
+  el.inviteBtn?.addEventListener('click', () => alert('Send Invite is a placeholder.'));
+
+  // Regions for filter
+  const regions = Array.from(new Set(belData.map(r => r.region))).sort();
+  regions.forEach(reg => { el.regionSel && (el.regionSel.innerHTML += `<option value="${reg}">${reg}</option>`); });
+
+  /* --------------------------- Charts (Dashboard) --------------------------- */
+  function makeTableSortable(table) {
+    const headers = table.querySelectorAll('th[data-sortable]');
+    const tbody = table.querySelector('tbody');
+    headers.forEach((header, index) => {
+      header.addEventListener('click', () => {
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const sortDir = header.getAttribute('data-sort-dir') === 'asc' ? 'desc' : 'asc';
+        const dataType = header.getAttribute('data-type') || 'string';
+        headers.forEach(h => h.removeAttribute('data-sort-dir'));
+        header.setAttribute('data-sort-dir', sortDir);
+        rows.sort((a, b) => {
+          let valA = a.children[index].textContent.trim();
+          let valB = b.children[index].textContent.trim();
+          if (dataType === 'number') {
+            valA = parseFloat(valA.replace(/[^0-9.-]/g, '')) || 0;
+            valB = parseFloat(valB.replace(/[^0-9.-]/g, '')) || 0;
+          }
+          if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+          if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+          return 0;
+        });
+        tbody.innerHTML = '';
+        rows.forEach(row => tbody.appendChild(row));
+      });
+    });
+  }
+
+  const pieCtx = document.getElementById('level-pie-chart');
+  if (pieCtx && window.Chart) {
+    new Chart(pieCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Builder', 'Enabler', 'Explorer', 'Leader'],
+        datasets: [{
+          label: 'BEL Count',
+          data: [75, 45, 25, 7],
+          backgroundColor: ['#006EFF', '#00893A', '#F39800', '#DB3A3A'],
+          borderColor: '#FFFFFF',
+          borderWidth: 2
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { padding: 20, boxWidth: 12 } } } }
+    });
+  }
+  const productCategoryCanvas = document.getElementById('product-category-chart');
+  if (productCategoryCanvas && window.Chart) {
+    const categoryDetails = {
+      'Remote IO & Communication': ['ADAM-6017: 20 units', 'WISE-4012E: 11 units'],
+      'Wireless Sensing & Solutions': ['WISE-2410: 8 units', 'WISE-2200-M: 5 units'],
+      'Embedded Computers': ['UNO-2271G: 4 units', 'ARK-1220: 6 units'],
+      'Panel PC, HMI & Displays': ['TPC-1551T: 3 units', 'PPC-3150: 2 units'],
+      'Edge AI Solutions': ['AIR-101: 2 units', 'MIC-730AI: 1 unit'],
+    };
+    new Chart(productCategoryCanvas, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(categoryDetails),
+        datasets: [{
+          label: 'Total Units Sold',
+          data: [31, 13, 10, 5, 3],
+          backgroundColor: 'rgba(0, 110, 255, 0.8)',
+          borderColor: 'rgba(0, 110, 255, 1)',
+          borderRadius: 4,
+          details: categoryDetails
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { afterBody: (ctx) => ctx[0].dataset.details[ctx[0].label] || '' } }
+        },
+        scales: { x: { beginAtZero: true } }
+      }
+    });
+  }
+
+  const leaderboardTable = document.getElementById('leaderboard-table');
+  if (leaderboardTable) makeTableSortable(leaderboardTable);
+
+  // Dashboard table↔chart toggler
+  const perfPanel = document.querySelector('#performance-table-view')?.closest('.flex-center');
+  if (perfPanel && window.Chart) {
+    const toggleButtons = perfPanel.querySelectorAll('.view-toggle-btn');
+    const views = {
+      table: perfPanel.querySelector('#performance-table-view'),
+      chart: perfPanel.querySelector('#performance-chart-view')
+    };
+    let performanceChart = null;
+    toggleButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const v = btn.getAttribute('data-view');
+        toggleButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        for (const k in views) views[k].style.display = (k === v ? 'block' : 'none');
+        if (v === 'chart' && !performanceChart) {
+          const data = {
+            builder:  { clicks: 8000, revenue: 65000, orders: 510 },
+            enabler:  { clicks: 3500, revenue: 35000, orders: 255 },
+            explorer: { clicks: 1500, revenue: 15000, orders: 75 },
+            leader:   { clicks: 492,  revenue: 5000,  orders: 11 }
+          };
+          const totals = {
+            clicks: Object.values(data).reduce((s, x) => s + x.clicks, 0),
+            revenue: Object.values(data).reduce((s, x) => s + x.revenue, 0),
+            orders: Object.values(data).reduce((s, x) => s + x.orders, 0),
+          };
+          const pct = (v, t) => (v / t) * 100;
+          const perfCanvas = document.getElementById('performance-percentage-chart');
+          performanceChart = new Chart(perfCanvas, {
+            type: 'bar',
+            data: {
+              labels: ['Clicks %', 'Revenue %', 'Orders %'],
+              datasets: [
+                { label: 'Builder',  data: [pct(data.builder.clicks, totals.clicks),   pct(data.builder.revenue, totals.revenue),   pct(data.builder.orders, totals.orders)],   backgroundColor: '#a7f3d0' },
+                { label: 'Enabler',  data: [pct(data.enabler.clicks, totals.clicks),   pct(data.enabler.revenue, totals.revenue),   pct(data.enabler.orders, totals.orders)],   backgroundColor: '#bfdbfe' },
+                { label: 'Explorer', data: [pct(data.explorer.clicks, totals.clicks),  pct(data.explorer.revenue, totals.revenue),  pct(data.explorer.orders, totals.orders)],  backgroundColor: '#fed7aa' },
+                { label: 'Leader',   data: [pct(data.leader.clicks, totals.clicks),    pct(data.leader.revenue, totals.revenue),    pct(data.leader.orders, totals.orders)],    backgroundColor: '#f9a8d4' },
+              ]
+            },
+            options: {
+              indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+              plugins: { legend: { display: true, position: 'bottom' }, tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.x.toFixed(2)}%` } } },
+              scales: { x: { stacked: true, max: 100, title: { display: true, text: 'Contribution Percentage' }, ticks: { callback: (v) => v + '%' } }, y: { stacked: true } }
+            }
+          });
+        }
+      });
+    });
+  }
+
+  /* =======================================================================
+     Payouts & Orders
+     ======================================================================= */
+  const payoutsOrderRoot = document.getElementById('payouts-order');
+  if (payoutsOrderRoot) {
+    payoutsOrderRoot.innerHTML = `
+      <h1 class="bel-h1">Payouts & Orders</h1>
+
+      <div class="bel-panel" id="payouts-history-panel">
+        <div class="panel-header">
+          <h3 style="margin:0;">Payout History <span class="status-badge status-approved">Payout Day: 5th of each month</span></h3>
+        </div>
+        <div class="scrollable-table-container">
+          <table class="bel-table" id="payout-history-table">
+            <thead>
+              <tr>
+                <th data-sortable data-type="string">Payout Date</th>
+                <th data-sortable data-type="number">Payout Total</th>
+                <th data-sortable data-type="number">BEL Count</th>
+                <th>View Detail</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="pagination-bar" id="payout-pagination">
+          <div class="rows-select">
+            <label for="payout-rows">Rows per page</label>
+            <select id="payout-rows" class="bel-select" style="width: 70px;">
+              <option selected>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select>
+          </div>
+          <div class="pagination-controls">
+            <span id="payout-range" class="text-muted">0–0 of 0</span>
+            <button class="bel-btn" id="payout-prev" aria-label="Previous page"><i class="fas fa-chevron-left"></i></button>
+            <button class="bel-btn" id="payout-next" aria-label="Next page"><i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bel-panel" id="order-tracking-panel" style="margin-top:24px;">
+        <div class="panel-header">
+            <h3 style="margin:0;">Order Tracking</h3>
+        </div>
+        <div class="scrollable-table-container">
+            <table class="bel-table" id="order-tracking-table">
+            <thead>
+                <tr>
+                <th data-sortable data-type="string">Order Placed</th>
+                <th data-sortable data-type="string">Order Number</th>
+                <th data-sortable data-type="string">BEL Referral ID</th>
+                <th data-sortable data-type="string">BEL Name</th>
+                <th data-sortable data-type="number">Order Amount</th>
+                <th data-sortable data-type="string">Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="pagination-bar" id="order-pagination">
+            <div class="rows-select">
+            <label for="order-rows">Rows per page</label>
+            <select id="order-rows" class="bel-select" style="width: 70px;">
+                <option selected>10</option>
+                <option>20</option>
+                <option>50</option>
+            </select>
+            </div>
+            <div class="pagination-controls">
+            <span id="order-range" class="text-muted">0–0 of 0</span>
+            <button class="bel-btn" id="order-prev" aria-label="Previous page"><i class="fas fa-chevron-left"></i></button>
+            <button class="bel-btn" id="order-next" aria-label="Next page"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        </div>
+    `;
+  }
+
+  let payoutSerial = 1; // RP-000001...
+  const nextPayoutId = () => `RP-${pad6(payoutSerial++)}`;
+  function monthString(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    return `${y}-${m}-05`;
+  }
+  function shiftMonth(date, delta) {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + delta);
+    return d;
+  }
+  // build 14 months so you can see pagination when data > 10
+  function buildPayoutBatches() {
+    const base = new Date();
+    const months = Array.from({length: 14}, (_, i) => monthString(shiftMonth(base, -i)));
+    return months.map((payoutDate, i) => {
+      const ratio = Math.max(0.05, 0.15 - i * 0.01);
+      const details = belData.slice(0, 8).map((b, idx) => {
+        const gross = Math.max(50, b.revenue30 * ratio * (0.6 + 0.1 * idx));
+        const fees  = gross * 0.02;
+        const tax   = gross * 0.05;
+        const net   = gross - fees - tax;
+        const fail  = (idx === 2 && i === 0) || (idx === 5 && i === 1);
+        return {
+          payoutId: nextPayoutId(),
+          belId: b.id,
+          belName: b.name,
+          gross: Math.round(gross * 100) / 100,
+          fees:  Math.round(fees  * 100) / 100,
+          tax:   Math.round(tax   * 100) / 100,
+          net:   Math.round(net   * 100) / 100,
+          paid: !fail,
+          status: fail ? 'Failed' : 'Success'
+        };
+      });
+      const total = details.reduce((s, d) => s + d.net, 0);
+      return {
+        payoutDate,
+        total: Math.round(total * 100) / 100,
+        belCount: details.length,
+        details
+      };
+    });
+  }
+  const payoutBatches = buildPayoutBatches();
+
+  function renderPayoutHistory() {
+    const total = payoutBatches.length;
+    const startIndex = (state.payoutPage - 1) * state.payoutRowsPerPage;
+    const pageItems = payoutBatches.slice(startIndex, startIndex + state.payoutRowsPerPage);
+
+    const tbody = document.querySelector('#payout-history-table tbody');
+    if (!tbody) return;
+    tbody.innerHTML = pageItems.map(b => `
+      <tr data-payout-date="${b.payoutDate}">
+        <td>${b.payoutDate}</td>
+        <td>${fmtMoney2(b.total)}</td>
+        <td>${b.belCount}</td>
+        <td><button class="bel-button secondary payout-view-btn" data-payout-date="${b.payoutDate}">View Detail</button></td>
+      </tr>
+    `).join('');
+
+    const t = document.getElementById('payout-history-table');
+    if (t) makeTableSortable(t);
+
+    const from = total === 0 ? 0 : startIndex + 1;
+    const to = Math.min(startIndex + state.payoutRowsPerPage, total);
+    const range = document.getElementById('payout-range');
+    const prev  = document.getElementById('payout-prev');
+    const next  = document.getElementById('payout-next');
+    range && (range.textContent = `${from}–${to} of ${total}`);
+    prev && (prev.disabled = state.payoutPage === 1);
+    next && (next.disabled = to >= total);
+  }
+
+  // payout detail modal
+  let payoutModalEl = null;
+  function ensurePayoutModal() {
+    if (payoutModalEl) return payoutModalEl;
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-overlay';
+    wrap.id = 'payout-detail-modal';
+    wrap.innerHTML = `
+      <div class="modal-content" style="max-width:1100px;">
+        <div class="modal-header">
+          <h3 style="margin:0;">Payout Detail</h3>
+          <button class="close-button" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body-grid" style="grid-template-columns: 1fr;">
+          <div>
+            <div style="margin-bottom:12px;">
+              <span id="payout-modal-date" class="status-badge status-approved">Date: —</span>
+              <span id="payout-modal-total" class="status-badge status-processing" style="margin-left:8px;">Total: —</span>
+              <span id="payout-modal-count" class="status-badge status-completed" style="margin-left:8px;">BEL: —</span>
+            </div>
+            <div class="scrollable-table-container">
+              <table class="bel-table" id="payout-detail-table">
+                <thead>
+                  <tr>
+                    <th data-sortable>Payout ID</th>
+                    <th data-sortable>Referral ID</th>
+                    <th data-sortable>Name</th>
+                    <th data-sortable data-type="number">Gross</th>
+                    <th data-sortable data-type="number">Fees</th>
+                    <th data-sortable data-type="number">Tax</th>
+                    <th data-sortable data-type="number">Net</th>
+                    <th>Pay</th>
+                    <th data-sortable>Status</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div class="modal-actions" style="margin-top:16px; display:flex; justify-content:flex-end;">
+              <button class="bel-button secondary payout-close-btn">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrap);
+    payoutModalEl = wrap;
+
+    const closeBtn = payoutModalEl.querySelector('.close-button');
+    const closeBtn2 = payoutModalEl.querySelector('.payout-close-btn');
+    const close = () => payoutModalEl.classList.remove('show');
+    closeBtn?.addEventListener('click', close);
+    closeBtn2?.addEventListener('click', close);
+    payoutModalEl.addEventListener('click', (e) => { if (e.target === payoutModalEl) close(); });
+
+    return payoutModalEl;
+  }
+
+  function openPayoutModal(batch) {
+    const modal = ensurePayoutModal();
+    modal.querySelector('#payout-modal-date').textContent  = `Date: ${batch.payoutDate}`;
+    modal.querySelector('#payout-modal-total').textContent = `Total: ${fmtMoney2(batch.total)}`;
+    modal.querySelector('#payout-modal-count').textContent = `BEL: ${batch.belCount}`;
+
+    const tbody = modal.querySelector('#payout-detail-table tbody');
+    tbody.innerHTML = batch.details.map(d => `
+      <tr data-payout-id="${d.payoutId}">
+        <td>${d.payoutId}</td>
+        <td><a href="#" class="bel-id-link" data-bel-id="${d.belId}">${d.belId}</a></td>
+        <td>${d.belName}</td>
+        <td>${fmtMoney2(d.gross)}</td>
+        <td>${fmtMoney2(d.fees)}</td>
+        <td>${fmtMoney2(d.tax)}</td>
+        <td><strong>${fmtMoney2(d.net)}</strong></td>
+        <td>
+          ${d.paid
+            ? '<span class="status-badge status-completed">Paid</span>'
+            : `<button class="bel-button secondary pay-btn" data-payout-id="${d.payoutId}">${d.status === 'Failed' ? 'Retry' : 'Pay'}</button>`
+          }
+        </td>
+        <td>
+          <span class="status-badge ${d.status === 'Success' ? 'status-completed' : 'status-canceled'}">${d.status}</span>
+        </td>
+      </tr>
+    `).join('');
+
+    const dt = modal.querySelector('#payout-detail-table');
+    dt && makeTableSortable(dt);
+
+    modal.classList.add('show');
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.payout-view-btn');
+    if (!btn) return;
+    const date = btn.getAttribute('data-payout-date');
+    const batch = payoutBatches.find(b => b.payoutDate === date);
+    if (batch) openPayoutModal(batch);
+  });
+
+  document.addEventListener('click', (e) => {
+    const payBtn = e.target.closest('.pay-btn');
+    if (!payBtn) return;
+    const payoutId = payBtn.getAttribute('data-payout-id');
+    const batch = payoutBatches.find(b => b.details.some(d => d.payoutId === payoutId));
+    if (!batch) return;
+    const detail = batch.details.find(d => d.payoutId === payoutId);
+    if (!detail) return;
+    detail.paid = true;
+    detail.status = 'Success';
+    const row = document.querySelector(`#payout-detail-table tr[data-payout-id="${payoutId}"]`);
+    if (row) {
+      row.children[7].innerHTML = '<span class="status-badge status-completed">Paid</span>';
+      row.children[8].innerHTML = '<span class="status-badge status-completed">Success</span>';
+    }
+  });
+
+  // payout pagination controls
+  document.getElementById('payout-rows')?.addEventListener('change', (e) => {
+    state.payoutRowsPerPage = parseInt(e.target.value, 10) || 10;
+    state.payoutPage = 1;
+    renderPayoutHistory();
+  });
+  document.getElementById('payout-prev')?.addEventListener('click', () => {
+    if (state.payoutPage > 1) { state.payoutPage--; renderPayoutHistory(); }
+  });
+  document.getElementById('payout-next')?.addEventListener('click', () => {
+    const total = payoutBatches.length;
+    if (state.payoutPage * state.payoutRowsPerPage < total) { state.payoutPage++; renderPayoutHistory(); }
+  });
+
+  renderPayoutHistory();
+
+  // Orders sample data + render + pagination
+  const orders = [
+    { placed: '2025-08-28', number: 'SO-20250828-1001', belId: 'A8C1E3F', belName: 'Maxwell Walker', amount: 850.00, status: 'Completed' },
+    { placed: '2025-08-27', number: 'SO-20250827-1002', belId: 'B2D9K7L', belName: 'Olivia Chen',    amount: 420.50, status: 'Processing' },
+    { placed: '2025-08-26', number: 'SO-20250826-1003', belId: 'C7H4P2Q', belName: 'Luca Rossi',      amount: 1200.00, status: 'Completed' },
+    { placed: '2025-08-25', number: 'SO-20250825-1004', belId: 'D5N3V8X', belName: 'Emma Johansson',  amount: 199.99, status: 'Canceled' },
+    { placed: '2025-08-24', number: 'SO-20250824-1005', belId: 'E1Q6R9T', belName: 'Pierre Dubois',   amount: 650.00, status: 'Completed' },
+    { placed: '2025-08-23', number: 'SO-20250823-1006', belId: 'F3L2M5N', belName: 'Sophia Martinez', amount: 310.25, status: 'Completed' },
+    { placed: '2025-08-22', number: 'SO-20250822-1007', belId: 'G9T8Y1U', belName: "Liam O'Connor",   amount: 780.00, status: 'Processing' },
+    { placed: '2025-08-21', number: 'SO-20250821-1008', belId: 'H4J7K2L', belName: 'Hana Suzuki',     amount: 145.75, status: 'Completed' },
+    { placed: '2025-08-20', number: 'SO-20250820-1009', belId: 'J2M8N5B', belName: 'Chen Wei',        amount: 520.00, status: 'Completed' },
+    { placed: '2025-08-19', number: 'SO-20250819-1010', belId: 'K6P4R1S', belName: 'Ivan Petrov',     amount: 88.00,  status: 'Canceled' },
+    { placed: '2025-08-18', number: 'SO-20250818-1011', belId: 'A8C1E3F', belName: 'Maxwell Walker',  amount: 410.00, status: 'Completed' },
+    { placed: '2025-08-17', number: 'SO-20250817-1012', belId: 'B2D9K7L', belName: 'Olivia Chen',     amount: 299.00, status: 'Processing' },
+    { placed: '2025-08-16', number: 'SO-20250816-1013', belId: 'C7H4P2Q', belName: 'Luca Rossi',      amount: 980.00, status: 'Completed' },
+    { placed: '2025-08-15', number: 'SO-20250815-1014', belId: 'D5N3V8X', belName: 'Emma Johansson',  amount: 159.00, status: 'Completed' },
+  ];
+  function renderOrders() {
+    const tbody = document.querySelector('#order-tracking-table tbody');
+    if (!tbody) return;
+
+    const total = orders.length;
+    const startIndex = (state.orderPage - 1) * state.orderRowsPerPage;
+    const pageItems = orders.slice(startIndex, startIndex + state.orderRowsPerPage);
+
+    tbody.innerHTML = pageItems.map(o => `
+        <tr>
+        <td>${o.placed}</td>
+        <td>${o.number}</td>
+        <td><a href="#" class="bel-id-link" data-bel-id="${o.belId}">${o.belId}</a></td>
+        <td>${o.belName}</td>
+        <td>${fmtMoney2(o.amount)}</td>
+        <td>
+            <span class="status-badge ${
+            o.status === 'Completed' ? 'status-completed' :
+            o.status === 'Processing' ? 'status-processing' : 'status-canceled'
+            }">${o.status}</span>
+        </td>
+        </tr>
+    `).join('');
+
+    const t = document.getElementById('order-tracking-table');
+    if (t) makeTableSortable(t);
+
+    const from = total === 0 ? 0 : startIndex + 1;
+    const to = Math.min(startIndex + state.orderRowsPerPage, total);
+    const range = document.getElementById('order-range');
+    const prev  = document.getElementById('order-prev');
+    const next  = document.getElementById('order-next');
+    range && (range.textContent = `${from}–${to} of ${total}`);
+    prev && (prev.disabled = state.orderPage === 1);
+    next && (next.disabled = to >= total);
+  }
+  renderOrders();
+
+  // Order pagination controls
+  document.getElementById('order-rows')?.addEventListener('change', (e) => {
+    state.orderRowsPerPage = parseInt(e.target.value, 10) || 10;
+    state.orderPage = 1;
+    renderOrders();
+  });
+  document.getElementById('order-prev')?.addEventListener('click', () => {
+    if (state.orderPage > 1) { state.orderPage--; renderOrders(); }
+  });
+  document.getElementById('order-next')?.addEventListener('click', () => {
+    const total = orders.length;
+    if (state.orderPage * state.orderRowsPerPage < total) { state.orderPage++; renderOrders(); }
+  });
+
+  /* =======================================================================
+     Content Management (Central CMS)
+     ======================================================================= */
+  const contentRoot = document.getElementById('content');
+  if (contentRoot) {
+    contentRoot.innerHTML = `
+      <h1 class="bel-h1">Content</h1>
+      <div class="bel-panel" id="content-mgmt-panel">
+        <div class="panel-header">
+          <h3 style="margin:0;">Content Management (Central CMS)</h3>
+          <button class="bel-button" id="asset-add-btn"><i class="fas fa-plus"></i> Add Asset</button>
+        </div>
+        <div class="scrollable-table-container">
+          <table class="bel-table" id="asset-table">
+            <thead>
+              <tr>
+                <th data-sortable data-type="string">Upload Date</th>
+                <th data-sortable data-type="string">Title</th>
+                <th data-sortable data-type="string">Subtitle</th>
+                <th>Picture</th>
+                <th data-sortable data-type="string">Page Link URL</th>
+                <th>Edit</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="pagination-bar" id="asset-pagination">
+          <div class="rows-select">
+            <label for="asset-rows">Rows per page</label>
+            <select id="asset-rows" class="bel-select" style="width: 70px;">
+              <option selected>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select>
+          </div>
+          <div class="pagination-controls">
+            <span id="asset-range" class="text-muted">0–0 of 0</span>
+            <button class="bel-btn" id="asset-prev" aria-label="Previous page"><i class="fas fa-chevron-left"></i></button>
+            <button class="bel-btn" id="asset-next" aria-label="Next page"><i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  let assetSerial = 1;
+  const nextAssetId = () => `ASSET-${String(assetSerial++).padStart(4,'0')}`;
+  const assets = [
+    {
+      id: nextAssetId(),
+      uploadedAt: '2025-08-20 10:30',
+      title: 'ADAM Promo',
+      subtitle: 'Limited-time offer on Remote I/O. Check details now.',
+      imageName: 'adam-banner.png',
+      imageSrc: 'https://irp.cdn-website.com/56869327/dms3rep/multi/iotmart-logo.svg',
+      url: 'https://www.advantech.com/'
+    }
+  ];
+
+  function escapeHtml(s='') {
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderAssets() {
+    const total = assets.length;
+    const startIndex = (state.assetPage - 1) * state.assetRowsPerPage;
+    const pageItems = assets.slice(startIndex, startIndex + state.assetRowsPerPage);
+
+    const tbody = document.querySelector('#asset-table tbody');
+    if (!tbody) return;
+    tbody.innerHTML = pageItems.map(a => `
+      <tr data-asset-id="${a.id}">
+        <td>${a.uploadedAt}</td>
+        <td>${escapeHtml(a.title)}</td>
+        <td>
+          <span title="${escapeHtml(a.subtitle)}"
+                style="display:inline-block; max-width:360px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            ${escapeHtml(a.subtitle)}
+          </span>
+        </td>
+        <td><a href="#" class="asset-image-link" data-asset-id="${a.id}">${escapeHtml(a.imageName || 'image')}</a></td>
+        <td><a href="${a.url}" target="_blank" rel="noopener">${escapeHtml(a.url)}</a></td>
+        <td><button class="bel-button secondary asset-edit-btn" data-asset-id="${a.id}"><i class="fas fa-edit"></i> Edit</button></td>
+        <td><button class="bel-button asset-delete-btn" data-asset-id="${a.id}" style="background-color:#DB3A3A;">Delete</button></td>
+      </tr>
+    `).join('');
+
+    const t = document.getElementById('asset-table');
+    t && makeTableSortable(t);
+
+    const from = total === 0 ? 0 : startIndex + 1;
+    const to = Math.min(startIndex + state.assetRowsPerPage, total);
+    const range = document.getElementById('asset-range');
+    const prev  = document.getElementById('asset-prev');
+    const next  = document.getElementById('asset-next');
+    range && (range.textContent = `${from}–${to} of ${total}`);
+    prev && (prev.disabled = state.assetPage === 1);
+    next && (next.disabled = to >= total);
+  }
+
+  /* ---------- Image modal ---------- */
+  let imageModalEl = null;
+  function ensureImageModal() {
+    if (imageModalEl) return imageModalEl;
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-overlay';
+    wrap.id = 'asset-image-modal';
+    wrap.innerHTML = `
+      <div class="modal-content" style="max-width:980px;">
+        <div class="modal-header">
+          <h3 style="margin:0;">Picture Preview</h3>
+          <button class="close-button" aria-label="Close">&times;</button>
+        </div>
+        <div style="padding-top:16px;">
+          <img id="asset-image-preview" src="" alt="preview" style="max-width:100%; height:auto; display:block; margin:auto; border:1px solid #eee; border-radius:4px;" />
+          <div id="asset-image-name" style="margin-top:8px; text-align:center; color:#666; font-size:0.9rem;"></div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrap);
+    imageModalEl = wrap;
+    const close = () => imageModalEl.classList.remove('show');
+    imageModalEl.querySelector('.close-button')?.addEventListener('click', close);
+    imageModalEl.addEventListener('click', (e) => { if (e.target === imageModalEl) close(); });
+    return imageModalEl;
+  }
+  function openImageModal(assetId) {
+    const a = assets.find(x => x.id === assetId);
+    if (!a) return;
+    const modal = ensureImageModal();
+    modal.querySelector('#asset-image-preview').src = a.imageSrc || '';
+    modal.querySelector('#asset-image-name').textContent = a.imageName || '';
+    modal.classList.add('show');
+  }
+
+  /* ---------- Delete confirm modal ---------- */
+  let confirmModalEl = null;
+  function ensureConfirmModal() {
+    if (confirmModalEl) return confirmModalEl;
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-overlay';
+    wrap.id = 'asset-delete-modal';
+    wrap.innerHTML = `
+      <div class="modal-content" style="max-width:520px;">
+        <div class="modal-header">
+          <h3 style="margin:0;">Confirm Deletion</h3>
+          <button class="close-button" aria-label="Close">&times;</button>
+        </div>
+        <div style="padding-top:16px;">
+          <p style="line-height:1.6; font-size:0.95rem;">
+            This action <strong>cannot be undone</strong>. Are you sure you want to delete this asset?
+          </p>
+          <div class="modal-actions" style="margin-top:16px; display:flex; justify-content:flex-end; gap:8px;">
+            <button class="bel-button secondary" id="confirm-cancel-btn">Cancel</button>
+            <button class="bel-button" id="confirm-ok-btn" style="background-color:#DB3A3A;">Delete</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrap);
+    confirmModalEl = wrap;
+
+    const close = () => confirmModalEl.classList.remove('show');
+    confirmModalEl.querySelector('.close-button')?.addEventListener('click', close);
+    confirmModalEl.querySelector('#confirm-cancel-btn')?.addEventListener('click', close);
+    confirmModalEl.addEventListener('click', (e) => { if (e.target === confirmModalEl) close(); });
+
+    return confirmModalEl;
+  }
+  function openConfirmModal(assetId) {
+    const modal = ensureConfirmModal();
+    modal.dataset.assetId = assetId;
+    modal.classList.add('show');
+  }
+  document.addEventListener('click', (e) => {
+    const ok = e.target.closest('#confirm-ok-btn');
+    if (!ok) return;
+    const modal = ok.closest('#asset-delete-modal');
+    const assetId = modal?.dataset.assetId;
+    if (!assetId) return;
+    const idx = assets.findIndex(a => a.id === assetId);
+    if (idx >= 0) assets.splice(idx, 1);
+    modal.classList.remove('show');
+    const maxPage = Math.max(1, Math.ceil(assets.length / state.assetRowsPerPage));
+    if (state.assetPage > maxPage) state.assetPage = maxPage;
+    renderAssets();
+  });
+
+  /* ---------- Add/Edit form modal ---------- */
+  let formModalEl = null;
+  function ensureFormModal() {
+    if (formModalEl) return formModalEl;
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-overlay';
+    wrap.id = 'asset-form-modal';
+    wrap.innerHTML = `
+      <div class="modal-content" style="max-width:440px;">
+        <div class="modal-header">
+          <h3 style="margin:0;" id="asset-form-title">Add Asset</h3>
+          <button class="close-button" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body-grid" style="grid-template-columns: 1fr;">
+          <form id="asset-form">
+            <div class="bel-form-group" style="margin-bottom:12px;">
+              <label>Title</label>
+              <input type="text" id="asset-title" maxlength="25" required />
+            </div>
+            <div class="bel-form-group" style="margin-bottom:12px;">
+              <label>Subtitle</label>
+              <input type="text" id="asset-subtitle" maxlength="60" required />
+            </div>
+            <div class="bel-form-group" style="margin-bottom:12px;">
+              <label>Picture (1200×740)</label>
+              <input type="file" id="asset-image" accept="image/*" />
+              <div id="asset-image-hint" style="font-size:0.85rem; color:#777; margin-top:6px;">Required for new asset; optional for edit if you keep the old image</div>
+              <img id="asset-thumb" alt="" style="display:none; max-width:260px; margin-top:8px; border:1px solid #eee; border-radius:4px;" />
+            </div>
+            <div class="bel-form-group" style="margin-bottom:12px;">
+              <label>Page Link URL</label>
+              <input type="url" id="asset-url" placeholder="https://example.com/..." required />
+            </div>
+          </form>
+          <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:8px;">
+            <button class="bel-button secondary" id="asset-cancel-btn">Cancel</button>
+            <button class="bel-button" id="asset-save-btn">Save</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrap);
+    formModalEl = wrap;
+
+    const close = () => formModalEl.classList.remove('show');
+    formModalEl.querySelector('.close-button')?.addEventListener('click', close);
+    formModalEl.addEventListener('click', (e) => { if (e.target === formModalEl) close(); });
+    formModalEl.querySelector('#asset-cancel-btn')?.addEventListener('click', close);
+
+    // image preview
+    const fileInput = formModalEl.querySelector('#asset-image');
+    const thumb = formModalEl.querySelector('#asset-thumb');
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files?.[0];
+      if (!file) { thumb.style.display = 'none'; return; }
+      const dataUrl = await readFileAsDataURL(file);
+      thumb.src = dataUrl; thumb.style.display = 'block';
+    });
+
+    return formModalEl;
+  }
+
+  let editingAssetId = null; // null = add
+  function openFormModal(mode, asset=null) {
+    const modal = ensureFormModal();
+    const title = modal.querySelector('#asset-form-title');
+    const inputTitle = modal.querySelector('#asset-title');
+    const inputSubtitle = modal.querySelector('#asset-subtitle');
+    const inputImage = modal.querySelector('#asset-image');
+    const inputUrl = modal.querySelector('#asset-url');
+    const thumb = modal.querySelector('#asset-thumb');
+
+    editingAssetId = mode === 'edit' && asset ? asset.id : null;
+    title.textContent = mode === 'edit' ? 'Edit Asset' : 'Add Asset';
+
+    inputTitle.value = asset?.title || '';
+    inputSubtitle.value = asset?.subtitle || '';
+    inputUrl.value = asset?.url || '';
+    inputImage.value = '';
+    if (asset?.imageSrc) { thumb.src = asset.imageSrc; thumb.style.display = 'block'; }
+    else { thumb.style.display = 'none'; }
+
+    modal.classList.add('show');
+  }
+
+  function readFileAsDataURL(file) {
+    return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(fr.result);
+      fr.onerror = reject;
+      fr.readAsDataURL(file);
+    });
+  }
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+  async function validateImageAndGetData(file) {
+    if (!file) throw new Error('Please choose an image');
+    const dataUrl = await readFileAsDataURL(file);
+    const img = await loadImage(dataUrl);
+    if (img.naturalWidth !== 1200 || img.naturalHeight !== 740) {
+      throw new Error(`Image must be 1200×740. Got ${img.naturalWidth}×${img.naturalHeight}.`);
+    }
+    return { dataUrl, name: file.name };
+  }
+  function nowISO() {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    const hh = String(d.getHours()).padStart(2,'0');
+    const mi = String(d.getMinutes()).padStart(2,'0');
+    return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+  }
+
+  document.addEventListener('click', async (e) => {
+    const saveBtn = e.target.closest('#asset-save-btn');
+    if (!saveBtn) return;
+
+    const modal = saveBtn.closest('#asset-form-modal');
+    const inputTitle = modal.querySelector('#asset-title');
+    const inputSubtitle = modal.querySelector('#asset-subtitle');
+    const inputImage = modal.querySelector('#asset-image');
+    const inputUrl = modal.querySelector('#asset-url');
+
+    const title = inputTitle.value.trim();
+    const subtitle = inputSubtitle.value.trim();
+    const url = inputUrl.value.trim();
+
+    if (!title || title.length > 25) { alert('Title is required and must be ≤ 25 characters.'); return; }
+    if (!subtitle || subtitle.length > 60) { alert('Subtitle is required and must be ≤ 60 characters.'); return; }
+    if (!/^https?:\/\/.+/i.test(url)) { alert('URL must start with http:// or https://'); return; }
+
+    try {
+      let imgData = null;
+      if (editingAssetId) {
+        if (inputImage.files?.[0]) imgData = await validateImageAndGetData(inputImage.files[0]);
+      } else {
+        imgData = await validateImageAndGetData(inputImage.files?.[0]);
+      }
+
+      if (editingAssetId) {
+        const a = assets.find(x => x.id === editingAssetId);
+        if (!a) return;
+        a.title = title;
+        a.subtitle = subtitle;
+        a.url = url;
+        if (imgData) { a.imageSrc = imgData.dataUrl; a.imageName = imgData.name; }
+      } else {
+        assets.unshift({
+          id: nextAssetId(),
+          uploadedAt: nowISO(),
+          title, subtitle,
+          imageName: imgData?.name || 'image',
+          imageSrc: imgData?.dataUrl || '',
+          url
+        });
+      }
+
+      state.assetPage = 1;
+      renderAssets();
+      modal.classList.remove('show');
+    } catch (err) {
+      alert(err.message || 'Image processing failed.');
+    }
+  });
+
+  // delegated actions
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#asset-add-btn')) { openFormModal('add', null); return; }
+    const imgLink = e.target.closest('.asset-image-link');
+    if (imgLink) { e.preventDefault(); openImageModal(imgLink.dataset.assetId); return; }
+    const editBtn = e.target.closest('.asset-edit-btn');
+    if (editBtn) { const a = assets.find(x => x.id === editBtn.dataset.assetId); if (a) openFormModal('edit', a); return; }
+    const delBtn = e.target.closest('.asset-delete-btn');
+    if (delBtn) { openConfirmModal(delBtn.dataset.assetId); return; }
+  });
+
+  // asset pagination controls
+  document.getElementById('asset-rows')?.addEventListener('change', (e) => {
+    state.assetRowsPerPage = parseInt(e.target.value, 10) || 10;
+    state.assetPage = 1;
+    renderAssets();
+  });
+  document.getElementById('asset-prev')?.addEventListener('click', () => {
+    if (state.assetPage > 1) { state.assetPage--; renderAssets(); }
+  });
+  document.getElementById('asset-next')?.addEventListener('click', () => {
+    const total = assets.length;
+    if (state.assetPage * state.assetRowsPerPage < total) { state.assetPage++; renderAssets(); }
+  });
+
+  renderAssets();
+
+  /* =======================================================================
+     Support & Communications (Contact Support + Announcements)
+     ======================================================================= */
+  const supportRoot = document.getElementById('support-comm');
+  if (supportRoot) {
+    supportRoot.innerHTML = `
+      <h1 class="bel-h1">Support & Communications</h1>
+
+      <!-- Contact Support (Tickets) -->
+      <div class="bel-panel" id="support-panel">
+        <div class="panel-header">
+          <h3 style="margin:0;">Contact Support</h3>
+        </div>
+        <div class="scrollable-table-container">
+          <table class="bel-table" id="support-table">
+            <thead>
+              <tr>
+                <th data-sortable data-type="string">Ticket #</th>
+                <th data-sortable data-type="string">BEL Name</th>
+                <th data-sortable data-type="string">BEL ID</th>
+                <th data-sortable data-type="string">Subject</th>
+                <th data-sortable data-type="string">Status</th>
+                <th>View Detail</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="pagination-bar" id="support-pagination">
+          <div class="rows-select">
+            <label for="support-rows">Rows per page</label>
+            <select id="support-rows" class="bel-select" style="width:70px;">
+              <option selected>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select>
+          </div>
+          <div class="pagination-controls">
+            <span id="support-range" class="text-muted">0–0 of 0</span>
+            <button class="bel-btn" id="support-prev" aria-label="Previous page"><i class="fas fa-chevron-left"></i></button>
+            <button class="bel-btn" id="support-next" aria-label="Next page"><i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Announcements -->
+      <div class="bel-panel" id="ann-panel" style="margin-top:24px;">
+        <div class="panel-header">
+          <h3 style="margin:0;">Announcements</h3>
+          <button class="bel-button" id="send-announcement-btn"><i class="fas fa-bullhorn"></i> Send Announcement</button>
+        </div>
+        <div class="scrollable-table-container">
+          <table class="bel-table" id="ann-table">
+            <thead>
+              <tr>
+                <th data-sortable data-type="string">Created</th>
+                <th data-sortable data-type="string">Category</th>
+                <th data-sortable data-type="string">Title</th>
+                <th data-sortable data-type="string">Body</th>
+                <th data-sortable data-type="string">Link</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="pagination-bar" id="ann-pagination">
+          <div class="rows-select">
+            <label for="ann-rows">Rows per page</label>
+            <select id="ann-rows" class="bel-select" style="width:70px;">
+              <option selected>10</option>
+              <option>20</option>
+              <option>50</option>
+            </select>
+          </div>
+          <div class="pagination-controls">
+            <span id="ann-range" class="text-muted">0–0 of 0</span>
+            <button class="bel-btn" id="ann-prev" aria-label="Previous page"><i class="fas fa-chevron-left"></i></button>
+            <button class="bel-btn" id="ann-next" aria-label="Next page"><i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Helpers
+  const nowISO_ = () => {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    const hh = String(d.getHours()).padStart(2,'0');
+    const mi = String(d.getMinutes()).padStart(2,'0');
+    return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+  };
+  const ellipsis = (s='', n=40) => (s.length > n ? s.slice(0, n-1) + '…' : s);
+
+  // Status badge for support tickets
+  function supportStatusBadge(status) {
+    const cls =
+      status === 'Closed'    ? 'status-completed'  :
+      status === 'Replied'   ? 'status-processing' :
+                               'status-canceled';   // Pending
+    return `<span class="status-badge ${cls}">${status}</span>`;
+  }
+
+  // --- Mock Support Tickets ---
+  let ticketSerial = 1;
+  const nextTicketId = () => {
+    const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+    return `CS-${date}-${String(ticketSerial++).padStart(4,'0')}`;
+  };
+  const supportTickets = (() => {
+    const pool = Array.isArray(window.belData) ? window.belData : belData;
+    const subjects = [
+      'Issue with payout amount','Unable to access dashboard','Wrong referral attribution',
+      'Order status not updating','Question about campaign','Need invoice for last month',
+      'Login 2FA problem','Profile photo upload failed','Link tracking mismatch',
+      'Request to change region','Remove duplicate referral','How to upgrade level',
+      'Tax form clarification','Payout bank info update'
+    ];
+    const bodies = [
+      'Hi team, the payout for August looks incorrect compared to my records.',
+      'I cannot open BEL Board on mobile. It keeps spinning.',
+      'My clicks are showing under another BEL ID.',
+      'Order placed two days ago is still Processing.',
+      'When does the new ADAM campaign end?',
+      'I need a PDF invoice for July payout.',
+      '2FA codes not accepted; tried multiple times.',
+      'JPG upload returns 500 error.',
+      'UTM parameters are not recorded on my page.',
+      'Please move my primary market to EU.',
+      'There is a duplicate BEL created by mistake.',
+      'What are the requirements for Leader level?',
+      'Which tax form is required for TW users?',
+      'I changed bank; how to update?'
+    ];
+    const statuses = ['Pending','Replied','Closed'];
+    return Array.from({length: 14}, (_, i) => {
+      const o = pool[i % pool.length];
+      return {
+        ticketId: nextTicketId(),
+        belId: o.id,
+        belName: o.name,
+        subject: subjects[i],
+        message: bodies[i],
+        status: statuses[i % statuses.length],
+        createdAt: nowISO_(),
+        replies: (i % 3 ? [] : [{ time: nowISO_(), text: 'We are checking this for you.' }])
+      };
+    });
+  })();
+
+  // --- Mock Announcements History ---
+  const annHistory = [
+    { created: '2025-08-26 09:00', category: 'Important',   title: 'September payout postponed', body: 'We found reconciliation gaps', link: '' },
+    { created: '2025-08-25 14:20', category: 'New Campaign', title: 'ADAM Remote I/O promo',     body: 'Launch today — join now!',   link: 'https://advantech.com' },
+  ];
+
+  // ---- Contact Support: render + pagination ----
+  function renderSupportTickets() {
+    const tbody = document.querySelector('#support-table tbody');
+    if (!tbody) return;
+
+    const total = supportTickets.length;
+    const startIndex = (state.supportPage - 1) * state.supportRowsPerPage;
+    const pageItems = supportTickets.slice(startIndex, startIndex + state.supportRowsPerPage);
+
+    tbody.innerHTML = pageItems.map(t => `
+      <tr data-ticket-id="${t.ticketId}">
+        <td>${t.ticketId}</td>
+        <td>${t.belName}</td>
+        <td><a href="#" class="bel-id-link" data-bel-id="${t.belId}">${t.belId}</a></td>
+        <td title="${t.subject}">${ellipsis(t.subject, 40)}</td>
+        <td>${supportStatusBadge(t.status)}</td>
+        <td><button class="bel-button secondary support-view-btn" data-ticket-id="${t.ticketId}">View Detail</button></td>
+      </tr>
+    `).join('');
+
+    const table = document.getElementById('support-table');
+    if (table && typeof makeTableSortable === 'function') makeTableSortable(table);
+
+    const from = total === 0 ? 0 : startIndex + 1;
+    const to = Math.min(startIndex + state.supportRowsPerPage, total);
+
+    const rangeEl = document.getElementById('support-range');
+    const prevEl  = document.getElementById('support-prev');
+    const nextEl  = document.getElementById('support-next');
+
+    if (rangeEl) rangeEl.textContent = `${from}–${to} of ${total}`;
+    if (prevEl)  prevEl.disabled = state.supportPage === 1;
+    if (nextEl)  nextEl.disabled = to >= total;
+  }
+
+  // ---- Announcements: render + pagination ----
+  function renderAnnouncements() {
+    const tbody = document.querySelector('#ann-table tbody');
+    if (!tbody) return;
+
+    const total = annHistory.length;
+    const startIndex = (state.annPage - 1) * state.annRowsPerPage;
+    const pageItems = annHistory.slice(startIndex, startIndex + state.annRowsPerPage);
+
+    tbody.innerHTML = pageItems.map(a => `
+      <tr>
+        <td>${a.created}</td>
+        <td>${a.category}</td>
+        <td title="${a.title}">${ellipsis(a.title, 24)}</td>
+        <td title="${a.body}">
+          <span style="display:inline-block; max-width:360px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            ${a.body}
+          </span>
+        </td>
+        <td>${a.link ? `<a href="${a.link}" target="_blank" rel="noopener">${a.link}</a>` : '-'}</td>
+      </tr>
+    `).join('');
+
+    const table = document.getElementById('ann-table');
+    if (table && typeof makeTableSortable === 'function') makeTableSortable(table);
+
+    const from = total === 0 ? 0 : startIndex + 1;
+    const to = Math.min(startIndex + state.annRowsPerPage, total);
+
+    const rangeEl = document.getElementById('ann-range');
+    const prevEl  = document.getElementById('ann-prev');
+    const nextEl  = document.getElementById('ann-next');
+
+    if (rangeEl) rangeEl.textContent = `${from}–${to} of ${total}`;
+    if (prevEl)  prevEl.disabled = state.annPage === 1;
+    if (nextEl)  nextEl.disabled = to >= total;
+  }
+
+  let supportModalEl = null;
+  function ensureSupportModal() {
+    if (supportModalEl) return supportModalEl;
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-overlay';
+    wrap.id = 'support-ticket-modal';
+    wrap.innerHTML = `
+      <div class="modal-content" style="max-width:900px;">
+        <div class="modal-header">
+          <h3 style="margin:0;">Support Ticket</h3>
+          <button class="close-button" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body-grid" style="grid-template-columns: 1fr;">
+          <div>
+            <div class="bel-grid-container grid-cols-2" style="margin-bottom:12px;">
+              <div class="bel-card" style="padding:12px;"><div class="bel-card-title">Ticket #</div><div id="sup-t-id" class="bel-card-value" style="font-size:1.1rem;"></div></div>
+              <div class="bel-card" style="padding:12px;"><div class="bel-card-title">Status</div><div id="sup-t-status" class="bel-card-value" style="font-size:1.1rem;"></div></div>
+            </div>
+
+            <div class="bel-grid-container grid-cols-2" style="margin-bottom:12px;">
+              <div class="bel-card" style="padding:12px;"><div class="bel-card-title">BEL Name</div><div id="sup-bel-name" class="bel-card-value" style="font-size:1.1rem;"></div></div>
+              <div class="bel-card" style="padding:12px;"><div class="bel-card-title">BEL ID</div><div id="sup-bel-id" class="bel-card-value" style="font-size:1.1rem;"></div></div>
+            </div>
+
+            <div class="bel-card" style="padding:12px; margin-bottom:12px;">
+              <div class="bel-card-title">Subject</div>
+              <div id="sup-subject" style="font-weight:700; margin-top:6px;"></div>
+            </div>
+
+            <div class="bel-card" style="padding:12px; margin-bottom:12px;">
+              <div class="bel-card-title">Message</div>
+              <div id="sup-message" style="margin-top:6px; line-height:1.6;"></div>
+            </div>
+
+            <div class="bel-card" style="padding:12px; margin-bottom:12px;">
+              <div class="bel-card-title">Replies</div>
+              <div id="sup-replies" style="margin-top:6px; display:flex; flex-direction:column; gap:8px;"></div>
+            </div>
+
+            <div class="bel-card" style="padding:12px;">
+              <div class="bel-card-title">Reply</div>
+              <textarea id="sup-reply-input" placeholder="Type your reply..." style="width:100%; min-height:90px; border:1px solid var(--bel-border-color); border-radius:4px; padding:8px; margin-top:6px;"></textarea>
+              <div class="modal-actions" style="margin-top:10px; display:flex; justify-content:flex-end; gap:8px;">
+                <button class="bel-button secondary sup-close-btn">Close</button>
+                <button class="bel-button" id="sup-send-btn"><i class="fas fa-paper-plane"></i> Send</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrap);
+    supportModalEl = wrap;
+
+    const close = () => supportModalEl.classList.remove('show');
+    supportModalEl.querySelector('.close-button')?.addEventListener('click', close);
+    supportModalEl.querySelector('.sup-close-btn')?.addEventListener('click', close);
+    supportModalEl.addEventListener('click', (e) => { if (e.target === supportModalEl) close(); });
+
+    // send
+    supportModalEl.querySelector('#sup-send-btn')?.addEventListener('click', () => {
+      const id = supportModalEl.dataset.ticketId;
+      const t = supportTickets.find(x => x.ticketId === id);
+      if (!t) return;
+      const textarea = supportModalEl.querySelector('#sup-reply-input');
+      const txt = (textarea.value || '').trim();
+      if (!txt) { alert('Reply cannot be empty.'); return; }
+      t.replies = t.replies || [];
+      t.replies.push({ time: nowISO_(), text: txt });
+      if (t.status !== 'Closed') t.status = 'Replied';
+      textarea.value = '';
+      fillSupportModal(t);
+      renderSupportTickets();
+    });
+
+    return supportModalEl;
+  }
+
+  function fillSupportModal(t) {
+    const modal = ensureSupportModal();
+    modal.dataset.ticketId = t.ticketId;
+    modal.querySelector('#sup-t-id').textContent = t.ticketId;
+    modal.querySelector('#sup-t-status').innerHTML = supportStatusBadge(t.status);
+    modal.querySelector('#sup-bel-name').textContent = t.belName;
+    modal.querySelector('#sup-bel-id').innerHTML = `<a href="#" class="bel-id-link" data-bel-id="${t.belId}">${t.belId}</a>`;
+    modal.querySelector('#sup-subject').textContent = t.subject;
+    modal.querySelector('#sup-message').textContent = t.message;
+
+    const list = modal.querySelector('#sup-replies');
+    list.innerHTML = (t.replies && t.replies.length)
+      ? t.replies.map(r => `<div class="note-item"><p>${r.text}</p><span>${r.time}</span></div>`).join('')
+      : '<p class="text-muted">No replies yet.</p>';
+  }
+
+  function openSupportModal(ticketId) {
+    const t = supportTickets.find(x => x.ticketId === ticketId);
+    if (!t) return;
+    const modal = ensureSupportModal();
+    fillSupportModal(t);
+    modal.classList.add('show');
+  }
+
+  // Delegated: open ticket modal
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.support-view-btn');
+    if (!btn) return;
+    openSupportModal(btn.getAttribute('data-ticket-id'));
+  });
+
+  // Announcement modal
+  let annModalEl = null;
+  function ensureAnnounceModal() {
+    if (annModalEl) return annModalEl;
+    const wrap = document.createElement('div');
+    wrap.className = 'modal-overlay';
+    wrap.id = 'send-announcement-modal';
+    wrap.innerHTML = `
+      <div class="modal-content" style="max-width:720px;">
+        <div class="modal-header">
+          <h3 style="margin:0;">Send Announcement</h3>
+          <button class="close-button" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body-grid" style="grid-template-columns: 1fr;">
+          <div>
+            <div class="bel-form-group" style="margin-bottom:12px;">
+              <label>Category</label>
+              <select id="ann-category">
+                <option>Important</option>
+                <option>New Campaign</option>
+                <option>Maintenance</option>
+                <option>General</option>
+              </select>
+            </div>
+            <div class="bel-form-group" style="margin-bottom:12px;">
+              <label>Title (≤ 20 chars)</label>
+              <input type="text" id="ann-title" maxlength="20" required />
+            </div>
+            <div class="bel-form-group" style="margin-bottom:12px;">
+              <label>Body (≤ 40 chars)</label>
+              <input type="text" id="ann-body" maxlength="40" required />
+            </div>
+            <div class="bel-form-group" style="margin-bottom:12px;">
+              <label>Link (optional)</label>
+              <input type="url" id="ann-link" placeholder="https://example.com/..."/>
+            </div>
+            <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:8px;">
+              <button class="bel-button secondary" id="ann-cancel">Cancel</button>
+              <button class="bel-button" id="ann-send"><i class="fas fa-paper-plane"></i> Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrap);
+    annModalEl = wrap;
+
+    const close = () => annModalEl.classList.remove('show');
+    annModalEl.querySelector('.close-button')?.addEventListener('click', close);
+    annModalEl.querySelector('#ann-cancel')?.addEventListener('click', close);
+    annModalEl.addEventListener('click', (e) => { if (e.target === annModalEl) close(); });
+
+    annModalEl.querySelector('#ann-send')?.addEventListener('click', () => {
+      const cat = annModalEl.querySelector('#ann-category').value.trim();
+      const title = annModalEl.querySelector('#ann-title').value.trim();
+      const body = annModalEl.querySelector('#ann-body').value.trim();
+      const link = annModalEl.querySelector('#ann-link').value.trim();
+
+      if (!title || title.length > 20) { alert('Title is required and must be ≤ 20 characters.'); return; }
+      if (!body  || body.length  > 40) { alert('Body is required and must be ≤ 40 characters.'); return; }
+      if (link && !/^https?:\/\/.+/i.test(link)) { alert('Link must start with http:// or https://'); return; }
+
+      annHistory.unshift({ created: nowISO_(), category: cat, title, body, link });
+      renderAnnouncements();
+
+      // Optional: push into top-right notification panel if exists
+      try {
+        const list = document.querySelector('.bel-notification-list');
+        if (list) {
+          const li = document.createElement('li');
+          li.className = 'bel-notification-item';
+          const tagClass = cat === 'Important' ? 'important' : (cat === 'New Campaign' ? 'new-product' : '');
+          li.innerHTML = `
+            <div class="title"><span class="tag ${tagClass}">${cat}</span>${title}</div>
+            <div class="date">${new Date().toISOString().slice(0,10)}</div>
+          `;
+          list.prepend(li);
+        }
+      } catch {}
+
+      annModalEl.classList.remove('show');
+    });
+
+    return annModalEl;
+  }
+
+  // open announcement modal
+  document.getElementById('send-announcement-btn')?.addEventListener('click', () => {
+    ensureAnnounceModal().classList.add('show');
+  });
+
+  // pagination controls for Support
+  document.getElementById('support-rows')?.addEventListener('change', (e) => {
+    state.supportRowsPerPage = parseInt(e.target.value, 10) || 10;
+    state.supportPage = 1;
+    renderSupportTickets();
+  });
+  document.getElementById('support-prev')?.addEventListener('click', () => {
+    if (state.supportPage > 1) { state.supportPage--; renderSupportTickets(); }
+  });
+  document.getElementById('support-next')?.addEventListener('click', () => {
+    const total = supportTickets.length;
+    if (state.supportPage * state.supportRowsPerPage < total) { state.supportPage++; renderSupportTickets(); }
+  });
+
+  // pagination controls for Announcements
+  document.getElementById('ann-rows')?.addEventListener('change', (e) => {
+    state.annRowsPerPage = parseInt(e.target.value, 10) || 10;
+    state.annPage = 1;
+    renderAnnouncements();
+  });
+  document.getElementById('ann-prev')?.addEventListener('click', () => {
+    if (state.annPage > 1) { state.annPage--; renderAnnouncements(); }
+  });
+  document.getElementById('ann-next')?.addEventListener('click', () => {
+    const total = annHistory.length;
+    if (state.annPage * state.annRowsPerPage < total) { state.annPage++; renderAnnouncements(); }
+  });
+
+  // Initial render for Support & Announcements if present
+  renderSupportTickets();
+  renderAnnouncements();
+
+  /* --------------------------- Initial section --------------------------- */
+  const initialSectionFromHash = window.location.hash.substring(1);
+  const initialActiveInDom = document.querySelector('.content-section.active')?.id;
+  const initialSection = initialSectionFromHash || initialActiveInDom || 'dashboard';
+  contentLinks.forEach(l => l.classList.remove('active'));
+  const initialLink = document.querySelector(`.bel-sidebar-nav-link[href="#${initialSection}"]`)
+                    || document.querySelector('.bel-sidebar-nav-link[href="#dashboard"]');
+  initialLink?.classList.add('active');
+  showContent(initialSection);
+  renderTable();
+});
+</script>
+</body>
+</html>
