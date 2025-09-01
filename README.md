@@ -1,5 +1,5 @@
 # BEL Management Portal
-
+hello
 ## 專案概述
 
 BEL Management Portal 是一個品牌夥伴管理系統，提供 IoTmart 等品牌商管理其品牌推廣者（Brand Evangelist Leaders, BEL）的全面解決方案。此專案已從原始的單一 HTML 檔案重構為模組化的現代 Web 應用程式架構。
