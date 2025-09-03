@@ -1,6 +1,6 @@
 /**
  * BEL Management Portal - Main Application Script
- * Manages dashboard, BEL board, payouts, content, and support functionality
+ * Manages dashboard, Account Management, payouts, content, and support functionality
  */
 
 'use strict';
@@ -208,11 +208,11 @@ document.addEventListener('DOMContentLoaded', () => {
             history: [
                 { orderDate: "2025-08-20", orderNumber: "IMTW000234", referralId: "KTWADVANT", belName: "Maxwell Walker", amount: 1250.00, currency: "USD", status: "Completed" },
                 { orderDate: "2025-08-19", orderNumber: "IMUS000233", referralId: "KUSOLVACE", belName: "Olivia Chen", amount: 650.50, currency: "EUR", status: "Processing" },
-                { orderDate: "2025-08-18", orderNumber: "IMDE000232", referralId: "KDEIMULER", belName: "Liam Müller", amount: 745.75, currency: "GBP", status: "Shipped" },
+                { orderDate: "2025-08-18", orderNumber: "IMDE000232", referralId: "KDEIMULER", belName: "Liam Müller", amount: 745.75, currency: "GBP", status: "Processing" },
                 { orderDate: "2025-08-17", orderNumber: "IMFR000231", referralId: "KFRDUBOIS", belName: "Sophia Dubois", amount: 1680.30, currency: "EUR", status: "Completed" },
                 { orderDate: "2025-08-16", orderNumber: "IMJP000230", referralId: "KJPTANAKA", belName: "Kenji Tanaka", amount: 285000, currency: "JPY", status: "Processing" },
                 { orderDate: "2025-08-15", orderNumber: "IMAU000229", referralId: "KAUJOISON", belName: "Emma Johnson", amount: 3200.00, currency: "AUD", status: "Completed" },
-                { orderDate: "2025-08-14", orderNumber: "IMKR000228", referralId: "KKRALEXIM", belName: "Alex Kim", amount: 1850000, currency: "KRW", status: "Shipped" },
+                { orderDate: "2025-08-14", orderNumber: "IMKR000228", referralId: "KKRALEXIM", belName: "Alex Kim", amount: 1850000, currency: "KRW", status: "Processing" },
                 { orderDate: "2025-08-13", orderNumber: "IMMX000227", referralId: "KMXLOPEZZ", belName: "Isabella López", amount: 2750.00, currency: "USD", status: "Completed" },
                 { orderDate: "2025-08-12", orderNumber: "IMMX000226", referralId: "KMXGARCIA", belName: "Lucas Garcia", amount: 1640.00, currency: "USD", status: "Canceled" },
                 { orderDate: "2025-08-11", orderNumber: "IMCN000225", referralId: "KCNMIAWAN", belName: "Mia Wang", amount: 4580.80, currency: "USD", status: "Completed" },
@@ -238,11 +238,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 { orderDate: "2025-07-20", orderNumber: "IMPL000203", referralId: "KPLKAROLN", belName: "Sarah Wilson", amount: 1450.25, currency: "EUR", status: "Completed" },
                 { orderDate: "2025-07-19", orderNumber: "IMBR000202", referralId: "KBRSILVAN", belName: "Carlos Silva", amount: 2850.60, currency: "USD", status: "Processing" },
                 { orderDate: "2025-07-18", orderNumber: "IMIN000201", referralId: "KINRAJESH", belName: "Rajesh Patel", amount: 125000, currency: "INR", status: "Completed" },
-                { orderDate: "2025-07-17", orderNumber: "IMSG000200", referralId: "KSGJOHNSO", belName: "Michael Johnson", amount: 980.50, currency: "SGD", status: "Shipped" },
+                { orderDate: "2025-07-17", orderNumber: "IMSG000200", referralId: "KSGJOHNSO", belName: "Michael Johnson", amount: 980.50, currency: "SGD", status: "Processing" },
                 { orderDate: "2025-07-16", orderNumber: "IMTH000199", referralId: "KTHWONGCH", belName: "David Wong", amount: 68500, currency: "THB", status: "Completed" },
                 { orderDate: "2025-07-15", orderNumber: "IMMY000198", referralId: "KMYAHMEDZ", belName: "Ahmad Hassan", amount: 3250, currency: "MYR", status: "Processing" },
                 { orderDate: "2025-07-14", orderNumber: "IMZA000197", referralId: "KZAVANWYC", belName: "Daniel van Wyk", amount: 15500, currency: "ZAR", status: "Completed" },
-                { orderDate: "2025-07-13", orderNumber: "IMNL000196", referralId: "KNLPIETER", belName: "Pieter van Berg", amount: 1890.75, currency: "EUR", status: "Shipped" },
+                { orderDate: "2025-07-13", orderNumber: "IMNL000196", referralId: "KNLPIETER", belName: "Pieter van Berg", amount: 1890.75, currency: "EUR", status: "Processing" },
                 { orderDate: "2025-07-12", orderNumber: "IMSE000195", referralId: "KSEANDRES", belName: "Anders Larsson", amount: 18500, currency: "SEK", status: "Completed" },
                 { orderDate: "2025-07-11", orderNumber: "IMNO000194", referralId: "KNOERICSO", belName: "Erik Andersen", amount: 16800, currency: "NOK", status: "Processing" },
                 { orderDate: "2025-07-10", orderNumber: "IMCA000193", referralId: "KCAEMILYR", belName: "Emily Robertson", amount: 2650.30, currency: "CAD", status: "Completed" },
@@ -250,11 +250,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 { orderDate: "2025-07-08", orderNumber: "IMIL000191", referralId: "KILCOHENM", belName: "Michael Cohen", amount: 3750.80, currency: "ILS", status: "Completed" },
                 { orderDate: "2025-07-07", orderNumber: "IMIT000190", referralId: "KITROSSIT", belName: "Isabella Rossi", amount: 2180.45, currency: "EUR", status: "Processing" },
                 { orderDate: "2025-07-06", orderNumber: "IMKR000189", referralId: "KKRNOAHIM", belName: "Noah Kim", amount: 2450000, currency: "KRW", status: "Completed" },
-                { orderDate: "2025-07-05", orderNumber: "IMDE000188", referralId: "KDESCHMIT", belName: "Ava Schmidt", amount: 1685.20, currency: "EUR", status: "Shipped" },
+                { orderDate: "2025-07-05", orderNumber: "IMDE000188", referralId: "KDESCHMIT", belName: "Ava Schmidt", amount: 1685.20, currency: "EUR", status: "Processing" },
                 { orderDate: "2025-07-04", orderNumber: "IMNL000187", referralId: "KNLPIETER", belName: "Pieter van Berg", amount: 1450.30, currency: "EUR", status: "Completed" },
                 { orderDate: "2025-07-03", orderNumber: "IMSE000186", referralId: "KSEANDRES", belName: "Anders Larsson", amount: 16800, currency: "SEK", status: "Processing" },
                 { orderDate: "2025-07-02", orderNumber: "IMNO000185", referralId: "KNOERICSO", belName: "Erik Andersen", amount: 15200, currency: "NOK", status: "Completed" },
-                { orderDate: "2025-07-01", orderNumber: "IMCA000184", referralId: "KCAEMILYR", belName: "Emily Robertson", amount: 2350.75, currency: "CAD", status: "Shipped" }
+                { orderDate: "2025-07-01", orderNumber: "IMCA000184", referralId: "KCAEMILYR", belName: "Emily Robertson", amount: 2350.75, currency: "CAD", status: "Processing" }
             ]
         },
         content: {
@@ -623,7 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userProfile: document.querySelector('.bel-user-profile'),
         userProfilePanel: document.getElementById('user-profile-panel'),
         
-        // BEL Board
+        // Account Management
         regionSel: document.getElementById('f-region'),
         applyBtn: document.getElementById('apply-filters'),
         resetBtn: document.getElementById('reset-filters'),
@@ -661,7 +661,7 @@ document.addEventListener('DOMContentLoaded', () => {
         page: 1, 
         rowsPerPage: 20, 
         selected: new Set(),
-        filters: { keyword: '', level: '', region: '', start: '', end: '', activity: '' },
+        filters: { keyword: '', referralId: '', level: '', region: '', start: '', end: '', activity: '' },
         sortDir: 'desc', 
         currentReferralId: null, 
         notes: {},
@@ -672,8 +672,8 @@ document.addEventListener('DOMContentLoaded', () => {
         payoutRowsPerPage: 10,
         assetPage: 1, 
         assetRowsPerPage: 10,
-        orderPage: 1, 
-        orderRowsPerPage: 10,
+        orderPagePayout: 1, 
+        orderRowsPerPagePayout: 10,
         supportPage: 1, 
         supportRowsPerPage: 10,
         historyTicketsPage: 1,
@@ -957,7 +957,6 @@ document.addEventListener('DOMContentLoaded', () => {
         init() {
             this.renderSummaryStats();
             this.renderPerformanceTable();
-            this.renderLeaderboard();
             this.renderTopProducts();
             this.initializeCharts();
             this.setupViewSwitcher();
@@ -1005,30 +1004,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const performanceTable = document.querySelector('#performance-table-view table');
             if (performanceTable) {
                 TableUtils.makeTableSortable(performanceTable);
-            }
-        },
-
-        renderLeaderboard() {
-            const tableBody = document.querySelector('#leaderboard-table tbody');
-            if (!tableBody) return;
-            
-            tableBody.innerHTML = APP_DATA.dashboard.leaderboard.map(leader => `
-                <tr>
-                    <td><a href="#" class="referral-id-link open-bel-popup">${leader.id}</a></td>
-                    <td>${leader.name}</td>
-                    <td><span class="bel-badge ${leader.level.toLowerCase()}">${leader.level}</span></td>
-                    <td>${leader.clicks.toLocaleString()}</td>
-                    <td>${leader.orders}</td>
-                    <td>${utils.formatMoney(leader.revenue)}</td>
-                    <td>${leader.convRate}</td>
-                    <td>${utils.formatMoney(leader.aov, 2)}</td>
-                </tr>
-            `).join('');
-
-            // Apply sorting to the leaderboard table
-            const leaderboardTable = document.getElementById('leaderboard-table');
-            if (leaderboardTable) {
-                TableUtils.makeTableSortable(leaderboardTable);
             }
         },
 
@@ -1353,9 +1328,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /* ========================================================================
-       BEL BOARD MANAGEMENT
+       Account Management MANAGEMENT
        ======================================================================== */
-    const BELBoard = {
+    const AccountManagement = {
         belData: [],
 
         init() {
@@ -1404,6 +1379,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.thead?.addEventListener('click', (e) => this.handleSort(e));
             ui.exportBtn?.addEventListener('click', () => this.exportCSV());
 
+            // Search suggestions
+            this.setupSearchSuggestions();
+
             // Row selection
             document.addEventListener('click', (e) => {
                 if (e.target.classList.contains('row-check')) {
@@ -1428,15 +1406,19 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         getProcessedData() {
-            const { keyword, level, region, start, end, activity } = appState.filters;
+            const { keyword, referralId, level, region, start, end, activity } = appState.filters;
             const startDate = utils.parseDate(start);
             const endDate = utils.parseDate(end);
 
             let filtered = this.belData.filter(record => {
                 const kw = keyword.trim().toLowerCase();
-                if (kw && !(record.id.toLowerCase().includes(kw) || 
-                           record.name.toLowerCase().includes(kw) || 
-                           record.code.toLowerCase().includes(kw))) return false;
+                const rid = referralId.trim().toLowerCase();
+                
+                // Search by name field
+                if (kw && !record.name.toLowerCase().includes(kw)) return false;
+                // Search by referral ID field
+                if (rid && !record.id.toLowerCase().includes(rid)) return false;
+                
                 if (level && record.level !== level) return false;
                 if (region && record.country !== region) return false;
                 if (activity === 'clicks' && !(record.clicks30 > 0 && record.orders30 === 0)) return false;
@@ -1521,7 +1503,8 @@ document.addEventListener('DOMContentLoaded', () => {
             appState.page = 1;
             appState.selected.clear();
             appState.filters = {
-                keyword: document.getElementById('f-keyword')?.value || '',
+                keyword: document.getElementById('f-name')?.value || '',
+                referralId: document.getElementById('f-referral-id')?.value || '',
                 level: document.getElementById('f-level')?.value || '',
                 region: ui.regionSel?.value || '',
                 activity: document.getElementById('f-activity')?.value || ''
@@ -1586,6 +1569,176 @@ document.addEventListener('DOMContentLoaded', () => {
 
         exportCSV() {
             alert('Export CSV functionality is a placeholder for now.');
+        },
+
+        setupSearchSuggestions() {
+            // Setup for Name search
+            this.setupSearchForField('f-name', 'search-suggestions-name', 'name');
+            // Setup for Referral ID search
+            this.setupSearchForField('f-referral-id', 'search-suggestions-id', 'id');
+        },
+
+        setupSearchForField(inputId, suggestionsId, searchField) {
+            const searchInput = document.getElementById(inputId);
+            const suggestionsContainer = document.getElementById(suggestionsId);
+            
+            if (!searchInput || !suggestionsContainer) return;
+
+            let selectedIndex = -1;
+            let suggestions = [];
+
+            // Input event for showing suggestions
+            searchInput.addEventListener('input', utils.debounce((e) => {
+                const query = e.target.value.trim().toLowerCase();
+                selectedIndex = -1;
+                
+                if (query.length === 0) {
+                    this.hideSuggestions(suggestionsContainer);
+                    return;
+                }
+
+                // Find matching records based on search field
+                if (searchField === 'name') {
+                    suggestions = this.belData
+                        .filter(record => record.name.toLowerCase().includes(query))
+                        .slice(0, 8) // Limit to 8 suggestions
+                        .map(record => ({
+                            name: record.name,
+                            id: record.id,
+                            displayText: record.name,
+                            searchField: 'name'
+                        }));
+                } else if (searchField === 'id') {
+                    suggestions = this.belData
+                        .filter(record => record.id.toLowerCase().includes(query))
+                        .slice(0, 8) // Limit to 8 suggestions
+                        .map(record => ({
+                            name: record.name,
+                            id: record.id,
+                            displayText: `${record.id} - ${record.name}`,
+                            searchField: 'id'
+                        }));
+                }
+
+                if (suggestions.length > 0) {
+                    this.showSuggestions(suggestions, query, suggestionsContainer, searchInput);
+                } else {
+                    this.hideSuggestions(suggestionsContainer);
+                }
+            }, 150));
+
+            // Keyboard navigation
+            searchInput.addEventListener('keydown', (e) => {
+                const suggestionItems = suggestionsContainer.querySelectorAll('.search-suggestion-item');
+                
+                switch (e.key) {
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        selectedIndex = Math.min(selectedIndex + 1, suggestionItems.length - 1);
+                        this.highlightSuggestion(suggestionItems, selectedIndex);
+                        break;
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        selectedIndex = Math.max(selectedIndex - 1, -1);
+                        this.highlightSuggestion(suggestionItems, selectedIndex);
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        if (selectedIndex >= 0 && suggestionItems[selectedIndex]) {
+                            this.selectSuggestion(suggestions[selectedIndex], searchInput);
+                        } else {
+                            // Apply filter with current input value
+                            this.applyFilters();
+                        }
+                        break;
+                    case 'Escape':
+                        this.hideSuggestions(suggestionsContainer);
+                        searchInput.blur();
+                        break;
+                }
+            });
+
+            // Click outside to hide suggestions
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                    this.hideSuggestions(suggestionsContainer);
+                }
+            });
+
+            // Focus event to show suggestions if there's a value
+            searchInput.addEventListener('focus', () => {
+                if (searchInput.value.trim().length > 0) {
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+            });
+        },
+
+        showSuggestions(suggestions, query, suggestionsContainer, searchInput) {
+            if (!suggestionsContainer) return;
+
+            const html = suggestions.map((suggestion, index) => {
+                if (suggestion.searchField === 'id') {
+                    // For Referral ID search: Black ID, gray name
+                    const highlightedId = this.highlightMatch(suggestion.id, query);
+                    return `
+                        <div class="search-suggestion-item" data-index="${index}">
+                            <div class="suggestion-id-main">${highlightedId}</div>
+                            <div class="suggestion-name-sub">${suggestion.name}</div>
+                        </div>
+                    `;
+                } else {
+                    // For name search: use original format
+                    const highlightedName = this.highlightMatch(suggestion.name, query);
+                    return `
+                        <div class="search-suggestion-item" data-index="${index}">
+                            <div class="suggestion-content">${highlightedName}</div>
+                        </div>
+                    `;
+                }
+            }).join('');
+
+            suggestionsContainer.innerHTML = html;
+            suggestionsContainer.classList.add('show');
+
+            // Add click listeners to suggestion items
+            suggestionsContainer.querySelectorAll('.search-suggestion-item').forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    this.selectSuggestion(suggestions[index], searchInput);
+                });
+            });
+        },
+
+        hideSuggestions(suggestionsContainer) {
+            if (suggestionsContainer) {
+                suggestionsContainer.classList.remove('show');
+                suggestionsContainer.innerHTML = '';
+            }
+        },
+
+        highlightSuggestion(items, index) {
+            items.forEach((item, i) => {
+                item.classList.toggle('highlighted', i === index);
+            });
+        },
+
+        selectSuggestion(suggestion, searchInput) {
+            if (searchInput) {
+                if (suggestion.searchField === 'name') {
+                    searchInput.value = suggestion.name;
+                } else if (suggestion.searchField === 'id') {
+                    searchInput.value = suggestion.id;
+                }
+                const suggestionsContainer = searchInput.nextElementSibling;
+                this.hideSuggestions(suggestionsContainer);
+                this.applyFilters();
+            }
+        },
+
+        highlightMatch(text, query) {
+            if (!query) return text;
+            
+            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<mark style="background-color: var(--ds-color-primary-light-30); font-weight: var(--fw-semibold);">$1</mark>');
         }
     };
 
@@ -1638,7 +1791,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         openModal(id, linkElement = null) {
-            let record = BELBoard.belData.find(r => r.id === id);
+            let record = AccountManagement.belData.find(r => r.id === id);
             
             if (!record && linkElement) {
                 // Extract data from table row if not found in belData
@@ -1717,7 +1870,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (firstTabId === 'overview') {
                 // Trigger chart initialization after a short delay to ensure DOM is ready
                 setTimeout(() => {
-                    const record = BELBoard.belData.find(x => x.id === appState.currentReferralId);
+                    const record = AccountManagement.belData.find(x => x.id === appState.currentReferralId);
                     if (record) {
                         this.initializeIndividualPerformanceChart(record);
                         this.initializePerformanceTrendChart(record);
@@ -1878,7 +2031,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (!appState.customerInsights[referralId]) {
                 // Create demo data based on BEL level and characteristics
-                const record = BELBoard.belData.find(x => x.id === referralId);
+                const record = AccountManagement.belData.find(x => x.id === referralId);
                 appState.customerInsights[referralId] = this.generateDemoInsights(record);
             }
             
@@ -1928,7 +2081,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         generateDemoSalesData(referralId) {
             // Get BEL record to determine sales pattern based on level and performance
-            const record = BELBoard.belData.find(x => x.id === referralId);
+            const record = AccountManagement.belData.find(x => x.id === referralId);
             const level = record?.level || 'Explorer';
             const revenue = record?.revenue30 || 5000;
             
@@ -2327,9 +2480,9 @@ document.addEventListener('DOMContentLoaded', () => {
         saveAccountChanges() {
             if (!appState.currentReferralId) return;
             
-            const record = BELBoard.belData.find(x => x.id === appState.currentReferralId);
+            const record = AccountManagement.belData.find(x => x.id === appState.currentReferralId);
             if (!record) {
-                this.showCustomAlert('This referral is not editable from BEL Board.', 'error');
+                this.showCustomAlert('This referral is not editable from Account Management.', 'error');
                 this.closeModal();
                 return;
             }
@@ -2347,9 +2500,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             this.showCustomAlert(`Saved changes for ${record.name}.`, 'success');
             
-            // Update both BEL Board and Dashboard
-            BELBoard.renderTable();
-            Dashboard.renderLeaderboard();
+            // Update both Account Management and Dashboard
+            AccountManagement.renderTable();
             Dashboard.renderPerformanceTable();
             
             this.closeModal();
@@ -2702,7 +2854,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Get current user email for banking history
-            const currentRecord = BELBoard.belData.find(x => x.id === appState.currentReferralId);
+            const currentRecord = AccountManagement.belData.find(x => x.id === appState.currentReferralId);
             const userEmail = currentRecord?.email || 'maxwell.walker@advantech.com';
 
             // Create demo history data
@@ -2762,7 +2914,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (ui.modalNote) ui.modalNote.value = '';
             
             // Find the complete BEL record and refresh modal with full data
-            const fullRecord = BELBoard.belData.find(record => record.id === appState.currentReferralId);
+            const fullRecord = AccountManagement.belData.find(record => record.id === appState.currentReferralId);
             if (fullRecord) {
                 this.fillModal(fullRecord);
             }
@@ -2805,14 +2957,13 @@ document.addEventListener('DOMContentLoaded', () => {
         imageModalEl: null,
         confirmModalEl: null,
         formModalEl: null,
+        historyTicketsModalEl: null,
         
         init() {
             this.setupEventListeners(); // 先設置事件監聽器
             this.injectPayoutsAndOrders();
-            this.injectOrders();
             this.injectContent();
             this.injectContactSupport();
-            this.injectAnnouncements();
         },
 
         injectPayoutsAndOrders() {
@@ -2820,7 +2971,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!payoutsOrderRoot) return;
 
             payoutsOrderRoot.innerHTML = `
-                <h1 class="bel-h1">Payouts</h1>
+                <h1 class="bel-h1">Payouts & Orders</h1>
                 <div class="bel-panel" id="payouts-history-panel">
                     <div class="panel-header">
                         <h3 style="margin:0;">Payout History 
@@ -2841,25 +2992,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         </table>
                     </div>
                 </div>
-            `;
-
-            // Render data after DOM injection
-            setTimeout(() => this.renderPayoutHistory(), 0);
-        },
-
-        injectOrders() {
-            const ordersRoot = document.getElementById('orders');
-            if (!ordersRoot) return;
-
-            ordersRoot.innerHTML = `
-                <h1 class="bel-h1">Orders</h1>
                 
-                <div class="bel-panel" id="order-tracking-panel">
+                <div class="bel-panel" id="order-tracking-panel-payout" style="margin-top: 20px;">
                     <div class="panel-header">
                         <h3 style="margin:0;">Order Tracking</h3>
                     </div>
                     <div class="scrollable-table-container">
-                        <table class="bel-table" id="order-tracking-table">
+                        <table class="bel-table" id="order-tracking-table-payout">
                             <thead>
                                 <tr>
                                     <th data-sortable data-type="string">Order Placed</th>
@@ -2875,19 +3014,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="pagination-bar">
                         <div class="rows-select">
-                            <label for="order-rows-per-page">Rows per page</label>
-                            <select id="order-rows-per-page" class="bel-select" style="width: 70px;">
+                            <label for="order-rows-per-page-payout">Rows per page</label>
+                            <select id="order-rows-per-page-payout" class="bel-select" style="width: 70px;">
                                 <option>5</option>
                                 <option selected>10</option>
                                 <option>20</option>
                             </select>
                         </div>
                         <div class="pagination-controls">
-                            <span id="order-range-label" class="text-muted">0–0 of 0</span>
-                            <button class="bel-btn secondary" id="order-prev-page" aria-label="Previous page">
+                            <span id="order-range-label-payout" class="text-muted">0–0 of 0</span>
+                            <button class="bel-btn secondary" id="order-prev-page-payout" aria-label="Previous page">
                                 <i class="fas fa-chevron-left"></i>
                             </button>
-                            <button class="bel-btn secondary" id="order-next-page" aria-label="Next page">
+                            <button class="bel-btn secondary" id="order-next-page-payout" aria-label="Next page">
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                         </div>
@@ -2897,8 +3036,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Render data after DOM injection
             setTimeout(() => {
-                this.renderOrders();
-                this.setupOrdersPagination();
+                this.renderPayoutHistory();
+                this.renderOrdersInPayout();
+                this.setupOrdersPaginationForPayout();
             }, 0);
         },
 
@@ -2907,10 +3047,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!contentRoot) return;
 
             contentRoot.innerHTML = `
-                <h1 class="bel-h1">Content</h1>
+                <h1 class="bel-h1">Publish Resource</h1>
                 <div class="bel-panel" id="content-mgmt-panel">
                     <div class="panel-header">
-                        <h3 style="margin:0;">Content Management (Central CMS)</h3>
+                        <h3 style="margin:0;">Content Management</h3>
                         <button class="bel-btn primary" id="asset-add-btn">
                             <i class="fas fa-plus"></i> Add Asset
                         </button>
@@ -2942,12 +3082,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!contactSupportRoot) return;
 
             contactSupportRoot.innerHTML = `
-                <h1 class="bel-h1">Contact Support</h1>
+                <h1 class="bel-h1">Respond to Leader</h1>
                 
                 <!-- Open Tickets Table -->
                 <div class="bel-panel" id="open-tickets-panel">
                     <div class="panel-header">
                         <h3 style="margin:0;">Open Tickets</h3>
+                        <button class="bel-btn secondary" id="view-history-tickets-btn">
+                            <i class="fas fa-history"></i> View History Tickets
+                        </button>
                     </div>
                     <div class="scrollable-table-container">
                         <table class="bel-table" id="open-tickets-table">
@@ -2966,62 +3109,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
 
-                <!-- History Tickets Table -->
-                <div class="bel-panel" id="history-tickets-panel" style="margin-top: 20px;">
-                    <div class="panel-header">
-                        <h3 style="margin:0;">History Tickets</h3>
-                    </div>
-                    <div class="scrollable-table-container">
-                        <table class="bel-table" id="history-tickets-table">
-                            <thead>
-                                <tr>
-                                    <th data-sortable data-type="string">Ticket #</th>
-                                    <th data-sortable data-type="string">BEL Name</th>
-                                    <th data-sortable data-type="string">Referral ID</th>
-                                    <th data-sortable data-type="string">Subject</th>
-                                    <th data-sortable data-type="string">Status</th>
-                                    <th>View Detail</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                    <!-- Pagination for History Tickets -->
-                    <div class="pagination-bar">
-                        <div class="rows-select">
-                            <label for="history-rows-per-page">Rows per page</label>
-                            <select id="history-rows-per-page" class="bel-select" style="width: 70px;">
-                                <option>5</option>
-                                <option selected>10</option>
-                                <option>20</option>
-                            </select>
-                        </div>
-                        <div class="pagination-controls">
-                            <span id="history-range-label" class="text-muted">0–0 of 0</span>
-                            <button class="bel-btn secondary" id="history-prev-page" aria-label="Previous page">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="bel-btn secondary" id="history-next-page" aria-label="Next page">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            setTimeout(() => {
-                this.renderContactSupportTickets();
-                this.setupHistoryTicketsPagination();
-            }, 0);
-        },
-
-        injectAnnouncements() {
-            const announcementsRoot = document.getElementById('announcements');
-            if (!announcementsRoot) return;
-
-            announcementsRoot.innerHTML = `
-                <h1 class="bel-h1">Announcements</h1>
-                <div class="bel-panel" id="announcements-panel">
+                <!-- System Announcements Panel -->
+                <div class="bel-panel" id="announcements-panel" style="margin-top: 20px;">
                     <div class="panel-header">
                         <h3 style="margin:0;">System Announcements</h3>
                         <button class="bel-btn primary" id="send-announcement-btn-new">
@@ -3045,7 +3134,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            setTimeout(() => this.renderAnnouncementsNew(), 0);
+            setTimeout(() => {
+                this.renderContactSupportTickets();
+                this.renderAnnouncementsNew();
+            }, 0);
         },
 
         renderPayoutHistory() {
@@ -3073,14 +3165,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        renderOrders() {
-            const tableBody = document.querySelector('#order-tracking-table tbody');
+        renderOrdersInPayout() {
+            const tableBody = document.querySelector('#order-tracking-table-payout tbody');
             if (!tableBody) return;
             
             const orders = APP_DATA.orders.history;
             const totalOrders = orders.length;
-            const startIndex = (appState.orderPage - 1) * appState.orderRowsPerPage;
-            const endIndex = Math.min(startIndex + appState.orderRowsPerPage, totalOrders);
+            const startIndex = (appState.orderPagePayout - 1) * appState.orderRowsPerPagePayout;
+            const endIndex = Math.min(startIndex + appState.orderRowsPerPagePayout, totalOrders);
             const paginatedOrders = orders.slice(startIndex, endIndex);
             
             tableBody.innerHTML = paginatedOrders.map(order => {
@@ -3102,20 +3194,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('');
 
             // Update pagination UI
-            this.updateOrdersPaginationUI(totalOrders, startIndex, endIndex);
+            this.updateOrdersPaginationUIForPayout(totalOrders, startIndex, endIndex);
 
             // Apply sorting to order tracking table
-            const orderTable = document.getElementById('order-tracking-table');
+            const orderTable = document.getElementById('order-tracking-table-payout');
             if (orderTable) {
                 TableUtils.makeTableSortable(orderTable);
             }
         },
 
-        updateOrdersPaginationUI(totalOrders, startIndex, endIndex) {
-            const rangeLabel = document.getElementById('order-range-label');
-            const prevBtn = document.getElementById('order-prev-page');
-            const nextBtn = document.getElementById('order-next-page');
-            const rowsSelect = document.getElementById('order-rows-per-page');
+        updateOrdersPaginationUIForPayout(totalOrders, startIndex, endIndex) {
+            const rangeLabel = document.getElementById('order-range-label-payout');
+            const prevBtn = document.getElementById('order-prev-page-payout');
+            const nextBtn = document.getElementById('order-next-page-payout');
+            const rowsSelect = document.getElementById('order-rows-per-page-payout');
 
             if (rangeLabel) {
                 const from = totalOrders === 0 ? 0 : startIndex + 1;
@@ -3124,7 +3216,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (prevBtn) {
-                prevBtn.disabled = appState.orderPage === 1;
+                prevBtn.disabled = appState.orderPagePayout === 1;
             }
 
             if (nextBtn) {
@@ -3134,21 +3226,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (rowsSelect) {
                 // Set the selected value based on current appState, default to 10 if not available
                 const availableOptions = ['5', '10', '20'];
-                const currentValue = appState.orderRowsPerPage.toString();
+                const currentValue = appState.orderRowsPerPagePayout.toString();
                 rowsSelect.value = availableOptions.includes(currentValue) ? currentValue : '10';
             }
         },
 
-        setupOrdersPagination() {
-            const prevBtn = document.getElementById('order-prev-page');
-            const nextBtn = document.getElementById('order-next-page');
-            const rowsSelect = document.getElementById('order-rows-per-page');
+        setupOrdersPaginationForPayout() {
+            const prevBtn = document.getElementById('order-prev-page-payout');
+            const nextBtn = document.getElementById('order-next-page-payout');
+            const rowsSelect = document.getElementById('order-rows-per-page-payout');
 
             if (prevBtn) {
                 prevBtn.addEventListener('click', () => {
-                    if (appState.orderPage > 1) {
-                        appState.orderPage--;
-                        this.renderOrders();
+                    if (appState.orderPagePayout > 1) {
+                        appState.orderPagePayout--;
+                        this.renderOrdersInPayout();
                     }
                 });
             }
@@ -3156,19 +3248,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (nextBtn) {
                 nextBtn.addEventListener('click', () => {
                     const totalOrders = APP_DATA.orders.history.length;
-                    const maxPage = Math.ceil(totalOrders / appState.orderRowsPerPage);
-                    if (appState.orderPage < maxPage) {
-                        appState.orderPage++;
-                        this.renderOrders();
+                    const maxPage = Math.ceil(totalOrders / appState.orderRowsPerPagePayout);
+                    if (appState.orderPagePayout < maxPage) {
+                        appState.orderPagePayout++;
+                        this.renderOrdersInPayout();
                     }
                 });
             }
 
             if (rowsSelect) {
                 rowsSelect.addEventListener('change', (e) => {
-                    appState.orderRowsPerPage = parseInt(e.target.value, 10);
-                    appState.orderPage = 1; // Reset to first page
-                    this.renderOrders();
+                    appState.orderRowsPerPagePayout = parseInt(e.target.value, 10);
+                    appState.orderPagePayout = 1; // Reset to first page
+                    this.renderOrdersInPayout();
                 });
             }
         },
@@ -3202,14 +3294,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderContactSupportTickets() {
             const openTableBody = document.querySelector('#open-tickets-table tbody');
-            const historyTableBody = document.querySelector('#history-tickets-table tbody');
-            if (!openTableBody || !historyTableBody) return;
+            if (!openTableBody) return;
             
             const tickets = APP_DATA.contactSupport.tickets;
             
             // Separate tickets into open and history
             const openTickets = tickets.filter(ticket => ticket.status === 'Open');
-            const allHistoryTickets = tickets.filter(ticket => ticket.status === 'Closed');
             
             // Render open tickets (no pagination)
             openTableBody.innerHTML = openTickets.map(ticket => `
@@ -3226,14 +3316,132 @@ document.addEventListener('DOMContentLoaded', () => {
                     </td>
                 </tr>
             `).join('');
+
+            // Apply sorting to open tickets table
+            const openTicketsTable = document.getElementById('open-tickets-table');
+            if (openTicketsTable) {
+                TableUtils.makeTableSortable(openTicketsTable);
+            }
+        },
+
+        ensureHistoryTicketsModal() {
+            if (this.historyTicketsModalEl) return this.historyTicketsModalEl;
             
-            // Implement pagination for history tickets
+            const wrap = document.createElement('div');
+            wrap.className = 'modal-overlay';
+            wrap.id = 'history-tickets-modal';
+            wrap.innerHTML = `
+                <div class="modal-content" style="max-width:1200px;">
+                    <div class="modal-header">
+                        <h3 style="margin:0;">History Tickets</h3>
+                        <button class="close-button" aria-label="Close">&times;</button>
+                    </div>
+                    <div class="modal-body-grid" style="grid-template-columns: 1fr;">
+                        <div>
+                            <div class="scrollable-table-container">
+                                <table class="bel-table" id="history-tickets-modal-table">
+                                    <thead>
+                                        <tr>
+                                            <th data-sortable data-type="string">Ticket #</th>
+                                            <th data-sortable data-type="string">BEL Name</th>
+                                            <th data-sortable data-type="string">Referral ID</th>
+                                            <th data-sortable data-type="string">Subject</th>
+                                            <th data-sortable data-type="string">Status</th>
+                                            <th>View Detail</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                            <!-- Pagination for History Tickets Modal -->
+                            <div class="pagination-bar" style="margin-top: 16px;">
+                                <div class="rows-select">
+                                    <label for="history-modal-rows-per-page">Rows per page</label>
+                                    <select id="history-modal-rows-per-page" class="bel-select" style="width: 70px;">
+                                        <option>5</option>
+                                        <option selected>10</option>
+                                        <option>20</option>
+                                    </select>
+                                </div>
+                                <div class="pagination-controls">
+                                    <span id="history-modal-range-label" class="text-muted">0–0 of 0</span>
+                                    <button class="bel-btn secondary" id="history-modal-prev-page" aria-label="Previous page">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <button class="bel-btn secondary" id="history-modal-next-page" aria-label="Next page">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(wrap);
+            this.historyTicketsModalEl = wrap;
+
+            const close = () => this.historyTicketsModalEl.classList.remove('show');
+            this.historyTicketsModalEl.querySelector('.close-button')?.addEventListener('click', close);
+            this.historyTicketsModalEl.addEventListener('click', (e) => { 
+                if (e.target === this.historyTicketsModalEl) close(); 
+            });
+
+            // Setup pagination for the modal
+            this.setupHistoryTicketsModalPagination();
+
+            return this.historyTicketsModalEl;
+        },
+
+        setupHistoryTicketsModalPagination() {
+            // Setup event listeners for history tickets modal pagination
+            const historyRowsPerPageSelect = document.getElementById('history-modal-rows-per-page');
+            const historyPrevBtn = document.getElementById('history-modal-prev-page');
+            const historyNextBtn = document.getElementById('history-modal-next-page');
+            
+            if (historyRowsPerPageSelect) {
+                historyRowsPerPageSelect.addEventListener('change', () => {
+                    appState.historyTicketsRowsPerPage = parseInt(historyRowsPerPageSelect.value, 10) || 10;
+                    appState.historyTicketsPage = 1;
+                    this.renderHistoryTicketsModal();
+                });
+            }
+            
+            if (historyPrevBtn) {
+                historyPrevBtn.addEventListener('click', () => {
+                    if (appState.historyTicketsPage > 1) {
+                        appState.historyTicketsPage--;
+                        this.renderHistoryTicketsModal();
+                    }
+                });
+            }
+            
+            if (historyNextBtn) {
+                historyNextBtn.addEventListener('click', () => {
+                    const tickets = APP_DATA.contactSupport.tickets;
+                    const allHistoryTickets = tickets.filter(ticket => ticket.status === 'Closed');
+                    const total = allHistoryTickets.length;
+                    if (appState.historyTicketsPage * appState.historyTicketsRowsPerPage < total) {
+                        appState.historyTicketsPage++;
+                        this.renderHistoryTicketsModal();
+                    }
+                });
+            }
+        },
+
+        renderHistoryTicketsModal() {
+            const modalTableBody = document.querySelector('#history-tickets-modal-table tbody');
+            if (!modalTableBody) return;
+            
+            const tickets = APP_DATA.contactSupport.tickets;
+            const allHistoryTickets = tickets.filter(ticket => ticket.status === 'Closed');
+            
+            // Implement pagination for history tickets modal
             const historyTotal = allHistoryTickets.length;
             const historyStartIndex = (appState.historyTicketsPage - 1) * appState.historyTicketsRowsPerPage;
             const historyPageItems = allHistoryTickets.slice(historyStartIndex, historyStartIndex + appState.historyTicketsRowsPerPage);
             
             // Render history tickets with pagination
-            historyTableBody.innerHTML = historyPageItems.map(ticket => `
+            modalTableBody.innerHTML = historyPageItems.map(ticket => `
                 <tr>
                     <td>${ticket.ticketNumber}</td>
                     <td>${ticket.belName}</td>
@@ -3248,24 +3456,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 </tr>
             `).join('');
 
-            // Update pagination UI for history tickets
-            this.updateHistoryTicketsPaginationUI(historyTotal, historyStartIndex, historyPageItems);
+            // Update pagination UI for history tickets modal
+            this.updateHistoryTicketsModalPaginationUI(historyTotal, historyStartIndex, historyPageItems);
 
-            // Apply sorting to both tables
-            const openTicketsTable = document.getElementById('open-tickets-table');
-            const historyTicketsTable = document.getElementById('history-tickets-table');
-            if (openTicketsTable) {
-                TableUtils.makeTableSortable(openTicketsTable);
-            }
-            if (historyTicketsTable) {
-                TableUtils.makeTableSortable(historyTicketsTable);
+            // Apply sorting to modal table
+            const historyTicketsModalTable = document.getElementById('history-tickets-modal-table');
+            if (historyTicketsModalTable) {
+                TableUtils.makeTableSortable(historyTicketsModalTable);
             }
         },
 
-        updateHistoryTicketsPaginationUI(total, startIndex, pageItems) {
-            const historyRangeLabel = document.getElementById('history-range-label');
-            const historyPrevBtn = document.getElementById('history-prev-page');
-            const historyNextBtn = document.getElementById('history-next-page');
+        updateHistoryTicketsModalPaginationUI(total, startIndex, pageItems) {
+            const historyRangeLabel = document.getElementById('history-modal-range-label');
+            const historyPrevBtn = document.getElementById('history-modal-prev-page');
+            const historyNextBtn = document.getElementById('history-modal-next-page');
             
             if (historyRangeLabel) {
                 const from = total === 0 ? 0 : startIndex + 1;
@@ -3283,40 +3487,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        setupHistoryTicketsPagination() {
-            // Setup event listeners for history tickets pagination
-            const historyRowsPerPageSelect = document.getElementById('history-rows-per-page');
-            const historyPrevBtn = document.getElementById('history-prev-page');
-            const historyNextBtn = document.getElementById('history-next-page');
-            
-            if (historyRowsPerPageSelect) {
-                historyRowsPerPageSelect.addEventListener('change', () => {
-                    appState.historyTicketsRowsPerPage = parseInt(historyRowsPerPageSelect.value, 10) || 10;
-                    appState.historyTicketsPage = 1;
-                    this.renderContactSupportTickets();
-                });
-            }
-            
-            if (historyPrevBtn) {
-                historyPrevBtn.addEventListener('click', () => {
-                    if (appState.historyTicketsPage > 1) {
-                        appState.historyTicketsPage--;
-                        this.renderContactSupportTickets();
-                    }
-                });
-            }
-            
-            if (historyNextBtn) {
-                historyNextBtn.addEventListener('click', () => {
-                    const tickets = APP_DATA.contactSupport.tickets;
-                    const allHistoryTickets = tickets.filter(ticket => ticket.status === 'Closed');
-                    const total = allHistoryTickets.length;
-                    if (appState.historyTicketsPage * appState.historyTicketsRowsPerPage < total) {
-                        appState.historyTicketsPage++;
-                        this.renderContactSupportTickets();
-                    }
-                });
-            }
+        openHistoryTicketsModal() {
+            const modal = this.ensureHistoryTicketsModal();
+            this.renderHistoryTicketsModal();
+            modal.classList.add('show');
         },
 
         getCategoryBadgeClass(category) {
@@ -3824,6 +3998,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.ensureAnnouncementModal().classList.add('show');
                     return;
                 }
+
+                // Event delegation for view history tickets button
+                const historyTicketsBtn = e.target.closest('#view-history-tickets-btn');
+                if (historyTicketsBtn) {
+                    this.openHistoryTicketsModal();
+                    return;
+                }
             });
         },
 
@@ -4319,7 +4500,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Initialize all modules
             Navigation.init();
             Dashboard.init();
-            BELBoard.init();
+            AccountManagement.init();
             BELModal.init();
             ContentManager.init();
 

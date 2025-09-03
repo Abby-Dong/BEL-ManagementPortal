@@ -30,7 +30,7 @@ BEL-management Portal-0830/
 - 分析產品銷售數據
 - 支援圖表切換檢視
 
-### BEL Board（BEL 管理）
+### Account Management（BEL 管理）
 - 篩選和搜尋 BEL 成員
 - 批次選擇和操作
 - 查看詳細個人資料

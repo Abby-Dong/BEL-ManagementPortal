@@ -46,7 +46,7 @@
     --bel-sidebar-active-bg: rgba(255, 255, 255, 0.2);
     
     /* -- Layout Sizes -- */
-    --bel-sidebar-width: 250px;
+    --bel-sidebar-width: 260px;
     --bel-header-height: 56px;
 
     /* -- Scrollbar -- */
@@ -829,6 +829,74 @@ body::-webkit-scrollbar-track,
     font-size: var(--fs-sm); 
     background-color: var(--ds-color-white); 
     transition: all 0.2s ease; 
+}
+
+/* Search Input Container and Suggestions */
+.search-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--ds-color-white);
+    border: 1px solid var(--ot-color-gray-45);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-suggestions.show {
+    display: block;
+}
+
+.search-suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--ds-color-gray-40);
+    font-size: var(--fs-sm);
+    color: var(--ds-color-gray-90);
+    transition: background-color 0.2s ease;
+}
+
+.search-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.search-suggestion-item:hover,
+.search-suggestion-item.highlighted {
+    background-color: var(--ds-color-primary-light-10);
+    color: var(--ds-color-primary-dark);
+}
+
+.search-suggestion-item .suggestion-name {
+    font-weight: var(--fw-semibold);
+}
+
+.search-suggestion-item .suggestion-id {
+    font-size: var(--fs-xs);
+    color: var(--ds-color-gray-70);
+}
+
+/* New styles for Referral ID search suggestions */
+.search-suggestion-item .suggestion-id-main {
+    font-weight: var(--fw-semibold);
+    color: var(--ds-color-gray-90);
+    line-height: 1.2;
+}
+
+.search-suggestion-item .suggestion-name-sub {
+    font-size: var(--fs-xs);
+    color: var(--ds-color-gray-60);
+    line-height: 1.2;
+    margin-top: 2px;
 }
 
 .section-title select { 
@@ -1717,7 +1785,7 @@ body::-webkit-scrollbar-track,
     gap: 0.5rem;
 }
 
-/* --- Page-Specific UI (BEL Board) --- */
+/* --- Page-Specific UI (Account Management) --- */
 .filters-grid { 
     display: grid; 
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 

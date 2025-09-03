@@ -1,4 +1,4 @@
-# BEL 管理面板 (`#BEL-board`)
+# BEL 管理面板 (`#Account-Management`)
 
 BEL 管理面板是一個綜合管理工具，用於檢視、篩選和組織所有品牌推廣者 (BEL)。
 
@@ -54,7 +54,7 @@ BEL 管理面板是一個綜合管理工具，用於檢視、篩選和組織所�
 
 BEL 資料來自 `data/bel-board.json`（注意：此檔案可能需要建立或屬於另一個 JSON 檔案的一部分）。
 
-# BEL Board (`#BEL-board`)
+# Account Management (`#Account-Management`)
 
-The BEL Board is a comprehensive management tool for viewing, filtering, and organizing all Brand Evangelist Leaders (BELs).
+The Account Management is a comprehensive management tool for viewing, filtering, and organizing all Brand Evangelist Leaders (BELs).
 

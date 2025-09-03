@@ -62,32 +62,24 @@
                     <i class="fas fa-tachometer-alt fa-fw"></i>
                     <span>Sales Performance</span>
                 </a>
-                <a href="#BEL-board" class="bel-sidebar-nav-link">
-                    <i class="fas fa-user-circle fa-fw"></i>
-                    <span>BEL Board</span>
-                </a>
                 <a href="#payouts-order" class="bel-sidebar-nav-link">
                     <i class="fas fa-wallet fa-fw"></i>
-                    <span>Payouts</span>
+                    <span>Payouts & Orders</span>
                 </a>
-                <a href="#orders" class="bel-sidebar-nav-link">
-                    <i class="fas fa-shopping-cart fa-fw"></i>
-                    <span>Orders</span>
-                </a>
-                <a href="#content" class="bel-sidebar-nav-link">
-                    <i class="fas fa-folder fa-fw"></i>
-                    <span>Content</span>
+                <a href="#Account-Management" class="bel-sidebar-nav-link">
+                    <i class="fas fa-user-circle fa-fw"></i>
+                    <span>Account Management</span>
                 </a>
             </nav>
             <div class="bel-sidebar-menu-title">HELP & SUPPORT</div>
             <nav class="bel-sidebar-nav">
                 <a href="#contact-support" class="bel-sidebar-nav-link">
                     <i class="fas fa-headset fa-fw"></i>
-                    <span>Contact Support</span>
+                    <span>Respond to Leader</span>
                 </a>
-                <a href="#announcements" class="bel-sidebar-nav-link">
-                    <i class="fas fa-bullhorn fa-fw"></i>
-                    <span>Announcements</span>
+                <a href="#content" class="bel-sidebar-nav-link">
+                    <i class="fas fa-folder fa-fw"></i>
+                    <span>Publish Resource</span>
                 </a>
             </nav>
         </aside>
@@ -105,7 +97,7 @@
                 </div>
                 
                 <!-- BEL Performance by Level -->
-                <h3 class="bel-h3">BEL Level Distribution & Performance</h3>
+                <h3 class="bel-h3">Level Distribution & Performance</h3>
                 <div class="bel-panel">
                     <div class="performance-grid">
                         <div>
@@ -149,30 +141,6 @@
                     </div>
                 </div>
 
-                <!-- Top 10 BEL Performance Leaderboard -->
-                <h3 class="bel-h3">Top 10 BEL Performance Leaderboard</h3>
-                <div class="bel-panel">
-                    <div class="scrollable-table-container">
-                        <table class="bel-table" id="leaderboard-table">
-                            <thead>
-                                <tr>
-                                    <th data-sortable>Referral ID</th>
-                                    <th data-sortable>Name</th>
-                                    <th data-sortable>Level</th>
-                                    <th data-sortable data-type="number">Clicks</th>
-                                    <th data-sortable data-type="number">Orders</th>
-                                    <th data-sortable data-type="number">Revenue</th>
-                                    <th data-sortable data-type="number">C2O CVR (%)</th>
-                                    <th data-sortable data-type="number">AOV</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Leaderboard data will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
                 <!-- Product Sales Analysis -->
                 <div class="section-title">
                     <h3>Product Sales Analysis</h3>
@@ -207,14 +175,28 @@
                     </div>
                 </div>
 
-                <h3 class="bel-h3">BEL Performance Leaderboard</h3>
+
                 <!-- Filters Panel -->
+                <div class="section-title">
+                    <h3>Top 10 BEL Performance Leaderboard</h3>
+                </div>
+               <!-- Filters Panel -->
                 <div class="bel-panel">
                     <h3 class="bel-h3" style="margin-top:0; font-size: 1.25rem;">Filters</h3>
                     <form id="bel-filters" class="filters-grid">
                         <div class="bel-form-group">
-                            <label for="f-keyword">Keyword</label>
-                            <input id="f-keyword" class="bel-input" type="search" placeholder="Search name, ID, or code" />
+                            <label for="f-referral-id">Referral ID</label>
+                            <div class="search-input-container">
+                                <input id="f-referral-id" class="bel-input" type="search" placeholder="Search Referral ID" autocomplete="off" />
+                                <div id="search-suggestions-id" class="search-suggestions"></div>
+                            </div>
+                        </div>
+                        <div class="bel-form-group">
+                            <label for="f-name">Name</label>
+                            <div class="search-input-container">
+                                <input id="f-name" class="bel-input" type="search" placeholder="Search Name" autocomplete="off" />
+                                <div id="search-suggestions-name" class="search-suggestions"></div>
+                            </div>
                         </div>
                         <div class="bel-form-group">
                             <label for="f-level">Level</label>
@@ -310,21 +292,15 @@
                     </div>
                 </div>
 
-
             </div>
 
-            <!-- BEL Board Section -->
-            <div id="BEL-board" class="content-section">
-                <h1 class="bel-h1">BEL Board</h1>
+            <!-- Account Management Section -->
+            <div id="Account-Management" class="content-section">
+                <h1 class="bel-h1">Account Management</h1>
             </div>
 
             <!-- Payouts & Orders Section -->
             <div id="payouts-order" class="content-section">
-                <!-- Content will be dynamically injected by JavaScript -->
-            </div>
-
-            <!-- Orders Section -->
-            <div id="orders" class="content-section">
                 <!-- Content will be dynamically injected by JavaScript -->
             </div>
 
@@ -335,11 +311,6 @@
 
             <!-- Contact Support Section -->
             <div id="contact-support" class="content-section">
-                <!-- Content will be dynamically injected by JavaScript -->
-            </div>
-
-            <!-- Announcements Section -->
-            <div id="announcements" class="content-section">
                 <!-- Content will be dynamically injected by JavaScript -->
             </div>
         </div>
