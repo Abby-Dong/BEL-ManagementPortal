@@ -120,7 +120,7 @@ class DataLoader {
                 avatar: "https://irp.cdn-website.com/56869327/dms3rep/multi/AVATAR-G.png"
             },
             'data/header.json': {
-                portalTitle: "BEL Management Portal",
+                portalTitle: "BEL Portal",
                 logo: "https://irp.cdn-website.com/56869327/dms3rep/multi/iotmart-logo.svg",
                 notifications: []
             },

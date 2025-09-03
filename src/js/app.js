@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
             avatar: "https://irp.cdn-website.com/56869327/dms3rep/multi/AVATAR-G.png"
         },
         header: {
-            portalTitle: "BEL Management Portal",
+            portalTitle: "BEL Portal",
             logo: "https://irp.cdn-website.com/56869327/dms3rep/multi/iotmart-logo.svg",
             notifications: [
                 {
@@ -74,12 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         dashboard: {
             summaryStats: {
-                belCount: { title: "BEL Count", value: "152", icon: "fas fa-users", trend: "+5.1%", trendText: "Since last month", status: "positive" },
-                totalClicks: { title: "Total Clicks", value: "13,492", icon: "fas fa-mouse-pointer", trend: "+12.3%", trendText: "Since last month", status: "positive" },
-                totalOrders: { title: "Total Orders", value: "851", icon: "fas fa-shopping-cart", trend: "+8.2%", trendText: "Since last month", status: "positive" },
-                revenue: { title: "Revenue", value: "$120k", icon: "fas fa-dollar-sign", trend: "+15.8%", trendText: "Since last month", status: "positive" },
-                convRate: { title: "Conv Rate", value: "6.31%", icon: "fas fa-bullseye", trend: "-0.5%", trendText: "Since last month", status: "negative" },
-                aov: { title: "AOV", value: "$141.5", icon: "fas fa-file-invoice-dollar", trend: "+2.1%", trendText: "Since last month", status: "positive" }
+                belCount: { title: "BEL Count (#)", value: "152", icon: "fas fa-users", trend: "+5.1%", trendText: "MoM", status: "positive" },
+                totalClicks: { title: "Total Clicks (#)", value: "13,492", icon: "fas fa-mouse-pointer", trend: "+12.3%", trendText: "MoM", status: "positive" },
+                totalOrders: { title: "Total Orders (#)", value: "851", icon: "fas fa-shopping-cart", trend: "+8.2%", trendText: "MoM", status: "positive" },
+                revenue: { title: "Revenue ($)", value: "$120k", icon: "fas fa-dollar-sign", trend: "+15.8%", trendText: "MoM", status: "positive" },
+                convRate: { title: "Conv Rate (%)", value: "6.31%", icon: "fas fa-bullseye", trend: "-0.5%", trendText: "MoM", status: "negative" },
+                aov: { title: "AOV ($)", value: "$141.5", icon: "fas fa-file-invoice-dollar", trend: "+2.1%", trendText: "MoM", status: "positive" }
             },
             performanceByLevel: {
                 distribution: {
@@ -662,7 +662,6 @@ document.addEventListener('DOMContentLoaded', () => {
         rowsPerPage: 20, 
         selected: new Set(),
         filters: { keyword: '', level: '', region: '', start: '', end: '', activity: '' },
-        sortBy: 'joined', 
         sortDir: 'desc', 
         currentReferralId: null, 
         notes: {},
@@ -1069,7 +1068,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     data: {
                         labels: pieData.labels,
                         datasets: [{
-                            label: 'BEL Count',
+                            label: 'BEL Count (#)',
                             data: pieData.data,
                             backgroundColor: pieData.colors,
                             borderColor: '#ffffff',
@@ -1219,7 +1218,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 yAxisID: 'y1'
                             },
                             {
-                                label: 'Conv. Rate (%)',
+                                label: 'C2O CVR (%)',
                                 data: convRateData,
                                 backgroundColor: colors.gray60,
                                 borderColor: colors.gray60,
@@ -1259,7 +1258,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                             label += `$${(context.parsed.y * 1000).toLocaleString()}`;
                                         } else if (label.includes('Clicks')) {
                                             label += `${(context.parsed.y * 1000).toLocaleString()}`;
-                                        } else if (label.includes('Conv. Rate')) {
+                                        } else if (label.includes('C2O CVR (%)')) {
                                             label += `${context.parsed.y}%`;
                                         } else {
                                             label += context.parsed.y;
@@ -1386,7 +1385,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 email: leader.email || `${leader.name.toLowerCase().replace(' ', '.')}@company.com`,
                 code: `${leader.name.split(' ')[0].toUpperCase()}${Math.floor(Math.random() * 100)}`,
                 level: leader.level,
-                joined: '2023-01-15',
                 clicks30: leader.clicks,
                 orders30: leader.orders,
                 revenue30: leader.revenue,
@@ -1441,8 +1439,6 @@ document.addEventListener('DOMContentLoaded', () => {
                            record.code.toLowerCase().includes(kw))) return false;
                 if (level && record.level !== level) return false;
                 if (region && record.country !== region) return false;
-                if (startDate && new Date(record.joined) < startDate) return false;
-                if (endDate && new Date(record.joined) > endDate) return false;
                 if (activity === 'clicks' && !(record.clicks30 > 0 && record.orders30 === 0)) return false;
                 if (activity === 'orders' && !(record.orders30 > 0)) return false;
                 if (activity === 'none' && !((record.clicks30 + record.orders30) === 0)) return false;
@@ -1479,7 +1475,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td><a href="#" class="referral-id-link" data-referral-id="${record.id}">${record.id}</a></td>
                         <td>${record.name}</td>
                         <td><span class="bel-badge ${record.level.toLowerCase()}">${record.level}</span></td>
-                        <td>${record.joined}</td>
                         <td style="text-align:right;">${record.clicks30.toLocaleString()}</td>
                         <td style="text-align:right;">${record.orders30.toLocaleString()}</td>
                         <td style="text-align:right;">${utils.formatMoney(record.revenue30)}</td>
@@ -1529,8 +1524,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 keyword: document.getElementById('f-keyword')?.value || '',
                 level: document.getElementById('f-level')?.value || '',
                 region: ui.regionSel?.value || '',
-                start: document.getElementById('f-start')?.value || '',
-                end: document.getElementById('f-end')?.value || '',
                 activity: document.getElementById('f-activity')?.value || ''
             };
             this.renderTable();
@@ -1662,7 +1655,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     name,
                     code: '—',
                     level,
-                    joined: '—',
                     clicks30: clicks,
                     orders30: orders,
                     revenue30: revenue,
@@ -2118,7 +2110,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.individualPerformanceChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Clicks (000s)', 'Orders', 'Revenue ($000s)', 'Conv. Rate (%)'],
+                    labels: ['Clicks (000s)', 'Orders', 'Revenue ($000s)', 'C2O CVR (%)'],
                     datasets: [{
                         label: 'Performance Metrics',
                         data: [
@@ -2131,7 +2123,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             blueColors.primary,    // Clicks
                             blueColors.light,      // Orders  
                             blueColors.medium,     // Revenue
-                            blueColors.dark        // Conv. Rate
+                            blueColors.dark        // C2O CVR (%)
                         ],
                         borderColor: [
                             blueColors.primary,
@@ -2160,7 +2152,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         return `Clicks: ${(value * 1000).toLocaleString()}`;
                                     } else if (label.includes('Revenue')) {
                                         return `Revenue: ${utils.formatMoney(value * 1000)}`;
-                                    } else if (label.includes('Conv. Rate')) {
+                                    } else if (label.includes('C2O CVR (%)')) {
                                         return `Conversion Rate: ${value.toFixed(2)}%`;
                                     } else {
                                         return `Orders: ${value.toLocaleString()}`;

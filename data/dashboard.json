@@ -1,51 +1,51 @@
 {
   "summaryStats": {
     "belCount": {
-      "title": "BEL Count",
+      "title": "BEL Count (#)",
       "value": "152",
       "icon": "fas fa-users",
       "trend": "+5.1%",
-      "trendText": "Since last month",
+      "trendText": "MoM",
       "status": "positive"
     },
     "totalClicks": {
-      "title": "Total Clicks",
+      "title": "Total Clicks (#)",
       "value": "13,492",
       "icon": "fas fa-mouse-pointer",
       "trend": "+12.3%",
-      "trendText": "Since last month",
+      "trendText": "MoM",
       "status": "positive"
     },
     "totalOrders": {
-      "title": "Total Orders",
+      "title": "Total Orders (#)",
       "value": "851",
       "icon": "fas fa-shopping-cart",
       "trend": "+8.2%",
-      "trendText": "Since last month",
+      "trendText": "MoM",
       "status": "positive"
     },
     "revenue": {
-      "title": "Revenue",
+      "title": "Revenue ($)",
       "value": "$120k",
       "icon": "fas fa-dollar-sign",
       "trend": "+15.8%",
-      "trendText": "Since last month",
+      "trendText": "MoM",
       "status": "positive"
     },
     "convRate": {
-      "title": "Conv Rate",
+      "title": "Conv Rate (%)",
       "value": "6.31%",
       "icon": "fas fa-bullseye",
       "trend": "-0.5%",
-      "trendText": "Since last month",
+      "trendText": "MoM",
       "status": "negative"
     },
     "aov": {
-      "title": "AOV",
+      "title": "AOV ($)",
       "value": "$141.5",
       "icon": "fas fa-file-invoice-dollar",
       "trend": "+2.1%",
-      "trendText": "Since last month",
+      "trendText": "MoM",
       "status": "positive"
     }
   },

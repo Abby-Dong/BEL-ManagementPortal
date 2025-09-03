@@ -19,7 +19,7 @@
         <div class="bel-header-content">
             <div class="bel-sidebar-logo">
                 <img src="https://irp.cdn-website.com/56869327/dms3rep/multi/iotmart-logo.svg" alt="logo">
-                <span>BEL Management Portal</span>
+                <span>BEL Portal</span>
             </div>
             <div class="bel-header-right">
                 <div class="bel-notification-bell" id="notification-bell">
@@ -60,7 +60,7 @@
             <nav class="bel-sidebar-nav">
                 <a href="#dashboard" class="bel-sidebar-nav-link active">
                     <i class="fas fa-tachometer-alt fa-fw"></i>
-                    <span>Dashboard</span>
+                    <span>Sales Performance</span>
                 </a>
                 <a href="#BEL-board" class="bel-sidebar-nav-link">
                     <i class="fas fa-user-circle fa-fw"></i>
@@ -97,7 +97,7 @@
             
             <!-- Dashboard Section -->
             <div id="dashboard" class="content-section active">
-                <h1 class="bel-h1">Dashboard</h1>
+                <h1 class="bel-h1">Sales Performance Dashboard</h1>
                 
                 <!-- Summary Statistics Cards -->
                 <div class="bel-stats-cards grid-cols-3">
@@ -132,7 +132,7 @@
                                             <th data-sortable data-type="number">Total Clicks</th>
                                             <th data-sortable data-type="number">Revenue</th>
                                             <th data-sortable data-type="number">Orders</th>
-                                            <th data-sortable data-type="number">Conv. Rate</th>
+                                            <th data-sortable data-type="number">C2O CVR (%)</th>
                                             <th data-sortable data-type="number">AOV</th>
                                         </tr>
                                     </thead>
@@ -162,7 +162,7 @@
                                     <th data-sortable data-type="number">Clicks</th>
                                     <th data-sortable data-type="number">Orders</th>
                                     <th data-sortable data-type="number">Revenue</th>
-                                    <th data-sortable data-type="number">Conv. Rate</th>
+                                    <th data-sortable data-type="number">C2O CVR (%)</th>
                                     <th data-sortable data-type="number">AOV</th>
                                 </tr>
                             </thead>
@@ -206,12 +206,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- BEL Board Section -->
-            <div id="BEL-board" class="content-section">
-                <h1 class="bel-h1">BEL Board</h1>
-
+                <h3 class="bel-h3">BEL Performance Leaderboard</h3>
                 <!-- Filters Panel -->
                 <div class="bel-panel">
                     <h3 class="bel-h3" style="margin-top:0; font-size: 1.25rem;">Filters</h3>
@@ -238,14 +234,6 @@
                             </select>
                         </div>
                         <div class="bel-form-group">
-                            <label for="f-start">Registered From</label>
-                            <input id="f-start" class="bel-input" type="date" />
-                        </div>
-                        <div class="bel-form-group">
-                            <label for="f-end">Registered To</label>
-                            <input id="f-end" class="bel-input" type="date" />
-                        </div>
-                        <div class="bel-form-group">
                             <label for="f-activity">Last 30 Days Activity</label>
                             <select id="f-activity" class="bel-select">
                                 <option value="">Any activity</option>
@@ -263,66 +251,71 @@
                             </button>
                         </div>
                     </form>
+                    <!-- Batch Actions -->
+                    <div class="batch-actions">
+                        <div class="left">
+                            <input type="checkbox" id="select-all-page" style="transform: scale(1.2); margin-right: 4px;"/>
+                            <label for="select-all-page">Select all</label>
+                            <span class="text-muted" id="selected-count">0 selected</span>
+                        </div>
+                        <div class="right">
+                            <button class="bel-btn secondary" id="export-csv">
+                                <i class="fas fa-file-export"></i> Export CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- BEL Table -->
+                    <div class="scrollable-table-container">
+                        <table class="bel-table" id="bel-table">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="th-select" aria-label="Select all on this page" /></th>
+                                    <th data-sortable="id">Referral ID</th>
+                                    <th data-sortable="name">Name</th>
+                                    <th data-sortable="level">Level</th>
+                                    <th data-sortable="clicks30" style="text-align: right;">Clicks</th>
+                                    <th data-sortable="orders30" style="text-align: right;">Orders</th>
+                                    <th data-sortable="revenue30" style="text-align: right;">Revenue</th>
+                                    <th style="text-align: right;">C2O CVR (%)</th>
+                                    <th style="text-align: right;">AOV</th>
+                                    <th data-sortable="country">Region</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- BEL data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination-bar">
+                        <div class="rows-select">
+                            <label for="rows-per-page">Rows per page</label>
+                            <select id="rows-per-page" class="bel-select" style="width: 70px;">
+                                <option>10</option>
+                                <option selected>20</option>
+                                <option>50</option>
+                            </select>
+                        </div>
+                        <div class="pagination-controls">
+                            <span id="range-label" class="text-muted">0–0 of 0</span>
+                            <button class="bel-btn secondary" id="prev-page" aria-label="Previous page">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="bel-btn secondary" id="next-page" aria-label="Next page">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Batch Actions -->
-                <div class="batch-actions">
-                    <div class="left">
-                        <input type="checkbox" id="select-all-page" style="transform: scale(1.2); margin-right: 4px;"/>
-                        <label for="select-all-page">Select all</label>
-                        <span class="text-muted" id="selected-count">0 selected</span>
-                    </div>
-                    <div class="right">
-                        <button class="bel-btn secondary" id="export-csv">
-                            <i class="fas fa-file-export"></i> Export CSV
-                        </button>
-                    </div>
-                </div>
 
-                <!-- BEL Table -->
-                <div class="scrollable-table-container">
-                    <table class="bel-table" id="bel-table">
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox" id="th-select" aria-label="Select all on this page" /></th>
-                                <th data-sortable="id">Referral ID</th>
-                                <th data-sortable="name">Name</th>
-                                <th data-sortable="level">Level</th>
-                                <th data-sortable="joined">Joined</th>
-                                <th data-sortable="clicks30" style="text-align: right;">Clicks</th>
-                                <th data-sortable="orders30" style="text-align: right;">Orders</th>
-                                <th data-sortable="revenue30" style="text-align: right;">Revenue</th>
-                                <th style="text-align: right;">Conv. Rate</th>
-                                <th style="text-align: right;">AOV</th>
-                                <th data-sortable="country">Region</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- BEL data will be populated by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
+            </div>
 
-                <!-- Pagination -->
-                <div class="pagination-bar">
-                    <div class="rows-select">
-                        <label for="rows-per-page">Rows per page</label>
-                        <select id="rows-per-page" class="bel-select" style="width: 70px;">
-                            <option>10</option>
-                            <option selected>20</option>
-                            <option>50</option>
-                        </select>
-                    </div>
-                    <div class="pagination-controls">
-                        <span id="range-label" class="text-muted">0–0 of 0</span>
-                        <button class="bel-btn secondary" id="prev-page" aria-label="Previous page">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button class="bel-btn secondary" id="next-page" aria-label="Next page">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
+            <!-- BEL Board Section -->
+            <div id="BEL-board" class="content-section">
+                <h1 class="bel-h1">BEL Board</h1>
             </div>
 
             <!-- Payouts & Orders Section -->
@@ -392,7 +385,7 @@
                             <div class="metric-card"><span>Total Clicks</span><strong id="modal-total-clicks">12,830</strong></div>
                             <div class="metric-card"><span>Total Orders</span><strong id="modal-total-orders">98</strong></div>
                             <div class="metric-card"><span>Total Revenue</span><strong id="modal-total-revenue">$98.5k</strong></div>
-                            <div class="metric-card"><span>Conv. Rate</span><strong id="modal-conv-rate">7.6%</strong></div>
+                            <div class="metric-card"><span>C2O CVR (%)</span><strong id="modal-conv-rate">7.6%</strong></div>
                             <div class="metric-card"><span>AOV</span><strong id="modal-aov">$1,005</strong></div>
                         </div>
                         
