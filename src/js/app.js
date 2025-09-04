@@ -625,6 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Account Management
         regionSel: document.getElementById('f-region'),
+        countrySel: document.getElementById('f-country'),
         applyBtn: document.getElementById('apply-filters'),
         resetBtn: document.getElementById('reset-filters'),
         rowsPerPage: document.getElementById('rows-per-page'),
@@ -661,7 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
         page: 1, 
         rowsPerPage: 20, 
         selected: new Set(),
-        filters: { keyword: '', referralId: '', level: '', country: '', start: '', end: '', activity: '' },
+        filters: { keyword: '', referralId: '', level: '', region: '', country: '', start: '', end: '', activity: '' },
         sortDir: 'desc', 
         currentReferralId: null, 
         notes: {},
@@ -712,6 +713,143 @@ document.addEventListener('DOMContentLoaded', () => {
             return config.position === 'before' 
                 ? `${config.symbol} ${formattedAmount}`
                 : `${formattedAmount} ${config.symbol}`;
+        },
+
+        // Region mapping function based on country
+        getRegionFromCountry: (country) => {
+            const regionMapping = {
+                // AAU / NZ - 澳洲和紐西蘭
+                'Australia': 'AAU / NZ',
+                'New Zealand': 'AAU / NZ',
+                
+                // ASEAN - 東南亞國家協會
+                'Brunei': 'ASEAN',
+                'Cambodia': 'ASEAN',
+                'Indonesia': 'ASEAN',
+                'Malaysia': 'ASEAN',
+                'Philippines': 'ASEAN',
+                'Singapore': 'ASEAN',
+                'Thailand': 'ASEAN',
+                'Vietnam': 'ASEAN',
+                'Myanmar': 'ASEAN',
+                'Laos': 'ASEAN',
+                
+                // China - 中國
+                'China': 'China',
+                
+                // Europe - 歐洲
+                'Austria': 'Europe',
+                'Belgium': 'Europe',
+                'Bulgaria': 'Europe',
+                'Croatia': 'Europe',
+                'Cyprus': 'Europe',
+                'Czech Republic': 'Europe',
+                'Denmark': 'Europe',
+                'Estonia': 'Europe',
+                'Finland': 'Europe',
+                'France': 'Europe',
+                'Germany': 'Europe',
+                'Greece': 'Europe',
+                'Hungary': 'Europe',
+                'Ireland': 'Europe',
+                'Italy': 'Europe',
+                'Latvia': 'Europe',
+                'Lithuania': 'Europe',
+                'Luxembourg': 'Europe',
+                'Malta': 'Europe',
+                'Netherlands': 'Europe',
+                'Poland': 'Europe',
+                'Portugal': 'Europe',
+                'Romania': 'Europe',
+                'Slovakia': 'Europe',
+                'Slovenia': 'Europe',
+                'Spain': 'Europe',
+                'Sweden': 'Europe',
+                'Norway': 'Europe',
+                'Switzerland': 'Europe',
+                'United Kingdom': 'Europe',
+                'Iceland': 'Europe',
+                
+                // India - 印度
+                'India': 'India',
+                
+                // Japan - 日本
+                'Japan': 'Japan',
+                
+                // Korea - 韓國
+                'South Korea': 'Korea',
+                'Korea': 'Korea',
+                
+                // LATAM - 拉丁美洲
+                'Argentina': 'LATAM',
+                'Bolivia': 'LATAM',
+                'Brazil': 'LATAM',
+                'Chile': 'LATAM',
+                'Colombia': 'LATAM',
+                'Costa Rica': 'LATAM',
+                'Cuba': 'LATAM',
+                'Dominican Republic': 'LATAM',
+                'Ecuador': 'LATAM',
+                'El Salvador': 'LATAM',
+                'Guatemala': 'LATAM',
+                'Honduras': 'LATAM',
+                'Mexico': 'LATAM',
+                'Nicaragua': 'LATAM',
+                'Panama': 'LATAM',
+                'Paraguay': 'LATAM',
+                'Peru': 'LATAM',
+                'Uruguay': 'LATAM',
+                'Venezuela': 'LATAM',
+                
+                // ME&A - 中東和非洲
+                'Algeria': 'ME&A',
+                'Angola': 'ME&A',
+                'Egypt': 'ME&A',
+                'Ethiopia': 'ME&A',
+                'Ghana': 'ME&A',
+                'Kenya': 'ME&A',
+                'Morocco': 'ME&A',
+                'Nigeria': 'ME&A',
+                'South Africa': 'ME&A',
+                'Tunisia': 'ME&A',
+                'Uganda': 'ME&A',
+                'Zimbabwe': 'ME&A',
+                'Israel': 'ME&A',
+                'Jordan': 'ME&A',
+                'Lebanon': 'ME&A',
+                'Qatar': 'ME&A',
+                'Saudi Arabia': 'ME&A',
+                'UAE': 'ME&A',
+                'Turkey': 'ME&A',
+                'Iran': 'ME&A',
+                'Iraq': 'ME&A',
+                'Kuwait': 'ME&A',
+                'Oman': 'ME&A',
+                'Bahrain': 'ME&A',
+                
+                // North America - 北美洲
+                'United States': 'North America',
+                'Canada': 'North America',
+                
+                // Taiwan - 台灣
+                'Taiwan': 'Taiwan',
+                
+                // Russia & CIS - 俄羅斯與獨立國協
+                'Russia': 'Russia & CIS',
+                'Belarus': 'Russia & CIS',
+                'Kazakhstan': 'Russia & CIS',
+                'Kyrgyzstan': 'Russia & CIS',
+                'Tajikistan': 'Russia & CIS',
+                'Turkmenistan': 'Russia & CIS',
+                'Uzbekistan': 'Russia & CIS',
+                'Armenia': 'Russia & CIS',
+                'Azerbaijan': 'Russia & CIS',
+                'Georgia': 'Russia & CIS',
+                'Moldova': 'Russia & CIS',
+                'Ukraine': 'Russia & CIS'
+            };
+            
+            return regionMapping[country] || 'Others';
         },
         
         formatPercent: (decimal) => `${(decimal * 100).toFixed(1)}%`,
@@ -1429,7 +1567,7 @@ document.addEventListener('DOMContentLoaded', () => {
         init() {
             this.generateBelData();
             this.setupEventListeners();
-            this.populateCountryFilter();
+            this.populateFilters();
             this.renderTable();
         },
 
@@ -1469,6 +1607,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 orders30: leader.orders,
                 revenue30: leader.revenue,
                 country: getCountryName(getCountryCode(leader.id)),
+                get region() { return utils.getRegionFromCountry(this.country); },
                 tags: ['Top Performer']
             }));
         },
@@ -1501,17 +1640,28 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
-        populateCountryFilter() {
+        populateFilters() {
+            // Populate Country filter
             const countries = Array.from(new Set(this.belData.map(r => r.country))).sort();
             countries.forEach(country => {
-                if (ui.regionSel) {
-                    ui.regionSel.innerHTML += `<option value="${country}">${country}</option>`;
+                if (ui.countrySel) {
+                    ui.countrySel.innerHTML += `<option value="${country}">${country}</option>`;
                 }
             });
+
+            // Populate Region filter (regions are populated via HTML options, but we can add dynamic ones if needed)
+            const regions = Array.from(new Set(this.belData.map(r => r.region))).sort();
+            
+            // Note: Region options are already defined in HTML, but if we need to add dynamic ones:
+            // regions.forEach(region => {
+            //     if (ui.regionSel && !ui.regionSel.querySelector(`option[value="${region}"]`)) {
+            //         ui.regionSel.innerHTML += `<option value="${region}">${region}</option>`;
+            //     }
+            // });
         },
 
         getProcessedData() {
-            const { keyword, referralId, level, country, start, end, activity } = appState.filters;
+            const { keyword, referralId, level, region, country, start, end, activity } = appState.filters;
             const startDate = utils.parseDate(start);
             const endDate = utils.parseDate(end);
 
@@ -1525,6 +1675,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (rid && !record.id.toLowerCase().includes(rid)) return false;
                 
                 if (level && record.level !== level) return false;
+                if (region && record.region !== region) return false;
                 if (country && record.country !== country) return false;
                 if (activity === 'clicks' && !(record.clicks30 > 0 && record.orders30 === 0)) return false;
                 if (activity === 'orders' && !(record.orders30 > 0)) return false;
@@ -1567,6 +1718,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td style="text-align:right;">${utils.formatMoney(record.revenue30)}</td>
                         <td style="text-align:right;">${utils.formatPercent(conv)}</td>
                         <td style="text-align:right;">${record.orders30 ? utils.formatMoney(aov) : '-'}</td>
+                        <td>${record.region}</td>
                         <td>${record.country}</td>
                     </tr>
                 `;
@@ -1611,7 +1763,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 keyword: document.getElementById('f-name')?.value || '',
                 referralId: document.getElementById('f-referral-id')?.value || '',
                 level: document.getElementById('f-level')?.value || '',
-                country: ui.regionSel?.value || '',
+                region: ui.regionSel?.value || '',
+                country: ui.countrySel?.value || '',
                 activity: document.getElementById('f-activity')?.value || ''
             };
             this.renderTable();
@@ -3097,6 +3250,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const nameInput = document.getElementById('account-f-name');
             const idInput = document.getElementById('account-f-referral-id');
             const levelSelect = document.getElementById('account-f-level');
+            const regionSelect = document.getElementById('account-f-region');
             const sortSelect = document.getElementById('account-f-sort');
 
             // Real-time filtering on input change
@@ -3114,6 +3268,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (levelSelect) {
                 levelSelect.addEventListener('change', () => {
+                    this.renderCurrentView();
+                });
+            }
+
+            if (regionSelect) {
+                regionSelect.addEventListener('change', () => {
                     this.renderCurrentView();
                 });
             }
@@ -3187,20 +3347,47 @@ document.addEventListener('DOMContentLoaded', () => {
             const nameFilter = document.getElementById('account-f-name')?.value.toLowerCase() || '';
             const idFilter = document.getElementById('account-f-referral-id')?.value.toLowerCase() || '';
             const levelFilter = document.getElementById('account-f-level')?.value || '';
+            const regionFilter = document.getElementById('account-f-region')?.value || '';
             const sortBy = document.getElementById('account-f-sort')?.value || 'name';
 
+            // Helper function to get country from referral ID
+            const getCountryFromId = (id) => {
+                const prefix = id.substring(1, 3);
+                const countryNames = {
+                    'TW': 'Taiwan', 'US': 'United States', 'DE': 'Germany', 'FR': 'France', 'JP': 'Japan',
+                    'AU': 'Australia', 'KR': 'South Korea', 'IT': 'Italy', 'MX': 'Mexico', 'CN': 'China',
+                    'CA': 'Canada', 'IN': 'India', 'NO': 'Norway', 'NL': 'Netherlands', 'BR': 'Brazil',
+                    'SE': 'Sweden', 'CH': 'Switzerland', 'DK': 'Denmark', 'PL': 'Poland', 'BE': 'Belgium',
+                    'SG': 'Singapore', 'TH': 'Thailand', 'MY': 'Malaysia', 'ZA': 'South Africa'
+                };
+                const countryMap = {
+                    'TW': 'TW', 'US': 'US', 'DE': 'DE', 'FR': 'FR', 'JP': 'JP',
+                    'AU': 'AU', 'KR': 'KR', 'IT': 'IT', 'MX': 'MX', 'CN': 'CN',
+                    'CA': 'CA', 'IN': 'IN', 'NO': 'NO', 'NL': 'NL', 'BR': 'BR',
+                    'SE': 'SE', 'CH': 'CH', 'DA': 'DK', 'PL': 'PL', 'BE': 'BE',
+                    'SG': 'SG', 'TH': 'TH', 'MY': 'MY', 'ZA': 'ZA'
+                };
+                const countryCode = countryMap[prefix] || 'US';
+                return countryNames[countryCode] || 'United States';
+            };
+
             // 使用現有的 leaderboard 資料來渲染帳戶卡片
-            let accountData = APP_DATA.dashboard.leaderboard.map(account => ({
-                referralId: account.id,
-                name: account.name,
-                level: account.level,
-                clicks: account.clicks,
-                orders: account.orders,
-                revenue: account.revenue,
-                c20cvr: parseFloat(account.convRate.replace('%', '')),
-                aov: account.aov,
-                email: account.email
-            }));
+            let accountData = APP_DATA.dashboard.leaderboard.map(account => {
+                const country = getCountryFromId(account.id);
+                return {
+                    referralId: account.id,
+                    name: account.name,
+                    level: account.level,
+                    clicks: account.clicks,
+                    orders: account.orders,
+                    revenue: account.revenue,
+                    c20cvr: parseFloat(account.convRate.replace('%', '')),
+                    aov: account.aov,
+                    email: account.email,
+                    country: country,
+                    region: utils.getRegionFromCountry(country)
+                };
+            });
 
             // Apply filters
             if (nameFilter) {
@@ -3216,6 +3403,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (levelFilter) {
                 accountData = accountData.filter(account => 
                     account.level === levelFilter
+                );
+            }
+            if (regionFilter) {
+                accountData = accountData.filter(account => 
+                    account.region === regionFilter
                 );
             }
 
@@ -3328,6 +3520,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const nameFilter = document.getElementById('account-f-name')?.value.toLowerCase() || '';
             const idFilter = document.getElementById('account-f-referral-id')?.value.toLowerCase() || '';
             const levelFilter = document.getElementById('account-f-level')?.value || '';
+            const regionFilter = document.getElementById('account-f-region')?.value || '';
             const sortBy = document.getElementById('account-f-sort')?.value || 'name';
 
             // 將國碼轉換為國家名稱的輔助函數
@@ -3352,18 +3545,22 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             // 使用現有的 leaderboard 資料來渲染帳戶列表
-            let accountData = APP_DATA.dashboard.leaderboard.map(account => ({
-                referralId: account.id,
-                name: account.name,
-                level: account.level,
-                clicks: account.clicks,
-                orders: account.orders,
-                revenue: account.revenue,
-                c20cvr: parseFloat(account.convRate.replace('%', '')),
-                aov: account.aov,
-                email: account.email,
-                region: getCountryFromId(account.id) // Use country name from ID
-            }));
+            let accountData = APP_DATA.dashboard.leaderboard.map(account => {
+                const country = getCountryFromId(account.id);
+                return {
+                    referralId: account.id,
+                    name: account.name,
+                    level: account.level,
+                    clicks: account.clicks,
+                    orders: account.orders,
+                    revenue: account.revenue,
+                    c20cvr: parseFloat(account.convRate.replace('%', '')),
+                    aov: account.aov,
+                    email: account.email,
+                    country: country,
+                    region: utils.getRegionFromCountry(country)
+                };
+            });
 
             // Apply filters (same logic as grid view)
             if (nameFilter) {
@@ -3379,6 +3576,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (levelFilter) {
                 accountData = accountData.filter(account => 
                     account.level === levelFilter
+                );
+            }
+            if (regionFilter) {
+                accountData = accountData.filter(account => 
+                    account.region === regionFilter
                 );
             }
 
@@ -3414,7 +3616,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Show message if no results
             if (accountData.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 2rem; color: #666;">No accounts found matching the current filters.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 2rem; color: #666;">No accounts found matching the current filters.</td></tr>';
                 return;
             }
 
@@ -3433,6 +3635,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td style="text-align: right;">${account.c20cvr.toFixed(1)}%</td>
                     <td style="text-align: right;">${account.aov}</td>
                     <td>${account.region}</td>
+                    <td>${account.country}</td>
                 `;
 
                 tableBody.appendChild(row);

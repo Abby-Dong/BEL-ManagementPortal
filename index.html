@@ -141,9 +141,9 @@
                     </div>
                 </div>
 
-                <!-- Product Sales Analysis -->
+                <!-- Categories & Products Sales Effectiveness -->
                 <div class="section-title">
-                    <h3>Product Sales Analysis</h3>
+                    <h3>Categories & Products Sales Effectiveness</h3>
                 </div>
                 <div class="bel-panel">
                     <div class="product-sales-grid">
@@ -209,8 +209,27 @@
                             </select>
                         </div>
                         <div class="bel-form-group">
-                            <label for="f-region">Country</label>
+                            <label for="f-region">Region</label>
                             <select id="f-region" class="bel-select">
+                                <option value="">All Regions</option>
+                                <option value="AAU / NZ">AAU / NZ</option>
+                                <option value="ASEAN">ASEAN</option>
+                                <option value="China">China</option>
+                                <option value="Europe">Europe</option>
+                                <option value="India">India</option>
+                                <option value="Japan">Japan</option>
+                                <option value="Korea">Korea</option>
+                                <option value="LATAM">LATAM</option>
+                                <option value="ME&A">ME&A</option>
+                                <option value="North America">North America</option>
+                                <option value="Taiwan">Taiwan</option>
+                                <option value="Russia & CIS">Russia & CIS</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div class="bel-form-group">
+                            <label for="f-country">Country</label>
+                            <select id="f-country" class="bel-select">
                                 <option value="">All Countries</option>
                                 <!-- Countries will be populated by JavaScript -->
                             </select>
@@ -261,6 +280,7 @@
                                     <th data-sortable="revenue30" style="text-align: right;">Revenue</th>
                                     <th style="text-align: right;">C2O CVR (%)</th>
                                     <th style="text-align: right;">AOV</th>
+                                    <th data-sortable="region">Region</th>
                                     <th data-sortable="country">Country</th>
                                 </tr>
                             </thead>
@@ -337,6 +357,25 @@
                             </select>
                         </div>
                         <div class="bel-form-group">
+                            <label for="account-f-region">Region</label>
+                            <select id="account-f-region" class="bel-select">
+                                <option value="">All Regions</option>
+                                <option value="AAU / NZ">AAU / NZ</option>
+                                <option value="ASEAN">ASEAN</option>
+                                <option value="China">China</option>
+                                <option value="Europe">Europe</option>
+                                <option value="India">India</option>
+                                <option value="Japan">Japan</option>
+                                <option value="Korea">Korea</option>
+                                <option value="LATAM">LATAM</option>
+                                <option value="ME&A">ME&A</option>
+                                <option value="North America">North America</option>
+                                <option value="Taiwan">Taiwan</option>
+                                <option value="Russia & CIS">Russia & CIS</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div class="bel-form-group">
                             <label for="account-f-sort">Sort By</label>
                             <select id="account-f-sort" class="bel-select">
                                 <option value="name">By Name</option>
@@ -372,7 +411,8 @@
                                         <th data-sortable="revenue30" style="text-align: right;">Revenue</th>
                                         <th data-sortable="c20cvr" style="text-align: right;">C2O CVR (%)</th>
                                         <th data-sortable="aov" style="text-align: right;">AOV</th>
-                                        <th data-sortable="region">Country</th>
+                                        <th data-sortable="region">Region</th>
+                                        <th data-sortable="country">Country</th>
                                     </tr>
                                 </thead>
                                 <tbody>
