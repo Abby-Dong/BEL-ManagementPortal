@@ -661,7 +661,7 @@ document.addEventListener('DOMContentLoaded', () => {
         page: 1, 
         rowsPerPage: 20, 
         selected: new Set(),
-        filters: { keyword: '', referralId: '', level: '', region: '', start: '', end: '', activity: '' },
+        filters: { keyword: '', referralId: '', level: '', country: '', start: '', end: '', activity: '' },
         sortDir: 'desc', 
         currentReferralId: null, 
         notes: {},
@@ -1429,7 +1429,7 @@ document.addEventListener('DOMContentLoaded', () => {
         init() {
             this.generateBelData();
             this.setupEventListeners();
-            this.populateRegionFilter();
+            this.populateCountryFilter();
             this.renderTable();
         },
 
@@ -1447,6 +1447,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 return countryMap[prefix] || 'US';
             };
 
+            // 將國碼轉換為國家名稱
+            const getCountryName = (countryCode) => {
+                const countryNames = {
+                    'TW': 'Taiwan', 'US': 'United States', 'DE': 'Germany', 'FR': 'France', 'JP': 'Japan',
+                    'AU': 'Australia', 'KR': 'South Korea', 'IT': 'Italy', 'MX': 'Mexico', 'CN': 'China',
+                    'CA': 'Canada', 'IN': 'India', 'NO': 'Norway', 'NL': 'Netherlands', 'BR': 'Brazil',
+                    'SE': 'Sweden', 'CH': 'Switzerland', 'DK': 'Denmark', 'PL': 'Poland', 'BE': 'Belgium',
+                    'SG': 'Singapore', 'TH': 'Thailand', 'MY': 'Malaysia', 'ZA': 'South Africa'
+                };
+                return countryNames[countryCode] || 'United States';
+            };
+
             this.belData = APP_DATA.dashboard.leaderboard.map(leader => ({
                 id: leader.id,
                 name: leader.name,
@@ -1456,7 +1468,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 clicks30: leader.clicks,
                 orders30: leader.orders,
                 revenue30: leader.revenue,
-                country: getCountryCode(leader.id),
+                country: getCountryName(getCountryCode(leader.id)),
                 tags: ['Top Performer']
             }));
         },
@@ -1489,7 +1501,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
-        populateRegionFilter() {
+        populateCountryFilter() {
             const countries = Array.from(new Set(this.belData.map(r => r.country))).sort();
             countries.forEach(country => {
                 if (ui.regionSel) {
@@ -1499,7 +1511,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         getProcessedData() {
-            const { keyword, referralId, level, region, start, end, activity } = appState.filters;
+            const { keyword, referralId, level, country, start, end, activity } = appState.filters;
             const startDate = utils.parseDate(start);
             const endDate = utils.parseDate(end);
 
@@ -1513,7 +1525,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (rid && !record.id.toLowerCase().includes(rid)) return false;
                 
                 if (level && record.level !== level) return false;
-                if (region && record.country !== region) return false;
+                if (country && record.country !== country) return false;
                 if (activity === 'clicks' && !(record.clicks30 > 0 && record.orders30 === 0)) return false;
                 if (activity === 'orders' && !(record.orders30 > 0)) return false;
                 if (activity === 'none' && !((record.clicks30 + record.orders30) === 0)) return false;
@@ -1599,7 +1611,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 keyword: document.getElementById('f-name')?.value || '',
                 referralId: document.getElementById('f-referral-id')?.value || '',
                 level: document.getElementById('f-level')?.value || '',
-                region: ui.regionSel?.value || '',
+                country: ui.regionSel?.value || '',
                 activity: document.getElementById('f-activity')?.value || ''
             };
             this.renderTable();
@@ -3318,6 +3330,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const levelFilter = document.getElementById('account-f-level')?.value || '';
             const sortBy = document.getElementById('account-f-sort')?.value || 'name';
 
+            // 將國碼轉換為國家名稱的輔助函數
+            const getCountryFromId = (id) => {
+                const prefix = id.substring(1, 3);
+                const countryNames = {
+                    'TW': 'Taiwan', 'US': 'United States', 'DE': 'Germany', 'FR': 'France', 'JP': 'Japan',
+                    'AU': 'Australia', 'KR': 'South Korea', 'IT': 'Italy', 'MX': 'Mexico', 'CN': 'China',
+                    'CA': 'Canada', 'IN': 'India', 'NO': 'Norway', 'NL': 'Netherlands', 'BR': 'Brazil',
+                    'SE': 'Sweden', 'CH': 'Switzerland', 'DK': 'Denmark', 'PL': 'Poland', 'BE': 'Belgium',
+                    'SG': 'Singapore', 'TH': 'Thailand', 'MY': 'Malaysia', 'ZA': 'South Africa'
+                };
+                const countryMap = {
+                    'TW': 'TW', 'US': 'US', 'DE': 'DE', 'FR': 'FR', 'JP': 'JP',
+                    'AU': 'AU', 'KR': 'KR', 'IT': 'IT', 'MX': 'MX', 'CN': 'CN',
+                    'CA': 'CA', 'IN': 'IN', 'NO': 'NO', 'NL': 'NL', 'BR': 'BR',
+                    'SE': 'SE', 'CH': 'CH', 'DA': 'DK', 'PL': 'PL', 'BE': 'BE',
+                    'SG': 'SG', 'TH': 'TH', 'MY': 'MY', 'ZA': 'ZA'
+                };
+                const countryCode = countryMap[prefix] || 'US';
+                return countryNames[countryCode] || 'United States';
+            };
+
             // 使用現有的 leaderboard 資料來渲染帳戶列表
             let accountData = APP_DATA.dashboard.leaderboard.map(account => ({
                 referralId: account.id,
@@ -3329,7 +3362,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 c20cvr: parseFloat(account.convRate.replace('%', '')),
                 aov: account.aov,
                 email: account.email,
-                region: account.country || account.region || 'N/A' // Use country or region field
+                region: getCountryFromId(account.id) // Use country name from ID
             }));
 
             // Apply filters (same logic as grid view)
