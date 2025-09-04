@@ -297,6 +297,91 @@
             <!-- Account Management Section -->
             <div id="Account-Management" class="content-section">
                 <h1 class="bel-h1">Account Management</h1>
+                
+                <!-- View Switcher -->
+                <div class="view-switcher" id="account-view-switcher" style="margin-bottom: 16px;">
+                    <button class="view-btn active" data-view="grid">
+                        <i class="fas fa-th"></i> Grid View
+                    </button>
+                    <button class="view-btn" data-view="list">
+                        <i class="fas fa-list"></i> List View
+                    </button>
+                </div>
+                
+                <!-- Filters Panel -->
+                <div class="bel-panel" style="margin-bottom: 16px;">
+                    <h3 class="bel-h3" style="margin-top:0; font-size: 1.25rem;">Filters</h3>
+                    <form id="account-filters" class="filters-grid">
+                        <div class="bel-form-group">
+                            <label for="account-f-referral-id">Referral ID</label>
+                            <div class="search-input-container">
+                                <input id="account-f-referral-id" class="bel-input" type="search" placeholder="Search Referral ID" autocomplete="off" />
+                                <div id="account-search-suggestions-id" class="search-suggestions"></div>
+                            </div>
+                        </div>
+                        <div class="bel-form-group">
+                            <label for="account-f-name">Name</label>
+                            <div class="search-input-container">
+                                <input id="account-f-name" class="bel-input" type="search" placeholder="Search Name" autocomplete="off" />
+                                <div id="account-search-suggestions-name" class="search-suggestions"></div>
+                            </div>
+                        </div>
+                        <div class="bel-form-group">
+                            <label for="account-f-level">Level</label>
+                            <select id="account-f-level" class="bel-select">
+                                <option value="">All Levels</option>
+                                <option value="Builder">Builder</option>
+                                <option value="Enabler">Enabler</option>
+                                <option value="Explorer">Explorer</option>
+                                <option value="Leader">Leader</option>
+                            </select>
+                        </div>
+                        <div class="bel-form-group">
+                            <label for="account-f-sort">Sort By</label>
+                            <select id="account-f-sort" class="bel-select">
+                                <option value="name">By Name</option>
+                                <option value="id">By ID</option>
+                                <option value="level">By Level</option>
+                                <option value="orders">By Orders</option>
+                                <option value="clicks">By Clicks</option>
+                                <option value="revenue">By Revenue</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Account Cards Container -->
+                <div class="view-container active" id="account-grid-view">
+                    <div id="account-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Cards will be dynamically inserted here by JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Account List Container -->
+                <div class="view-container" id="account-list-view" style="display: none;">
+                    <div class="bel-panel" style="padding: 0;">
+                        <div class="scrollable-table-container">
+                            <table class="bel-table" id="account-list-table">
+                                <thead>
+                                    <tr>
+                                        <th data-sortable="referralId">Referral ID</th>
+                                        <th data-sortable="name">Name</th>
+                                        <th data-sortable="level">Level</th>
+                                        <th data-sortable="clicks30" style="text-align: right;">Clicks</th>
+                                        <th data-sortable="orders30" style="text-align: right;">Orders</th>
+                                        <th data-sortable="revenue30" style="text-align: right;">Revenue</th>
+                                        <th data-sortable="c20cvr" style="text-align: right;">C2O CVR (%)</th>
+                                        <th data-sortable="aov" style="text-align: right;">AOV</th>
+                                        <th data-sortable="region">Region</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- List items will be dynamically inserted here by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Payouts & Orders Section -->

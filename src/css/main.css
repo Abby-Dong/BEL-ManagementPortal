@@ -1786,6 +1786,255 @@ body::-webkit-scrollbar-track,
 }
 
 /* --- Page-Specific UI (Account Management) --- */
+/* Account Management Card Styles */
+.bel-acct-mgmt-card {
+    background-color: var(--ds-color-white);
+    padding: 16px;
+    border-radius: 4px;
+    transition: all 300ms ease-in-out;
+    cursor: pointer;
+    border: 1px solid var(--ot-color-gray-45);
+}
+
+.bel-acct-mgmt-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Level pill styles */
+.bel-acct-mgmt-level-explorer { 
+    background-color: var(--ds-color-primary-light-10); 
+    color: var(--ds-color-primary); 
+    font-weight: var(--fw-semibold); 
+    font-size: var(--fs-xs); 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+}
+
+.bel-acct-mgmt-level-builder { 
+    background-color: var(--ds-color-brand-light-30); 
+    color: var(--ds-color-link); 
+    font-weight: var(--fw-semibold); 
+    font-size: var(--fs-xs); 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+}
+
+.bel-acct-mgmt-level-enabler { 
+    background-color: var(--ds-color-success-light); 
+    color: var(--ds-color-success); 
+    font-weight: var(--fw-semibold); 
+    font-size: var(--fs-xs); 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+}
+
+.bel-acct-mgmt-level-leader { 
+    background-color: var(--ds-color-error-light); 
+    color: var(--ds-color-error); 
+    font-weight: var(--fw-semibold); 
+    font-size: var(--fs-xs); 
+    padding: 4px 8px; 
+    border-radius: 4px; 
+}
+
+/* Text styles */
+.bel-acct-mgmt-text-xl-var { 
+    font-size: var(--fs-xl); 
+    font-weight: var(--fw-bold); 
+    color: var(--ds-color-gray-80); 
+}
+
+.bel-acct-mgmt-text-xs-var { 
+    font-size: var(--fs-xs); 
+    color: var(--ds-color-gray-70); 
+}
+
+.bel-acct-mgmt-text-gray-40-var { 
+    color: var(--ds-color-gray-60); 
+    font-size: var(--fs-base); 
+}
+
+.bel-acct-mgmt-text-clicks-var,
+.bel-acct-mgmt-text-orders-var,
+.bel-acct-mgmt-text-cvr-var { 
+    font-weight: var(--fw-bold); 
+    color: var(--ds-color-gray-80); 
+}
+
+.bel-acct-mgmt-bg-brand-var { 
+    background-color: var(--ds-color-brand); 
+}
+
+.bel-acct-mgmt-cta-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    color: var(--ds-color-link);
+    font-weight: var(--fw-semibold);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s, text-decoration 0.2s;
+    font-size: var(--fs-sm);
+}
+
+.bel-acct-mgmt-cta-btn:hover {
+    color: var(--ds-color-brand-dark);
+    text-decoration: none;
+}
+
+/* Utility classes for grid layout */
+.grid {
+    display: grid;
+}
+
+.grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.gap-6 {
+    gap: 16px;
+}
+
+/* Responsive grid */
+@media (min-width: 640px) {
+    .sm\:grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .lg\:grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1280px) {
+    .xl\:grid-cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* Flexbox utilities */
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.justify-start {
+    justify-content: flex-start;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.space-x-1 > * + * {
+    margin-left: 0.25rem;
+}
+
+.space-x-2 > * + * {
+    margin-left: 0.5rem;
+}
+
+.space-x-4 > * + * {
+    margin-left: 1rem;
+}
+
+.space-y-2 > * + * {
+    margin-top: 0.5rem;
+}
+
+.space-y-4 > * + * {
+    margin-top: 0rem;
+}
+
+/* Text utilities */
+.whitespace-nowrap {
+    white-space: nowrap;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
+.text-ellipsis {
+    text-overflow: ellipsis;
+}
+
+.flex-1 {
+    flex: 1 1 0%;
+}
+
+.min-w-0 {
+    min-width: 0px;
+}
+
+/* Size utilities */
+.w-12 {
+    width: 3rem;
+}
+
+.h-12 {
+    height: 3rem;
+}
+
+.mr-2 {
+    margin-right: 0.5rem;
+}
+
+.ml-2 {
+    margin-left: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mt-4 {
+    margin-top: 1rem;
+}
+
+.pt-4 {
+    padding-top: 1rem;
+}
+
+.rounded-full {
+    border-radius: 9999px;
+}
+
+.text-white {
+    color: white;
+}
+
+.font-bold {
+    font-weight: var(--fw-bold);
+}
+
+.text-sm {
+    font-size: var(--fs-sm);
+}
+
+/* Table and filter styles (existing) */
 .filters-grid { 
     display: grid; 
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 

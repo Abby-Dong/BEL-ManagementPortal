@@ -844,6 +844,93 @@ document.addEventListener('DOMContentLoaded', () => {
                 border: 3px solid var(--ds-color-link);
                 box-sizing: border-box;
             ">${initials}</div>`;
+        },
+
+        // Create avatar HTML string without border (for Account Management)
+        generateAvatarHTMLNoBorder: (name, userId = '', size = 40) => {
+            const avatarColors = [
+                '#F39800', '#e57b03', '#004280', '#003160', '#336899',
+                '#e8ecef', '#cfd2d5', '#b6bfc1', '#737b7d'
+            ];
+
+            const getInitials = (fullName) => {
+                if (!fullName) return 'U';
+                const names = fullName.trim().split(' ');
+                if (names.length === 1) {
+                    return names[0].substring(0, 2).toUpperCase();
+                }
+                return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+            };
+
+            const getColorIndex = (str) => {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return Math.abs(hash) % avatarColors.length;
+            };
+
+            const initials = getInitials(name);
+            const colorIndex = getColorIndex(userId || name);
+            const backgroundColor = avatarColors[colorIndex];
+            
+            // Determine text color based on background
+            const isLightColor = ['#e8ecef', '#cfd2d5', '#b6bfc1'].includes(backgroundColor);
+            const textColor = isLightColor ? '#434447' : 'white';
+
+            return `<div class="generated-avatar" style="
+                width: ${size}px;
+                height: ${size}px;
+                border-radius: 50%;
+                background-color: ${backgroundColor};
+                color: ${textColor};
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                font-size: ${Math.round(size * 0.35)}px;
+                box-sizing: border-box;
+            ">${initials}</div>`;
+        },
+
+        // Create random photo avatar for Account Management (simulate real user photos)
+        generateAvatarHTMLPlaceholder: (userId = '', size = 40) => {
+            // Generate consistent random seed based on userId
+            const getRandomSeed = (str) => {
+                if (!str) str = Math.random().toString();
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return Math.abs(hash);
+            };
+
+            const seed = getRandomSeed(userId);
+            
+            // Use Lorem Picsum for random but consistent photos based on seed
+            // This service provides random photos that are consistent for the same seed
+            const photoId = (seed % 1000) + 1; // Use IDs 1-1000
+            const photoUrl = `https://picsum.photos/seed/${photoId}/${size}/${size}`;
+            
+            return `<div class="real-photo-avatar" style="
+                width: ${size}px;
+                height: ${size}px;
+                border-radius: 50%;
+                background-image: url('${photoUrl}');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-sizing: border-box;
+                flex-shrink: 0;
+                border: 2px solid #f3f4f6;
+            "></div>`;
         }
     };
 
@@ -934,6 +1021,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (targetElement) {
                 targetElement.classList.add('active');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // 如果切換到Account Management頁面，渲染帳戶卡片和設置過濾器
+                if (targetId === 'Account-Management') {
+                    ContentManager.renderAccountCards();
+                    ContentManager.setupAccountFilters();
+                }
             }
         },
 
@@ -2504,6 +2597,12 @@ document.addEventListener('DOMContentLoaded', () => {
             AccountManagement.renderTable();
             Dashboard.renderPerformanceTable();
             
+            // Update Account Management cards if currently on that page
+            const currentSection = document.querySelector('.content-section.active')?.id;
+            if (currentSection === 'Account-Management') {
+                ContentManager.renderAccountCards();
+            }
+            
             this.closeModal();
         },
 
@@ -2961,9 +3060,370 @@ document.addEventListener('DOMContentLoaded', () => {
         
         init() {
             this.setupEventListeners(); // 先設置事件監聽器
+            this.injectAccountManagement();
             this.injectPayoutsAndOrders();
             this.injectContent();
             this.injectContactSupport();
+        },
+
+        injectAccountManagement() {
+            // Account Management功能會在導航切換時自動初始化
+            // 這裡我們確保帳戶卡片在切換到Account Management頁面時正確渲染
+            const accountManagementRoot = document.getElementById('Account-Management');
+            if (!accountManagementRoot) return;
+
+            // 檢查是否已經有帳戶容器，如果沒有則不需要做任何事
+            // HTML中已經包含了帳戶容器的結構
+            const accountContainer = accountManagementRoot.querySelector('#account-container');
+            if (accountContainer && APP_DATA.dashboard?.leaderboard) {
+                this.renderAccountCards();
+                this.setupAccountFilters();
+            }
+        },
+
+        setupAccountFilters() {
+            const nameInput = document.getElementById('account-f-name');
+            const idInput = document.getElementById('account-f-referral-id');
+            const levelSelect = document.getElementById('account-f-level');
+            const sortSelect = document.getElementById('account-f-sort');
+
+            // Real-time filtering on input change
+            if (nameInput) {
+                nameInput.addEventListener('input', () => {
+                    this.renderCurrentView();
+                });
+            }
+
+            if (idInput) {
+                idInput.addEventListener('input', () => {
+                    this.renderCurrentView();
+                });
+            }
+
+            if (levelSelect) {
+                levelSelect.addEventListener('change', () => {
+                    this.renderCurrentView();
+                });
+            }
+
+            if (sortSelect) {
+                sortSelect.addEventListener('change', () => {
+                    this.renderCurrentView();
+                });
+            }
+
+            // Setup View Switcher
+            this.setupViewSwitcher();
+        },
+
+        setupViewSwitcher() {
+            const viewSwitcher = document.getElementById('account-view-switcher');
+            if (!viewSwitcher) return;
+
+            const viewButtons = viewSwitcher.querySelectorAll('.view-btn');
+            const gridView = document.getElementById('account-grid-view');
+            const listView = document.getElementById('account-list-view');
+
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const view = btn.getAttribute('data-view');
+                    
+                    // Update button states
+                    viewButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Switch views
+                    if (view === 'grid') {
+                        gridView.style.display = 'block';
+                        listView.style.display = 'none';
+                        gridView.classList.add('active');
+                        listView.classList.remove('active');
+                        this.renderAccountCards(); // Render grid view
+                    } else {
+                        gridView.style.display = 'none';
+                        listView.style.display = 'block';
+                        gridView.classList.remove('active');
+                        listView.classList.add('active');
+                        this.renderAccountList(); // Render list view
+                    }
+                });
+            });
+        },
+
+        renderCurrentView() {
+            // Check which view is currently active
+            const gridView = document.getElementById('account-grid-view');
+            const listView = document.getElementById('account-list-view');
+            
+            if (gridView && gridView.style.display !== 'none') {
+                // Grid view is active
+                this.renderAccountCards();
+            } else if (listView && listView.style.display !== 'none') {
+                // List view is active
+                this.renderAccountList();
+            } else {
+                // Default to grid view if no view is explicitly active
+                this.renderAccountCards();
+            }
+        },
+
+        renderAccountCards() {
+            const container = document.getElementById('account-container');
+            if (!container || !APP_DATA.dashboard?.leaderboard) return;
+
+            // Get filter values
+            const nameFilter = document.getElementById('account-f-name')?.value.toLowerCase() || '';
+            const idFilter = document.getElementById('account-f-referral-id')?.value.toLowerCase() || '';
+            const levelFilter = document.getElementById('account-f-level')?.value || '';
+            const sortBy = document.getElementById('account-f-sort')?.value || 'name';
+
+            // 使用現有的 leaderboard 資料來渲染帳戶卡片
+            let accountData = APP_DATA.dashboard.leaderboard.map(account => ({
+                referralId: account.id,
+                name: account.name,
+                level: account.level,
+                clicks: account.clicks,
+                orders: account.orders,
+                revenue: account.revenue,
+                c20cvr: parseFloat(account.convRate.replace('%', '')),
+                aov: account.aov,
+                email: account.email
+            }));
+
+            // Apply filters
+            if (nameFilter) {
+                accountData = accountData.filter(account => 
+                    account.name.toLowerCase().includes(nameFilter)
+                );
+            }
+            if (idFilter) {
+                accountData = accountData.filter(account => 
+                    account.referralId.toLowerCase().includes(idFilter)
+                );
+            }
+            if (levelFilter) {
+                accountData = accountData.filter(account => 
+                    account.level === levelFilter
+                );
+            }
+
+            // Apply sorting
+            accountData.sort((a, b) => {
+                switch (sortBy) {
+                    case 'name':
+                        return a.name.localeCompare(b.name);
+                    case 'id':
+                        return a.referralId.localeCompare(b.referralId);
+                    case 'level':
+                        // Sort by level hierarchy: Leader > Explorer > Enabler > Builder
+                        const levelOrder = { 'Leader': 4, 'Explorer': 3, 'Enabler': 2, 'Builder': 1 };
+                        return (levelOrder[b.level] || 0) - (levelOrder[a.level] || 0);
+                    case 'orders':
+                        return b.orders - a.orders; // Descending order
+                    case 'clicks':
+                        return b.clicks - a.clicks; // Descending order
+                    case 'revenue':
+                        return b.revenue - a.revenue; // Descending order
+                    default:
+                        return a.name.localeCompare(b.name);
+                }
+            });
+
+            container.innerHTML = '';
+            
+            // Show message if no results
+            if (accountData.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #666;">No accounts found matching the current filters.</div>';
+                return;
+            }
+
+            accountData.forEach(account => {
+                const card = document.createElement('div');
+                card.className = 'bel-acct-mgmt-card flex flex-col space-y-4';
+                card.style.cursor = 'pointer';
+                card.setAttribute('data-account-id', account.referralId);
+
+                card.innerHTML = `
+                    <!-- Main user info -->
+                    <div class="flex items-center space-x-4">
+                        ${utils.generateAvatarHTMLPlaceholder(account.referralId, 48)}
+                        <div class="flex-1 min-w-0">
+                            <!-- Name and level pill -->
+                            <div class="flex items-center space-x-2">
+                                <h2 class="bel-acct-mgmt-text-xl-var flex-1 whitespace-nowrap overflow-hidden text-ellipsis">${account.name}</h2>
+                                <span class="bel-acct-mgmt-level-${account.level.toLowerCase()}">
+                                    ${account.level}
+                                </span>
+                            </div>
+                            <p class="bel-acct-mgmt-text-xs-var">${account.referralId}</p>
+                        </div>
+                    </div>
+
+                    <!-- Metrics container -->
+                    <div class="flex flex-col space-y-2 mt-4 text-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="flex items-center space-x-1">
+                                <span class="bel-acct-mgmt-text-clicks-var">${account.clicks.toLocaleString()}</span>
+                                <span class="bel-acct-mgmt-text-xs-var">Clicks</span>
+                            </span>
+                            <span class="flex items-center space-x-1">
+                                <span class="bel-acct-mgmt-text-orders-var">${account.orders.toLocaleString()}</span>
+                                <span class="bel-acct-mgmt-text-xs-var">Orders</span>
+                            </span>
+                            <span class="flex items-center space-x-1">
+                                <span class="bel-acct-mgmt-text-cvr-var">${account.c20cvr}%</span>
+                                <span class="bel-acct-mgmt-text-xs-var">C2O CVR</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Email at the bottom -->
+                    <div class="flex flex-col mt-4 pt-4" style="border-top: 1px solid var(--ot-color-gray-45);">
+                        <div class="flex items-center justify-start mb-2">
+                            <i class="fas fa-envelope bel-acct-mgmt-text-gray-40-var mr-2"></i>
+                            <a href="mailto:${account.email}" style="font-size: var(--fs-sm); color: var(--ds-color-gray-70); font-weight: var(--fw-normal); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;" onclick="event.stopPropagation();">${account.email}</a>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            // 添加點擊事件處理
+            this.setupAccountCardEvents();
+        },
+
+        setupAccountCardEvents() {
+            const accountCards = document.querySelectorAll('.bel-acct-mgmt-card');
+            accountCards.forEach(card => {
+                card.addEventListener('click', (e) => {
+                    // 防止子元素的事件冒泡（如email鏈接）
+                    const accountId = card.getAttribute('data-account-id');
+                    // 觸發現有的BEL詳情模態框
+                    const accountData = APP_DATA.dashboard.leaderboard.find(account => account.id === accountId);
+                    if (accountData) {
+                        // 使用現有的模態框邏輯
+                        BELModal.openModal(accountData.id);
+                    }
+                });
+            });
+        },
+
+        renderAccountList() {
+            const tableBody = document.querySelector('#account-list-table tbody');
+            if (!tableBody || !APP_DATA.dashboard?.leaderboard) return;
+
+            // Get filter values (same logic as grid view)
+            const nameFilter = document.getElementById('account-f-name')?.value.toLowerCase() || '';
+            const idFilter = document.getElementById('account-f-referral-id')?.value.toLowerCase() || '';
+            const levelFilter = document.getElementById('account-f-level')?.value || '';
+            const sortBy = document.getElementById('account-f-sort')?.value || 'name';
+
+            // 使用現有的 leaderboard 資料來渲染帳戶列表
+            let accountData = APP_DATA.dashboard.leaderboard.map(account => ({
+                referralId: account.id,
+                name: account.name,
+                level: account.level,
+                clicks: account.clicks,
+                orders: account.orders,
+                revenue: account.revenue,
+                c20cvr: parseFloat(account.convRate.replace('%', '')),
+                aov: account.aov,
+                email: account.email,
+                region: account.country || account.region || 'N/A' // Use country or region field
+            }));
+
+            // Apply filters (same logic as grid view)
+            if (nameFilter) {
+                accountData = accountData.filter(account => 
+                    account.name.toLowerCase().includes(nameFilter)
+                );
+            }
+            if (idFilter) {
+                accountData = accountData.filter(account => 
+                    account.referralId.toLowerCase().includes(idFilter)
+                );
+            }
+            if (levelFilter) {
+                accountData = accountData.filter(account => 
+                    account.level === levelFilter
+                );
+            }
+
+            // Apply sorting (same logic as grid view)
+            accountData.sort((a, b) => {
+                switch (sortBy) {
+                    case 'name':
+                        return a.name.localeCompare(b.name);
+                    case 'id':
+                        return a.referralId.localeCompare(b.referralId);
+                    case 'level':
+                        // Sort by level hierarchy: Leader > Explorer > Enabler > Builder
+                        const levelOrder = { 'Leader': 4, 'Explorer': 3, 'Enabler': 2, 'Builder': 1 };
+                        return (levelOrder[b.level] || 0) - (levelOrder[a.level] || 0);
+                    case 'orders':
+                        return b.orders - a.orders; // Descending order
+                    case 'clicks':
+                        return b.clicks - a.clicks; // Descending order
+                    case 'revenue':
+                        return b.revenue - a.revenue; // Descending order
+                    case 'c20cvr':
+                        return b.c20cvr - a.c20cvr; // Descending order
+                    case 'aov':
+                        return parseFloat(b.aov.replace(/[$,]/g, '')) - parseFloat(a.aov.replace(/[$,]/g, '')); // Descending order
+                    case 'region':
+                        return a.region.localeCompare(b.region); // Ascending order
+                    default:
+                        return a.name.localeCompare(b.name);
+                }
+            });
+
+            tableBody.innerHTML = '';
+            
+            // Show message if no results
+            if (accountData.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 2rem; color: #666;">No accounts found matching the current filters.</td></tr>';
+                return;
+            }
+
+            accountData.forEach(account => {
+                const row = document.createElement('tr');
+                row.style.cursor = 'pointer';
+                row.setAttribute('data-account-id', account.referralId);
+                
+                row.innerHTML = `
+                    <td><a href="#" class="bel-id-link">${account.referralId}</a></td>
+                    <td>${account.name}</td>
+                    <td><span class="bel-badge ${account.level.toLowerCase()}">${account.level}</span></td>
+                    <td style="text-align: right;">${account.clicks.toLocaleString()}</td>
+                    <td style="text-align: right;">${account.orders.toLocaleString()}</td>
+                    <td style="text-align: right;">$${account.revenue.toLocaleString()}</td>
+                    <td style="text-align: right;">${account.c20cvr.toFixed(1)}%</td>
+                    <td style="text-align: right;">${account.aov}</td>
+                    <td>${account.region}</td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+
+            // 添加點擊事件處理
+            this.setupAccountListEvents();
+        },
+
+        setupAccountListEvents() {
+            const accountRows = document.querySelectorAll('#account-list-table tbody tr[data-account-id]');
+            accountRows.forEach(row => {
+                row.addEventListener('click', (e) => {
+                    // 允許點擊連結正常工作，但防止ID連結觸發模態框
+                    if (e.target.closest('a.bel-id-link')) return;
+                    
+                    const accountId = row.getAttribute('data-account-id');
+                    // 觸發現有的BEL詳情模態框
+                    const accountData = APP_DATA.dashboard.leaderboard.find(account => account.id === accountId);
+                    if (accountData) {
+                        BELModal.openModal(accountData.id);
+                    }
+                });
+            });
         },
 
         injectPayoutsAndOrders() {
