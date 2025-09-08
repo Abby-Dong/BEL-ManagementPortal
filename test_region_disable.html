@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Region Disable Feature</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; }
+        select { width: 200px; padding: 5px; margin: 10px 0; }
+        .disabled-option { color: #999 !important; font-style: italic; }
+        option:disabled { color: #999; }
+    </style>
+</head>
+<body>
+    <h1>Region Disable Feature Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Header Filter Region</h2>
+        <label>Header Region Filter:</label>
+        <select id="header-region-filter">
+            <option value="all">All Regions</option>
+            <!-- Options will be populated by JavaScript -->
+        </select>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Dashboard Region Filter</h2>
+        <label>Dashboard Region Filter:</label>
+        <select id="f-region">
+            <option value="">All Regions</option>
+            <!-- Options will be populated by JavaScript -->
+        </select>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Account Management Region Filter</h2>
+        <label>Account Management Region Filter:</label>
+        <select id="f-region-account">
+            <option value="">All Regions</option>
+            <!-- Options will be populated by JavaScript -->
+        </select>
+    </div>
+    
+    <div class="test-section">
+        <h2>Data Summary</h2>
+        <div id="data-summary">Loading...</div>
+    </div>
+
+    <script>
+        // Simulate the region data checking logic
+        async function loadAndTestRegions() {
+            try {
+                // Load BEL profiles data
+                const response = await fetch('/data/belProfiles.json');
+                const data = await response.json();
+                
+                // Get regions with actual data
+                const regionsWithData = new Set();
+                data.leaderboard.forEach(leader => {
+                    if (leader.region) {
+                        regionsWithData.add(leader.region);
+                    }
+                });
+                
+                // Standard regions from getRegionFromCountry
+                const standardRegions = [
+                    'AAU / NZ', 'ASEAN', 'China', 'Europe', 'India', 'Japan',
+                    'Korea', 'LATAM', 'ME&A', 'North America', 'Taiwan',
+                    'Russia & CIS', 'Others'
+                ];
+                
+                // Update all three selectors
+                updateRegionSelector('header-region-filter', standardRegions, regionsWithData);
+                updateRegionSelector('f-region', standardRegions, regionsWithData);
+                updateRegionSelector('f-region-account', standardRegions, regionsWithData);
+                
+                // Show data summary
+                const summaryDiv = document.getElementById('data-summary');
+                let summary = `<h3>Region Data Summary:</h3>`;
+                
+                standardRegions.forEach(region => {
+                    const hasData = regionsWithData.has(region);
+                    const count = hasData ? data.leaderboard.filter(l => l.region === region).length : 0;
+                    const status = hasData ? '✅ Enabled' : '❌ Disabled';
+                    summary += `<p><strong>${region}:</strong> ${status} (${count} BELs)</p>`;
+                });
+                
+                summaryDiv.innerHTML = summary;
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('data-summary').innerHTML = 'Error loading data';
+            }
+        }
+        
+        function updateRegionSelector(selectId, standardRegions, regionsWithData) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            
+            // Keep the "All Regions" option
+            const allOption = select.querySelector('option[value="all"], option[value=""]');
+            
+            // Create region options
+            const regionOptions = standardRegions.map(region => {
+                const hasData = regionsWithData.has(region);
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region + (hasData ? '' : ' (No data)');
+                option.disabled = !hasData;
+                if (!hasData) {
+                    option.style.color = '#999';
+                    option.style.fontStyle = 'italic';
+                }
+                return option;
+            });
+            
+            // Clear and rebuild select
+            select.innerHTML = '';
+            if (allOption) {
+                select.appendChild(allOption);
+            }
+            regionOptions.forEach(option => select.appendChild(option));
+        }
+        
+        // Load and test when page loads
+        document.addEventListener('DOMContentLoaded', loadAndTestRegions);
+    </script>
+</body>
+</html>

@@ -666,8 +666,10 @@ document.addEventListener('DOMContentLoaded', () => {
             this.renderSummaryStats();
             this.renderPerformanceTable();
             this.renderTopProducts();
+            this.renderTop10Leaderboard();
             this.initializeCharts();
             this.setupViewSwitcher();
+            this.updateDashboardRegionFilters(); // Add this line to update region filters
         },
 
         /**
@@ -705,25 +707,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Wait for DOM to be ready
             const waitForElements = () => {
                 // Get header filter elements
-                const filterBtn = document.querySelector('.bel-filter-btn');
-                const filterPanel = document.querySelector('.bel-filter-panel');
                 const yearSelect = document.getElementById('header-year-filter');
                 const regionSelect = document.getElementById('header-region-filter');
                 
                 console.log('Filter elements found:', {
-                    filterBtn: !!filterBtn,
-                    filterPanel: !!filterPanel,
                     yearSelect: !!yearSelect,
                     regionSelect: !!regionSelect
                 });
                 
-                if (!filterBtn || !filterPanel || !yearSelect || !regionSelect) {
-                    console.warn('Header filter elements not found, retrying in 100ms...', {
-                        filterBtn,
-                        filterPanel,
-                        yearSelect,
-                        regionSelect
-                    });
+                if (!yearSelect || !regionSelect) {
+                    console.warn('Header filter elements not found, retrying in 100ms...');
                     
                     // Retry after a short delay
                     setTimeout(waitForElements, 100);
@@ -746,25 +739,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Populate region selector with available regions from data
                 this.setupRegionSelector(regionSelect);
-                
-                // Setup filter button click handler
-                filterBtn.addEventListener('click', (e) => {
-                    console.log('Filter button clicked!');
-                    e.stopPropagation();
-                    filterPanel.classList.toggle('show');
-                    filterBtn.classList.toggle('active');
-                    console.log('Panel show class:', filterPanel.classList.contains('show'));
-                });
-                
-                console.log('Filter button event listener added');
-                
-                // Setup outside click to close
-                document.addEventListener('click', (e) => {
-                    if (!filterPanel.contains(e.target) && !filterBtn.contains(e.target)) {
-                        filterPanel.classList.remove('show');
-                        filterBtn.classList.remove('active');
-                    }
-                });
                 
                 // Setup year change handler
                 yearSelect.addEventListener('change', (e) => {
@@ -796,31 +770,65 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         /**
-         * Setup region selector with available regions from data
+         * Check which regions have actual data
          */
-        setupRegionSelector(regionSelect) {
-            // Get all available regions from BEL profiles data
-            const availableRegions = new Set();
-            
-            if (APP_DATA.belProfiles?.leaderboard) {
-                APP_DATA.belProfiles.leaderboard.forEach(leader => {
-                    if (leader.region) {
-                        availableRegions.add(leader.region);
-                    }
-                });
+        getRegionsWithData() {
+            if (!APP_DATA.belProfiles?.leaderboard) {
+                return new Set();
             }
             
-            // Convert to sorted array
-            const sortedRegions = Array.from(availableRegions).sort();
+            const regionsWithData = new Set();
+            APP_DATA.belProfiles.leaderboard.forEach(leader => {
+                if (leader.region) {
+                    regionsWithData.add(leader.region);
+                }
+            });
             
-            console.log('Available regions from data:', sortedRegions);
+            return regionsWithData;
+        },
+
+        /**
+         * Setup region selector with standard regions from getRegionFromCountry function
+         * Disable regions that have no data
+         */
+        setupRegionSelector(regionSelect) {
+            // Use standard regions defined in getRegionFromCountry function
+            // These are the ONLY allowed regions - no additions or modifications
+            const standardRegions = [
+                'AAU / NZ',
+                'ASEAN', 
+                'China',
+                'Europe',
+                'India',
+                'Japan',
+                'Korea',
+                'LATAM',
+                'ME&A',
+                'North America',
+                'Taiwan',
+                'Russia & CIS',
+                'Others'
+            ];
             
-            // Clear existing options and add "All Regions" + available regions
+            // Get regions that have actual data
+            const regionsWithData = this.getRegionsWithData();
+            
+            console.log('Using standard regions from getRegionFromCountry:', standardRegions);
+            console.log('Regions with data:', Array.from(regionsWithData));
+            
+            // Clear existing options and add "All Regions" + standard regions
+            const regionOptions = standardRegions.map(region => {
+                const hasData = regionsWithData.has(region);
+                const disabled = hasData ? '' : ' disabled';
+                const style = hasData ? '' : ' style="color: #999; font-style: italic;"';
+                const suffix = hasData ? '' : ' (No data)';
+                
+                return `<option value="${region}"${disabled}${style}>${region}${suffix}</option>`;
+            }).join('');
+            
             regionSelect.innerHTML = `
                 <option value="all">All Regions</option>
-                ${sortedRegions.map(region => 
-                    `<option value="${region}">${region}</option>`
-                ).join('')}
+                ${regionOptions}
             `;
         },
 
@@ -835,19 +843,15 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update all dashboard components with filters
             this.renderSummaryStats(selectedYear, selectedRegion);
             this.renderPerformanceTable(selectedYear, selectedRegion);
+            this.renderTop10Leaderboard(selectedYear, selectedRegion);
             this.initializeCharts(selectedYear, selectedRegion);
             
             // Update BEL table to reflect header filters
             AccountManagement.updateBelDataForHeaderFilters(selectedYear, selectedRegion);
             AccountManagement.renderTable();
             
-            // Close filter panel after selection
-            const filterPanel = document.querySelector('.bel-filter-panel');
-            const filterBtn = document.querySelector('.bel-filter-btn');
-            if (filterPanel && filterBtn) {
-                filterPanel.classList.remove('show');
-                filterBtn.classList.remove('active');
-            }
+            // Update Dashboard region filters after data changes
+            this.updateDashboardRegionFilters();
         },
 
         /**
@@ -1189,6 +1193,67 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        /**
+         * Update Dashboard region filters with disabled options for regions that have no data
+         */
+        updateDashboardRegionFilters() {
+            // Update the region filter in the Top 10 BEL Performance Leaderboard section
+            const dashboardRegionSelect = document.getElementById('f-region');
+            if (dashboardRegionSelect) {
+                this.updateRegionSelectWithDisabledOptions(dashboardRegionSelect);
+            }
+        },
+
+        /**
+         * Update a region select element with disabled options for regions that have no data
+         */
+        updateRegionSelectWithDisabledOptions(regionSelect) {
+            if (!regionSelect) return;
+
+            // Use standard regions defined in getRegionFromCountry function
+            const standardRegions = [
+                'AAU / NZ',
+                'ASEAN', 
+                'China',
+                'Europe',
+                'India',
+                'Japan',
+                'Korea',
+                'LATAM',
+                'ME&A',
+                'North America',
+                'Taiwan',
+                'Russia & CIS',
+                'Others'
+            ];
+            
+            // Get regions that have actual data
+            const regionsWithData = this.getRegionsWithData();
+            
+            console.log('Updating region select - Regions with data:', Array.from(regionsWithData));
+            
+            // Find the current selected value to preserve it
+            const currentValue = regionSelect.value;
+            
+            // Create region options with disabled state for regions without data
+            const regionOptions = standardRegions.map(region => {
+                const hasData = regionsWithData.has(region);
+                const disabled = hasData ? '' : ' disabled';
+                const style = hasData ? '' : ' style="color: #999; font-style: italic;"';
+                const suffix = hasData ? '' : ' (No data)';
+                const selected = currentValue === region ? ' selected' : '';
+                
+                return `<option value="${region}"${disabled}${style}${selected}>${region}${suffix}</option>`;
+            }).join('');
+            
+            // Update the select element
+            const allRegionsSelected = currentValue === '' || currentValue === 'all' ? ' selected' : '';
+            regionSelect.innerHTML = `
+                <option value=""${allRegionsSelected}>All Regions</option>
+                ${regionOptions}
+            `;
+        },
+
         renderTopProducts() {
             const tableBody = document.querySelector('.product-sales-grid .scrollable-table-container tbody');
             if (!tableBody) return;
@@ -1207,6 +1272,104 @@ document.addEventListener('DOMContentLoaded', () => {
             const topProductsTable = document.querySelector('.product-sales-grid .scrollable-table-container table');
             if (topProductsTable) {
                 TableUtils.makeTableSortable(topProductsTable);
+            }
+        },
+
+        /**
+         * Render Top 10 BEL Performance Leaderboard with header filter support
+         * @param {string} year - Year to filter by (defaults to current selected year)
+         * @param {string} region - Region to filter by (defaults to current selected region)
+         */
+        renderTop10Leaderboard(year = null, region = null) {
+            const tableBody = document.querySelector('#bel-table tbody');
+            if (!tableBody) return;
+            
+            // Use selected year/region or default
+            const selectedYear = year || this.getSelectedYear();
+            const selectedRegion = region || window.selectedDashboardRegion || 'all';
+            
+            console.log(`Rendering Top 10 Leaderboard for Year: ${selectedYear}, Region: ${selectedRegion}`);
+            
+            if (!APP_DATA.belProfiles?.leaderboard) {
+                tableBody.innerHTML = `
+                    <tr class="no-results">
+                        <td colspan="11" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
+                            No BEL data available.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Get filtered data based on region
+            let filteredData = this.getFilteredData(selectedYear, selectedRegion);
+            
+            // Calculate yearly performance data for each BEL
+            const belWithPerformance = filteredData.map(leader => {
+                // When 'All Years' is selected, calculate total performance across all years
+                const yearlyData = (selectedYear === 'all')
+                    ? AccountManagement.calculateTotalPerformance(leader)
+                    : AccountManagement.calculateYearlyData(leader, selectedYear);
+
+                const conv = yearlyData.clicks > 0 ? (yearlyData.orders / yearlyData.clicks) * 100 : 0;
+                const aov = yearlyData.orders > 0 ? yearlyData.revenue / yearlyData.orders : 0;
+                
+                return {
+                    ...leader,
+                    clicks: yearlyData.clicks,
+                    orders: yearlyData.orders,
+                    revenue: yearlyData.revenue,
+                    convRate: conv,
+                    aov: aov,
+                    // Calculate a performance score (weighted combination of metrics)
+                    performanceScore: (yearlyData.revenue * 0.4) + (yearlyData.orders * 0.3) + (yearlyData.clicks * 0.2) + (conv * 0.1)
+                };
+            });
+            
+            // Sort by performance score (descending) and take top 10
+            const top10 = belWithPerformance
+                .sort((a, b) => b.performanceScore - a.performanceScore)
+                .slice(0, 10);
+                
+            console.log(`Top 10 BELs filtered:`, top10.length);
+            
+            // Handle empty results
+            if (top10.length === 0) {
+                tableBody.innerHTML = `
+                    <tr class="no-results">
+                        <td colspan="11" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
+                            No accounts found matching the current filters.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Render the top 10 BELs
+            const rows = top10.map((bel, index) => {
+                return `
+                    <tr data-id="${bel.id}">
+                        <td><input type="checkbox" class="row-check" data-id="${bel.id}" /></td>
+                        <td><a href="#" class="referral-id-link" data-referral-id="${bel.id}">${bel.id}</a></td>
+                        <td>${bel.name}</td>
+                        <td><span class="bel-badge ${bel.level.toLowerCase()}">${bel.level}</span></td>
+                        <td style="text-align:right;">${bel.clicks.toLocaleString()}</td>
+                        <td style="text-align:right;">${bel.orders.toLocaleString()}</td>
+                        <td style="text-align:right;">${utils.formatMoney(bel.revenue)}</td>
+                        <td style="text-align:right;">${utils.formatPercent(bel.convRate / 100)}</td>
+                        <td style="text-align:right;">${bel.orders > 0 ? utils.formatMoney(bel.aov, 2) : '-'}</td>
+                        <td>${bel.region}</td>
+                        <td>${utils.getRegionFromCountry(bel.country || bel.region)}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tableBody.innerHTML = rows;
+            
+            // Apply sorting to the BEL table
+            const belTable = document.querySelector('#bel-table');
+            if (belTable) {
+                TableUtils.makeTableSortable(belTable);
             }
         },
 
@@ -1661,6 +1824,32 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         },
 
+        /**
+         * Calculate total performance across all available years
+         * @param {Object} record - BEL record with monthlyData
+         * @returns {Object} Cumulative data { clicks, orders, revenue }
+         */
+        calculateTotalPerformance(record) {
+            let totalClicks = 0;
+            let totalOrders = 0;
+            let totalRevenue = 0;
+
+            if (record.monthlyData) {
+                for (const year in record.monthlyData) {
+                    const yearlyData = this.calculateYearlyData(record, year);
+                    totalClicks += yearlyData.clicks;
+                    totalOrders += yearlyData.orders;
+                    totalRevenue += yearlyData.revenue;
+                }
+            }
+
+            return {
+                clicks: totalClicks,
+                orders: totalOrders,
+                revenue: totalRevenue
+            };
+        },
+
         generateBelData() {
             // 根據 Referral ID 的前兩碼確定國碼
             const getCountryCode = (id) => {
@@ -1703,7 +1892,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     monthlyData: leader.monthlyData, // Ensure monthlyData is carried over
                     bankingInfo: leader.bankingInfo, // Include banking information
                     country: getCountryName(getCountryCode(leader.id)),
-                    get region() { return utils.getRegionFromCountry(this.country); },
+                    region: leader.region, // Use the existing region field directly
                     tags: ['Top Performer']
                 };
             });
@@ -1748,15 +1937,63 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Populate Region filter (regions are populated via HTML options, but we can add dynamic ones if needed)
-            const regions = Array.from(new Set(this.belData.map(r => r.region))).sort();
+            // Update Region filter with disabled options for regions without data
+            this.updateRegionFilterWithDisabledOptions();
+        },
+
+        /**
+         * Update Region filter with disabled options for regions that have no data
+         */
+        updateRegionFilterWithDisabledOptions() {
+            const regionSelect = ui.regionSel;
+            if (!regionSelect) return;
+
+            // Use standard regions defined in getRegionFromCountry function
+            const standardRegions = [
+                'AAU / NZ',
+                'ASEAN', 
+                'China',
+                'Europe',
+                'India',
+                'Japan',
+                'Korea',
+                'LATAM',
+                'ME&A',
+                'North America',
+                'Taiwan',
+                'Russia & CIS',
+                'Others'
+            ];
             
-            // Note: Region options are already defined in HTML, but if we need to add dynamic ones:
-            // regions.forEach(region => {
-            //     if (ui.regionSel && !ui.regionSel.querySelector(`option[value="${region}"]`)) {
-            //         ui.regionSel.innerHTML += `<option value="${region}">${region}</option>`;
-            //     }
-            // });
+            // Get regions that have actual data in current belData
+            const regionsWithData = new Set();
+            this.belData.forEach(record => {
+                if (record.region) {
+                    regionsWithData.add(record.region);
+                }
+            });
+            
+            console.log('Account Management - Regions with data:', Array.from(regionsWithData));
+            
+            // Find the current selected value to preserve it
+            const currentValue = regionSelect.value;
+            
+            // Create region options with disabled state for regions without data
+            const regionOptions = standardRegions.map(region => {
+                const hasData = regionsWithData.has(region);
+                const disabled = hasData ? '' : ' disabled';
+                const style = hasData ? '' : ' style="color: #999; font-style: italic;"';
+                const suffix = hasData ? '' : ' (No data)';
+                const selected = currentValue === region ? ' selected' : '';
+                
+                return `<option value="${region}"${disabled}${style}${selected}>${region}${suffix}</option>`;
+            }).join('');
+            
+            // Update the select element
+            regionSelect.innerHTML = `
+                <option value="" ${currentValue === '' ? 'selected' : ''}>All Regions</option>
+                ${regionOptions}
+            `;
         },
 
         getProcessedData() {
@@ -1803,27 +2040,39 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (!ui.tbody) return;
 
-            const rows = pageItems.map(record => {
-                const conv = record.clicks30 ? record.orders30 / record.clicks30 : 0;
-                const aov = record.orders30 ? record.revenue30 / record.orders30 : 0;
-                return `
-                    <tr data-id="${record.id}">
-                        <td><input type="checkbox" class="row-check" data-id="${record.id}" ${appState.selected.has(record.id) ? 'checked' : ''} /></td>
-                        <td><a href="#" class="referral-id-link" data-referral-id="${record.id}">${record.id}</a></td>
-                        <td>${record.name}</td>
-                        <td><span class="bel-badge ${record.level.toLowerCase()}">${record.level}</span></td>
-                        <td style="text-align:right;">${record.clicks30.toLocaleString()}</td>
-                        <td style="text-align:right;">${record.orders30.toLocaleString()}</td>
-                        <td style="text-align:right;">${utils.formatMoney(record.revenue30)}</td>
-                        <td style="text-align:right;">${utils.formatPercent(conv)}</td>
-                        <td style="text-align:right;">${record.orders30 ? utils.formatMoney(aov, 2) : '-'}</td>
-                        <td>${record.region}</td>
-                        <td>${record.country}</td>
+            // Handle empty results
+            if (pageItems.length === 0) {
+                ui.tbody.innerHTML = `
+                    <tr class="no-results">
+                        <td colspan="11" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
+                            No accounts found matching the current filters.
+                        </td>
                     </tr>
                 `;
-            }).join('');
+            } else {
+                const rows = pageItems.map(record => {
+                    const conv = record.clicks30 ? record.orders30 / record.clicks30 : 0;
+                    const aov = record.orders30 ? record.revenue30 / record.orders30 : 0;
+                    return `
+                        <tr data-id="${record.id}">
+                            <td><input type="checkbox" class="row-check" data-id="${record.id}" ${appState.selected.has(record.id) ? 'checked' : ''} /></td>
+                            <td><a href="#" class="referral-id-link" data-referral-id="${record.id}">${record.id}</a></td>
+                            <td>${record.name}</td>
+                            <td><span class="bel-badge ${record.level.toLowerCase()}">${record.level}</span></td>
+                            <td style="text-align:right;">${record.clicks30.toLocaleString()}</td>
+                            <td style="text-align:right;">${record.orders30.toLocaleString()}</td>
+                            <td style="text-align:right;">${utils.formatMoney(record.revenue30)}</td>
+                            <td style="text-align:right;">${utils.formatPercent(conv)}</td>
+                            <td style="text-align:right;">${record.orders30 ? utils.formatMoney(aov, 2) : '-'}</td>
+                            <td>${record.region}</td>
+                            <td>${record.country}</td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                ui.tbody.innerHTML = rows;
+            }
             
-            ui.tbody.innerHTML = rows;
             this.updatePaginationUI(total, startIndex, pageItems);
             this.updateSelectionUI();
             this.updateSortUI();
@@ -2272,10 +2521,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Apply region filter first if specified
             if (selectedRegion && selectedRegion !== 'all') {
                 dataToProcess = dataToProcess.filter(leader => {
-                    const countryCode = getCountryCode(leader.id);
-                    const countryName = getCountryName(countryCode);
-                    const region = utils.getRegionFromCountry(countryName);
-                    return region === selectedRegion;
+                    // Use the existing region field directly from the data
+                    return leader.region === selectedRegion;
                 });
             }
 
@@ -2299,12 +2546,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     monthlyData: leader.monthlyData, // Ensure monthlyData is carried over
                     bankingInfo: leader.bankingInfo, // Include banking information
                     country: countryName,
-                    get region() { return utils.getRegionFromCountry(this.country); },
+                    region: leader.region, // Use the existing region field directly
                     tags: ['Top Performer']
                 };
             });
 
             console.log(`Updated BEL data for Year: ${selectedYear}, Region: ${selectedRegion}, Records: ${this.belData.length}`);
+            
+            // Update region filters with disabled options after data change
+            this.updateRegionFilterWithDisabledOptions();
         }
     };
 
