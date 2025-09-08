@@ -2668,3 +2668,207 @@ body::-webkit-scrollbar-track,
     color: var(--ds-color-brand);
     font-weight: 500;
 }
+
+/* ==========================================================================
+   HEADER FILTER DROPDOWN
+   ========================================================================== */
+
+.bel-filter-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-right: 16px;
+}
+
+.bel-filter-btn {
+    background: none;
+    border: none;
+    color: var(--ds-color-gray-70);
+    font-size: 18px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+}
+
+.bel-filter-btn:hover {
+    background-color: var(--ds-color-gray-30);
+    color: var(--ds-color-brand);
+}
+
+.bel-filter-btn.active {
+    background-color: var(--ds-color-brand-light-30);
+    color: var(--ds-color-brand);
+}
+
+.bel-filter-panel {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--ds-color-white);
+    border: 1px solid var(--ot-color-gray-45);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 280px;
+    max-width: 320px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    margin-top: 8px;
+}
+
+.bel-filter-panel.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.bel-filter-header {
+    padding: 16px 20px 12px;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--ds-color-gray-80);
+    border-bottom: 1px solid var(--ot-color-gray-45);
+    background-color: var(--ds-color-gray-30);
+    border-radius: 8px 8px 0 0;
+}
+
+.bel-filter-content {
+    padding: 16px 20px;
+}
+
+.bel-filter-group {
+    margin-bottom: 16px;
+}
+
+.bel-filter-group:last-child {
+    margin-bottom: 0;
+}
+
+.bel-filter-group label {
+    display: block;
+    font-weight: 600;
+    color: var(--ds-color-gray-80);
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.bel-filter-select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--ot-color-gray-45);
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: var(--ds-color-white);
+    color: var(--ds-color-gray-80);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.bel-filter-select:focus {
+    outline: none;
+    border-color: var(--ds-color-brand);
+    box-shadow: 0 0 0 2px var(--ds-color-brand-light-30);
+}
+
+.bel-filter-select:hover {
+    border-color: var(--ds-color-brand-light-50);
+}
+
+/* Arrow triangle for dropdown */
+.bel-filter-panel::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 16px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid var(--ot-color-gray-45);
+}
+
+.bel-filter-panel::after {
+    content: '';
+    position: absolute;
+    top: -7px;
+    right: 16px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid var(--ds-color-white);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .bel-filter-panel {
+        right: -20px;
+        min-width: 260px;
+        max-width: calc(100vw - 40px);
+    }
+    
+    .bel-filter-panel::before,
+    .bel-filter-panel::after {
+        right: 36px;
+    }
+}
+
+/* ==========================================================================
+   DASHBOARD YEAR SELECTOR
+   ========================================================================== */
+
+.dashboard-year-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 16px 20px;
+    background: var(--ds-color-white);
+    border: 1px solid var(--ot-color-gray-45);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-year-selector label {
+    font-weight: 600;
+    color: var(--ds-color-gray-80);
+    margin: 0;
+    white-space: nowrap;
+}
+
+.dashboard-year-selector select {
+    min-width: 120px;
+    font-weight: 500;
+    border-color: var(--ds-color-brand-light-50);
+}
+
+.dashboard-year-selector select:focus {
+    border-color: var(--ds-color-brand);
+    box-shadow: 0 0 0 2px var(--ds-color-brand-light-30);
+}
+
+.dashboard-year-selector span {
+    font-size: 0.85em;
+    color: var(--ds-color-gray-60);
+    margin-left: 8px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-year-selector {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .dashboard-year-selector select {
+        width: 100%;
+        min-width: auto;
+    }
+}

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .debug-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .debug-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        #console-output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>🔍 Filter Debug Tool</h1>
+        <p>這個頁面用來測試和診斷 Filter 功能問題</p>
+        
+        <div class="debug-section">
+            <h3>📋 Console 監控</h3>
+            <p>所有 console 輸出將顯示在下方：</p>
+            <button onclick="clearConsole()">清除 Console</button>
+            <button onclick="testFilterElements()">測試 Filter 元素</button>
+            <button onclick="loadMainPage()">載入主頁面</button>
+            <div id="console-output"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>🔧 元素檢測結果</h3>
+            <div id="element-check-results"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>📊 主頁面 iframe</h3>
+            <iframe id="main-iframe" src="" width="100%" height="400" style="border: 1px solid #ddd; border-radius: 4px;"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // 攔截 console 輸出
+        const originalConsole = {
+            log: console.log,
+            warn: console.warn,
+            error: console.error
+        };
+        
+        const consoleOutput = document.getElementById('console-output');
+        
+        function addToConsole(type, args) {
+            const timestamp = new Date().toLocaleTimeString();
+            const message = Array.from(args).map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            consoleOutput.textContent += `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            
+            // 也保持原本的 console 功能
+            originalConsole[type].apply(console, args);
+        }
+        
+        console.log = function(...args) { addToConsole('log', args); };
+        console.warn = function(...args) { addToConsole('warn', args); };
+        console.error = function(...args) { addToConsole('error', args); };
+        
+        function clearConsole() {
+            consoleOutput.textContent = '';
+        }
+        
+        function testFilterElements() {
+            const iframe = document.getElementById('main-iframe');
+            if (!iframe.contentDocument) {
+                console.error('主頁面未載入，請先點擊"載入主頁面"');
+                return;
+            }
+            
+            const doc = iframe.contentDocument;
+            const filterBtn = doc.querySelector('.bel-filter-btn');
+            const filterPanel = doc.querySelector('.bel-filter-panel');
+            const yearSelect = doc.getElementById('header-year-filter');
+            
+            console.log('=== 元素檢測結果 ===');
+            console.log('Filter Button:', filterBtn ? '✅ 找到' : '❌ 未找到');
+            console.log('Filter Panel:', filterPanel ? '✅ 找到' : '❌ 未找到');
+            console.log('Year Select:', yearSelect ? '✅ 找到' : '❌ 未找到');
+            
+            if (filterBtn) {
+                console.log('Filter Button details:', {
+                    className: filterBtn.className,
+                    id: filterBtn.id,
+                    innerHTML: filterBtn.innerHTML
+                });
+                
+                // 測試點擊
+                console.log('嘗試點擊 Filter Button...');
+                filterBtn.click();
+                
+                setTimeout(() => {
+                    if (filterPanel) {
+                        const isVisible = filterPanel.classList.contains('show');
+                        console.log('Panel 顯示狀態:', isVisible ? '✅ 已顯示' : '❌ 未顯示');
+                        console.log('Panel classes:', filterPanel.className);
+                    }
+                }, 100);
+            }
+            
+            // 更新頁面中的結果顯示
+            updateElementCheckResults({
+                filterBtn: !!filterBtn,
+                filterPanel: !!filterPanel,
+                yearSelect: !!yearSelect
+            });
+        }
+        
+        function updateElementCheckResults(results) {
+            const container = document.getElementById('element-check-results');
+            container.innerHTML = `
+                <div class="status ${results.filterBtn ? 'success' : 'error'}">
+                    Filter Button: ${results.filterBtn ? '✅ 找到' : '❌ 未找到'}
+                </div>
+                <div class="status ${results.filterPanel ? 'success' : 'error'}">
+                    Filter Panel: ${results.filterPanel ? '✅ 找到' : '❌ 未找到'}
+                </div>
+                <div class="status ${results.yearSelect ? 'success' : 'error'}">
+                    Year Select: ${results.yearSelect ? '✅ 找到' : '❌ 未找到'}
+                </div>
+            `;
+        }
+        
+        function loadMainPage() {
+            const iframe = document.getElementById('main-iframe');
+            iframe.src = './index.html';
+            console.log('載入主頁面到 iframe...');
+            
+            iframe.onload = () => {
+                console.log('主頁面載入完成');
+                
+                // 等待一段時間讓 JavaScript 初始化
+                setTimeout(() => {
+                    console.log('準備檢測元素...');
+                    testFilterElements();
+                }, 2000);
+            };
+        }
+        
+        // 頁面載入時自動初始化
+        window.addEventListener('load', () => {
+            console.log('Debug 頁面載入完成');
+            clearConsole();
+        });
+    </script>
+</body>
+</html>

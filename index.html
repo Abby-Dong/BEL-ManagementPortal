@@ -22,6 +22,43 @@
                 <span>BEL Portal</span>
             </div>
             <div class="bel-header-right">
+                <!-- Filter Dropdown -->
+                <div class="bel-filter-dropdown" id="filter-dropdown">
+                    <button class="bel-filter-btn" id="filter-btn">
+                        <i class="fas fa-filter"></i>
+                    </button>
+                    <div class="bel-filter-panel" id="filter-panel">
+                        <div class="bel-filter-header">Filters</div>
+                        <div class="bel-filter-content">
+                            <div class="bel-filter-group">
+                                <label for="header-year-filter">View Year:</label>
+                                <select id="header-year-filter" class="bel-filter-select">
+                                    <option value="all">All Years</option>
+                                    <!-- Years will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            <div class="bel-filter-group">
+                                <label for="header-region-filter">Region:</label>
+                                <select id="header-region-filter" class="bel-filter-select">
+                                    <option value="all">All Regions</option>
+                                    <option value="North America">North America</option>
+                                    <option value="Europe">Europe</option>
+                                    <option value="ASEAN">ASEAN</option>
+                                    <option value="China">China</option>
+                                    <option value="Japan">Japan</option>
+                                    <option value="Korea">Korea</option>
+                                    <option value="Taiwan">Taiwan</option>
+                                    <option value="India">India</option>
+                                    <option value="AAU / NZ">AAU / NZ</option>
+                                    <option value="LATAM">LATAM</option>
+                                    <option value="ME&A">ME&A</option>
+                                    <option value="Russia & CIS">Russia & CIS</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="bel-notification-bell" id="notification-bell">
                     <i class="fas fa-bell"></i>
                     <div class="dot"></div>

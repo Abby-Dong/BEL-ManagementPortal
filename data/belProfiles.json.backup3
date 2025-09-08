@@ -200,7 +200,7 @@
         "phone": "+1-555-1381",
         "address": "426 Maple Avenue, Chicago, IL 60601, USA"
       },
-      "region": "Taiwan",
+      "region": "Asia Pacific",
       "countryCode": "TW"
     },
     {
@@ -888,7 +888,7 @@
         "phone": "+1-555-6747",
         "address": "536 Pine Street, Los Angeles, CA 90210, USA"
       },
-      "region": "Japan",
+      "region": "Asia Pacific",
       "countryCode": "JP"
     },
     {
@@ -1170,7 +1170,7 @@
         "phone": "+1-555-1741",
         "address": "175 Main Street, Chicago, IL 60601, USA"
       },
-      "region": "Korea",
+      "region": "Asia Pacific",
       "countryCode": "KR"
     },
     {
@@ -1593,7 +1593,7 @@
         "phone": "+1-555-6651",
         "address": "263 Madison Avenue, Los Angeles, CA 90210, USA"
       },
-      "region": "China",
+      "region": "Asia Pacific",
       "countryCode": "CN"
     },
     {
@@ -1734,7 +1734,7 @@
         "phone": "+1-555-6778",
         "address": "662 Park Street, Chicago, IL 60601, USA"
       },
-      "region": "AAU / NZ",
+      "region": "Australia & New Zealand",
       "countryCode": "AU"
     },
     {
@@ -1875,7 +1875,7 @@
         "phone": "+1-555-9907",
         "address": "677 Pine Avenue, New York, NY 10001, USA"
       },
-      "region": "Korea",
+      "region": "Asia Pacific",
       "countryCode": "KR"
     }
   ]

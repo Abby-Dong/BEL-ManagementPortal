@@ -662,6 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
        ======================================================================== */
     const Dashboard = {
         init() {
+            this.setupYearSelector();
             this.renderSummaryStats();
             this.renderPerformanceTable();
             this.renderTopProducts();
@@ -670,11 +671,231 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         /**
+         * Dynamically generate year selector based on available data
+         */
+        setupYearSelector() {
+            // Find all available years from BEL profiles data
+            const availableYears = new Set();
+            
+            if (APP_DATA.belProfiles?.leaderboard) {
+                APP_DATA.belProfiles.leaderboard.forEach(leader => {
+                    if (leader.monthlyData) {
+                        Object.keys(leader.monthlyData).forEach(year => {
+                            availableYears.add(year);
+                        });
+                    }
+                });
+            }
+            
+            // Convert to sorted array (newest first)
+            const sortedYears = Array.from(availableYears).sort((a, b) => b - a);
+            
+            // Setup header filter instead of dashboard selector
+            if (sortedYears.length > 0) {
+                this.setupHeaderFilter(sortedYears);
+            }
+        },
+
+        /**
+         * Setup header filter dropdown with years and future region filter
+         */
+        setupHeaderFilter(years) {
+            console.log('Setting up header filter with years:', years);
+            
+            // Wait for DOM to be ready
+            const waitForElements = () => {
+                // Get header filter elements
+                const filterBtn = document.querySelector('.bel-filter-btn');
+                const filterPanel = document.querySelector('.bel-filter-panel');
+                const yearSelect = document.getElementById('header-year-filter');
+                const regionSelect = document.getElementById('header-region-filter');
+                
+                console.log('Filter elements found:', {
+                    filterBtn: !!filterBtn,
+                    filterPanel: !!filterPanel,
+                    yearSelect: !!yearSelect,
+                    regionSelect: !!regionSelect
+                });
+                
+                if (!filterBtn || !filterPanel || !yearSelect || !regionSelect) {
+                    console.warn('Header filter elements not found, retrying in 100ms...', {
+                        filterBtn,
+                        filterPanel,
+                        yearSelect,
+                        regionSelect
+                    });
+                    
+                    // Retry after a short delay
+                    setTimeout(waitForElements, 100);
+                    return;
+                }
+                
+                // Populate year selector with available years
+                const currentYear = new Date().getFullYear().toString();
+                const defaultYear = years.includes(currentYear) ? currentYear : years[0];
+                
+                console.log('Setting up years:', { currentYear, defaultYear, years });
+                
+                // Clear existing options and add "All Years" + available years
+                yearSelect.innerHTML = `
+                    <option value="all">All Years</option>
+                    ${years.map(year => 
+                        `<option value="${year}" ${year === defaultYear ? 'selected' : ''}>${year}</option>`
+                    ).join('')}
+                `;
+                
+                // Populate region selector with available regions from data
+                this.setupRegionSelector(regionSelect);
+                
+                // Setup filter button click handler
+                filterBtn.addEventListener('click', (e) => {
+                    console.log('Filter button clicked!');
+                    e.stopPropagation();
+                    filterPanel.classList.toggle('show');
+                    filterBtn.classList.toggle('active');
+                    console.log('Panel show class:', filterPanel.classList.contains('show'));
+                });
+                
+                console.log('Filter button event listener added');
+                
+                // Setup outside click to close
+                document.addEventListener('click', (e) => {
+                    if (!filterPanel.contains(e.target) && !filterBtn.contains(e.target)) {
+                        filterPanel.classList.remove('show');
+                        filterBtn.classList.remove('active');
+                    }
+                });
+                
+                // Setup year change handler
+                yearSelect.addEventListener('change', (e) => {
+                    const selectedYear = e.target.value;
+                    const selectedRegion = regionSelect.value;
+                    console.log(`Filter changed - Year: ${selectedYear}, Region: ${selectedRegion}`);
+                    
+                    this.applyFilters(selectedYear, selectedRegion);
+                });
+                
+                // Setup region change handler
+                regionSelect.addEventListener('change', (e) => {
+                    const selectedYear = yearSelect.value;
+                    const selectedRegion = e.target.value;
+                    console.log(`Filter changed - Year: ${selectedYear}, Region: ${selectedRegion}`);
+                    
+                    this.applyFilters(selectedYear, selectedRegion);
+                });
+                
+                // Set initial selected year
+                window.selectedDashboardYear = defaultYear;
+                window.selectedDashboardRegion = 'all';
+                
+                console.log('Header filter setup completed');
+            };
+            
+            // Start the setup process
+            waitForElements();
+        },
+
+        /**
+         * Setup region selector with available regions from data
+         */
+        setupRegionSelector(regionSelect) {
+            // Get all available regions from BEL profiles data
+            const availableRegions = new Set();
+            
+            if (APP_DATA.belProfiles?.leaderboard) {
+                APP_DATA.belProfiles.leaderboard.forEach(leader => {
+                    if (leader.region) {
+                        availableRegions.add(leader.region);
+                    }
+                });
+            }
+            
+            // Convert to sorted array
+            const sortedRegions = Array.from(availableRegions).sort();
+            
+            console.log('Available regions from data:', sortedRegions);
+            
+            // Clear existing options and add "All Regions" + available regions
+            regionSelect.innerHTML = `
+                <option value="all">All Regions</option>
+                ${sortedRegions.map(region => 
+                    `<option value="${region}">${region}</option>`
+                ).join('')}
+            `;
+        },
+
+        /**
+         * Apply both year and region filters
+         */
+        applyFilters(selectedYear, selectedRegion) {
+            // Store selected filters
+            window.selectedDashboardYear = selectedYear;
+            window.selectedDashboardRegion = selectedRegion;
+            
+            // Update all dashboard components with filters
+            this.renderSummaryStats(selectedYear, selectedRegion);
+            this.renderPerformanceTable(selectedYear, selectedRegion);
+            this.initializeCharts(selectedYear, selectedRegion);
+            
+            // Update BEL table to reflect header filters
+            AccountManagement.updateBelDataForHeaderFilters(selectedYear, selectedRegion);
+            AccountManagement.renderTable();
+            
+            // Close filter panel after selection
+            const filterPanel = document.querySelector('.bel-filter-panel');
+            const filterBtn = document.querySelector('.bel-filter-btn');
+            if (filterPanel && filterBtn) {
+                filterPanel.classList.remove('show');
+                filterBtn.classList.remove('active');
+            }
+        },
+
+        /**
+         * Filter BEL profiles data based on year and region
+         */
+        getFilteredData(year = null, region = null) {
+            if (!APP_DATA.belProfiles?.leaderboard) {
+                return [];
+            }
+            
+            let filteredData = APP_DATA.belProfiles.leaderboard;
+            
+            // Apply region filter
+            if (region && region !== 'all') {
+                filteredData = filteredData.filter(leader => 
+                    leader.region === region
+                );
+                console.log(`Filtered by region "${region}": ${filteredData.length} BELs`);
+            }
+            
+            return filteredData;
+        },
+
+        /**
+         * Get currently selected year from header filter
+         */
+        getSelectedYear() {
+            const yearSelect = document.getElementById('header-year-filter');
+            if (yearSelect && yearSelect.value !== 'all') {
+                return yearSelect.value;
+            }
+            
+            // Default to current year or latest available year
+            const currentYear = new Date().getFullYear().toString();
+            return window.selectedDashboardYear || currentYear;
+        },
+
+        /**
          * Calculate real-time summary statistics from BEL profiles data
-         * @param {string} year - Year to calculate (defaults to 2025)
+         * @param {string} year - Year to calculate (defaults to current selected year)
+         * @param {string} region - Region to filter by (defaults to current selected region)
          * @returns {Object} Calculated summary statistics
          */
-        calculateSummaryStats(year = '2025') {
+        calculateSummaryStats(year = null, region = null) {
+            // Use selected year/region or default
+            const selectedYear = year || this.getSelectedYear();
+            const selectedRegion = region || window.selectedDashboardRegion || 'all';
+            
             if (!APP_DATA.belProfiles?.leaderboard) {
                 return {
                     belCount: 0,
@@ -686,7 +907,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
 
-            const leaderboard = APP_DATA.belProfiles.leaderboard;
+            // Get filtered data based on region
+            const filteredLeaderboard = this.getFilteredData(selectedYear, selectedRegion);
             
             // Calculate totals
             let totalClicks = 0;
@@ -697,29 +919,58 @@ document.addEventListener('DOMContentLoaded', () => {
             let validCvrCount = 0;
             let validAovCount = 0;
 
-            leaderboard.forEach(leader => {
+            filteredLeaderboard.forEach(leader => {
                 let userClicks = 0;
                 let userOrders = 0;
                 let userRevenue = 0;
                 
                 // Process yearly data
-                if (leader.monthlyData && leader.monthlyData[year]) {
+                if (leader.monthlyData) {
                     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
                     
-                    // For 2025, only sum up to August (since it's September 8, 2025)
-                    let monthsToSum = monthNames;
-                    if (year === '2025') {
-                        monthsToSum = monthNames.slice(0, 8); // January to August
-                    }
-                    
-                    monthsToSum.forEach(monthName => {
-                        const monthData = leader.monthlyData[year][monthName];
-                        if (monthData) {
-                            userClicks += monthData.clicks || 0;
-                            userOrders += monthData.orders || 0;
-                            userRevenue += monthData.revenue || 0;
+                    if (selectedYear === 'all') {
+                        // For "All Years", sum all available years
+                        Object.keys(leader.monthlyData).forEach(year => {
+                            const currentDate = new Date();
+                            const currentYear = currentDate.getFullYear().toString();
+                            
+                            let monthsToSum = monthNames;
+                            if (year === currentYear) {
+                                // For current year, only sum up to current month
+                                const currentMonth = currentDate.getMonth(); // 0-based
+                                monthsToSum = monthNames.slice(0, currentMonth + 1);
+                            }
+                            
+                            monthsToSum.forEach(monthName => {
+                                const monthData = leader.monthlyData[year][monthName];
+                                if (monthData) {
+                                    userClicks += monthData.clicks || 0;
+                                    userOrders += monthData.orders || 0;
+                                    userRevenue += monthData.revenue || 0;
+                                }
+                            });
+                        });
+                    } else if (leader.monthlyData[selectedYear]) {
+                        // For specific year
+                        const currentDate = new Date();
+                        const currentYear = currentDate.getFullYear().toString();
+                        
+                        let monthsToSum = monthNames;
+                        if (selectedYear === currentYear) {
+                            // For current year, only sum up to current month
+                            const currentMonth = currentDate.getMonth(); // 0-based
+                            monthsToSum = monthNames.slice(0, currentMonth + 1);
                         }
-                    });
+                        
+                        monthsToSum.forEach(monthName => {
+                            const monthData = leader.monthlyData[selectedYear][monthName];
+                            if (monthData) {
+                                userClicks += monthData.clicks || 0;
+                                userOrders += monthData.orders || 0;
+                                userRevenue += monthData.revenue || 0;
+                            }
+                        });
+                    }
                 }
                 
                 totalClicks += userClicks;
@@ -746,7 +997,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const avgAov = validAovCount > 0 ? totalAovSum / validAovCount : 0;
 
             return {
-                belCount: leaderboard.length,
+                belCount: filteredLeaderboard.length,
                 totalClicks,
                 totalOrders,
                 totalRevenue,
@@ -768,12 +1019,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        renderSummaryStats() {
+        renderSummaryStats(year = null, region = null) {
             const statsContainer = document.querySelector('.bel-stats-cards');
             if (!statsContainer) return;
             
             // Calculate real-time statistics from BEL profiles
-            const realTimeStats = this.calculateSummaryStats();
+            const realTimeStats = this.calculateSummaryStats(year, region);
             
             // Format values for display
             const belCountValue = realTimeStats.belCount.toString();
@@ -857,10 +1108,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /**
          * Calculate performance data by level using yearly cumulative data from monthly data
-         * @param {string} year - Year to calculate (defaults to 2025)
+         * @param {string} year - Year to calculate (defaults to current selected year)
          * @returns {Array} Performance details by level
          */
-        calculatePerformanceByLevel(year = '2025') {
+        calculatePerformanceByLevel(year = null, region = null) {
+            // Use selected year/region or default
+            const selectedYear = year || this.getSelectedYear();
+            const selectedRegion = region || window.selectedDashboardRegion || 'all';
+            
             if (!APP_DATA.belProfiles?.leaderboard) return [];
             
             const levelStats = {
@@ -870,13 +1125,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Leader': { clicks: 0, orders: 0, revenue: 0, count: 0 }
             };
             
+            // Get filtered data based on region
+            const filteredLeaderboard = this.getFilteredData(selectedYear, selectedRegion);
+            
             // Aggregate data for each level
-            APP_DATA.belProfiles.leaderboard.forEach(leader => {
+            filteredLeaderboard.forEach(leader => {
                 const level = leader.level;
                 if (!levelStats[level]) return;
                 
                 // Calculate yearly cumulative data
-                const yearlyData = AccountManagement.calculateYearlyData(leader, year);
+                const yearlyData = AccountManagement.calculateYearlyData(leader, selectedYear);
                 
                 levelStats[level].clicks += yearlyData.clicks;
                 levelStats[level].orders += yearlyData.orders;
@@ -906,12 +1164,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
-        renderPerformanceTable() {
+        renderPerformanceTable(year = null, region = null) {
             const tableBody = document.querySelector('#performance-table-view tbody');
             if (!tableBody) return;
             
             // Use dynamic calculation instead of static data
-            const performanceDetails = this.calculatePerformanceByLevel();
+            const performanceDetails = this.calculatePerformanceByLevel(year, region);
             
             tableBody.innerHTML = performanceDetails.map(detail => `
                 <tr>
@@ -952,19 +1210,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        initializeCharts() {
-            this.initializePieChart();
+        initializeCharts(year = null, region = null) {
+            this.initializePieChart(year, region);
             this.initializeProductCategoryChart();
-            this.initializePerformanceChart();
+            this.initializePerformanceChart(year, region);
         },
 
-        initializePieChart() {
+        initializePieChart(year = null, region = null) {
             const pieCtx = document.getElementById('level-pie-chart');
             if (pieCtx && window.Chart) {
                 // Calculate real-time level distribution from BEL profiles
-                const levelCounts = this.calculateLevelDistribution();
+                const levelCounts = this.calculateLevelDistribution(year, region);
                 
-                new Chart(pieCtx, {
+                // Destroy existing chart if it exists
+                if (window.levelPieChart) {
+                    window.levelPieChart.destroy();
+                }
+                
+                window.levelPieChart = new Chart(pieCtx, {
                     type: 'doughnut',
                     data: {
                         labels: levelCounts.labels,
@@ -995,9 +1258,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /**
          * Calculate real-time level distribution from BEL profiles data
+         * @param {string} year - Year to calculate (defaults to current selected year)
          * @returns {Object} Level distribution with labels, data, and colors
          */
-        calculateLevelDistribution() {
+        calculateLevelDistribution(year = null, region = null) {
             if (!APP_DATA.belProfiles?.leaderboard) {
                 return {
                     labels: ["Builder", "Enabler", "Exploder", "Leader"],
@@ -1013,8 +1277,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Leader': 0
             };
 
-            // Count actual levels from BEL profiles
-            APP_DATA.belProfiles.leaderboard.forEach(leader => {
+            // Get filtered data based on region
+            const selectedRegion = region || window.selectedDashboardRegion || 'all';
+            const filteredLeaderboard = this.getFilteredData(year, selectedRegion);
+
+            // Count actual levels from filtered BEL profiles
+            filteredLeaderboard.forEach(leader => {
                 if (levelCount.hasOwnProperty(leader.level)) {
                     levelCount[leader.level]++;
                 }
@@ -1107,11 +1375,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        initializePerformanceChart() {
+        initializePerformanceChart(year = null, region = null) {
             const performanceCtx = document.getElementById('performance-percentage-chart');
             if (performanceCtx && window.Chart) {
                 // Use dynamic calculation instead of static data
-                const performanceData = this.calculatePerformanceByLevel();
+                const performanceData = this.calculatePerformanceByLevel(year, region);
+                
+                // Destroy existing chart if it exists
+                if (window.performanceChart) {
+                    window.performanceChart.destroy();
+                }
                 
                 // Get CSS variables for colors
                 const rootStyle = getComputedStyle(document.documentElement);
@@ -1135,7 +1408,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     typeof d.convRate === 'string' ? parseFloat(d.convRate.replace('%', '')) : d.convRate
                 );
 
-                new Chart(performanceCtx, {
+                window.performanceChart = new Chart(performanceCtx, {
                     type: 'bar',
                     data: {
                         labels: labels,
@@ -1322,7 +1595,11 @@ document.addEventListener('DOMContentLoaded', () => {
         belData: [],
 
         init() {
-            this.generateBelData();
+            // Initialize with current header filter values
+            const selectedYear = window.selectedDashboardYear || '2025';
+            const selectedRegion = window.selectedDashboardRegion || 'all';
+            
+            this.updateBelDataForHeaderFilters(selectedYear, selectedRegion);
             this.setupEventListeners();
             this.populateFilters();
             this.renderTable();
@@ -1331,26 +1608,39 @@ document.addEventListener('DOMContentLoaded', () => {
         /**
          * Calculate cumulative yearly data from monthly data
          * @param {Object} record - BEL record with monthlyData
-         * @param {string} year - Year to calculate (defaults to 2025)
+         * @param {string} year - Year to calculate (defaults to current selected year)
          * @returns {Object} Cumulative data { clicks, orders, revenue }
          */
-        calculateYearlyData(record, year = '2025') {
+        calculateYearlyData(record, year = null) {
+            // Use Dashboard's selected year if available, otherwise use current year
+            const selectedYear = year || (window.selectedDashboardYear) || new Date().getFullYear().toString();
+            
             let cumulativeClicks = 0;
             let cumulativeOrders = 0;
             let cumulativeRevenue = 0;
             
-            if (record.monthlyData && record.monthlyData[year]) {
+            if (record.monthlyData && record.monthlyData[selectedYear]) {
                 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
                 
-                // For 2025, only sum up to August (since it's September 8, 2025)
-                // For other years, sum the full year
+                // Determine how many months to sum based on current date and selected year
                 let monthsToSum = monthNames;
-                if (year === '2025') {
-                    monthsToSum = monthNames.slice(0, 8); // January to August
+                const currentDate = new Date();
+                const currentYear = currentDate.getFullYear().toString();
+                
+                if (selectedYear === currentYear) {
+                    // For current year, only sum up to current month
+                    const currentMonth = currentDate.getMonth(); // 0-based
+                    monthsToSum = monthNames.slice(0, currentMonth + 1);
+                } else if (parseInt(selectedYear) > parseInt(currentYear)) {
+                    // For future years, sum all available months (but there shouldn't be any)
+                    monthsToSum = monthNames;
+                } else {
+                    // For past years, sum the full year
+                    monthsToSum = monthNames;
                 }
                 
                 monthsToSum.forEach(monthName => {
-                    const monthData = record.monthlyData[year][monthName];
+                    const monthData = record.monthlyData[selectedYear][monthName];
                     if (monthData) {
                         cumulativeClicks += monthData.clicks || 0;
                         cumulativeOrders += monthData.orders || 0;
@@ -1938,6 +2228,83 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
             return text.replace(regex, '<mark style="background-color: var(--ds-color-primary-light-30); font-weight: var(--fw-semibold);">$1</mark>');
+        },
+
+        /**
+         * Update BEL table data based on header filter selections
+         * @param {string} selectedYear - Year to filter by (or 'all' for all years)
+         * @param {string} selectedRegion - Region to filter by (or 'all' for all regions)
+         */
+        updateBelDataForHeaderFilters(selectedYear, selectedRegion) {
+            // 根據 Referral ID 的前兩碼確定國碼
+            const getCountryCode = (id) => {
+                const prefix = id.substring(1, 3); // 取 K 後面的兩位
+                const countryMap = {
+                    'TW': 'TW', 'US': 'US', 'DE': 'DE', 'FR': 'FR', 'JP': 'JP',
+                    'AU': 'AU', 'KR': 'KR', 'IT': 'IT', 'MX': 'MX', 'CN': 'CN',
+                    'CA': 'CA', 'IN': 'IN', 'NO': 'NO', 'NL': 'NL', 'BR': 'BR',
+                    'SE': 'SE', 'CH': 'CH', 'DA': 'DK', 'PL': 'PL', 'BE': 'BE',
+                    'SG': 'SG', 'TH': 'TH', 'MY': 'MY', 'ZA': 'ZA'
+                };
+                return countryMap[prefix] || 'US';
+            };
+
+            // 將國碼轉換為國家名稱
+            const getCountryName = (countryCode) => {
+                const countryNames = {
+                    'TW': 'Taiwan', 'US': 'United States', 'DE': 'Germany', 'FR': 'France', 'JP': 'Japan',
+                    'AU': 'Australia', 'KR': 'South Korea', 'IT': 'Italy', 'MX': 'Mexico', 'CN': 'China',
+                    'CA': 'Canada', 'IN': 'India', 'NO': 'Norway', 'NL': 'Netherlands', 'BR': 'Brazil',
+                    'SE': 'Sweden', 'CH': 'Switzerland', 'DK': 'Denmark', 'PL': 'Poland', 'BE': 'Belgium',
+                    'SG': 'Singapore', 'TH': 'Thailand', 'MY': 'Malaysia', 'ZA': 'South Africa'
+                };
+                return countryNames[countryCode] || 'United States';
+            };
+
+            // Get all leaderboard data
+            if (!APP_DATA.belProfiles?.leaderboard) {
+                console.warn('No leaderboard data available');
+                return;
+            }
+
+            let dataToProcess = APP_DATA.belProfiles.leaderboard;
+
+            // Apply region filter first if specified
+            if (selectedRegion && selectedRegion !== 'all') {
+                dataToProcess = dataToProcess.filter(leader => {
+                    const countryCode = getCountryCode(leader.id);
+                    const countryName = getCountryName(countryCode);
+                    const region = utils.getRegionFromCountry(countryName);
+                    return region === selectedRegion;
+                });
+            }
+
+            // Update BEL data with year-specific calculations
+            this.belData = dataToProcess.map(leader => {
+                // Calculate yearly cumulative data based on selected year
+                const yearlyData = this.calculateYearlyData(leader, selectedYear);
+                
+                const countryCode = getCountryCode(leader.id);
+                const countryName = getCountryName(countryCode);
+                
+                return {
+                    id: leader.id,
+                    name: leader.name,
+                    email: leader.email || `${leader.name.toLowerCase().replace(' ', '.')}@company.com`,
+                    code: `${leader.name.split(' ')[0].toUpperCase()}${Math.floor(Math.random() * 100)}`,
+                    level: leader.level,
+                    clicks30: yearlyData.clicks,
+                    orders30: yearlyData.orders,
+                    revenue30: yearlyData.revenue,
+                    monthlyData: leader.monthlyData, // Ensure monthlyData is carried over
+                    bankingInfo: leader.bankingInfo, // Include banking information
+                    country: countryName,
+                    get region() { return utils.getRegionFromCountry(this.country); },
+                    tags: ['Top Performer']
+                };
+            });
+
+            console.log(`Updated BEL data for Year: ${selectedYear}, Region: ${selectedRegion}, Records: ${this.belData.length}`);
         }
     };
 
