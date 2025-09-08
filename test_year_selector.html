@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Year Selector Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        .console-log { background: #f5f5f5; padding: 10px; margin: 10px 0; font-family: monospace; }
+        select { padding: 5px; margin: 10px; }
+        button { padding: 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>年份選擇器功能測試</h1>
+    
+    <div class="test-section">
+        <h3>測試 1: 檢查數據結構</h3>
+        <button onclick="testDataStructure()">檢查 BEL 數據</button>
+        <div id="data-test-result" class="console-log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>測試 2: 年份選擇器功能</h3>
+        <select id="test-year-selector">
+            <option value="2024">2024</option>
+            <option value="2025" selected>2025</option>
+        </select>
+        <button onclick="testYearSelector()">測試年份選擇器</button>
+        <div id="year-test-result" class="console-log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>測試 3: 模擬模態視窗</h3>
+        <button onclick="simulateModal()">模擬打開模態視窗</button>
+        <div id="modal-test-result" class="console-log"></div>
+    </div>
+
+    <script>
+        let testData = null;
+        
+        // 載入測試數據
+        async function loadTestData() {
+            try {
+                const response = await fetch('/data/belProfiles.json');
+                testData = await response.json();
+                return testData;
+            } catch (error) {
+                console.error('載入數據失敗:', error);
+                return null;
+            }
+        }
+        
+        async function testDataStructure() {
+            const result = document.getElementById('data-test-result');
+            result.innerHTML = '正在載入數據...';
+            
+            const data = await loadTestData();
+            if (!data) {
+                result.innerHTML = '❌ 數據載入失敗';
+                return;
+            }
+            
+            const firstUser = data.leaderboard[0];
+            let output = `✅ 數據載入成功\n`;
+            output += `總用戶數: ${data.leaderboard.length}\n`;
+            output += `第一個用戶: ${firstUser.name}\n`;
+            output += `有 monthlyData: ${!!firstUser.monthlyData}\n`;
+            
+            if (firstUser.monthlyData) {
+                const years = Object.keys(firstUser.monthlyData);
+                output += `可用年份: ${years.join(', ')}\n`;
+                
+                years.forEach(year => {
+                    const months = Object.keys(firstUser.monthlyData[year]);
+                    output += `${year} 年月份: ${months.join(', ')}\n`;
+                });
+            }
+            
+            result.innerHTML = output;
+        }
+        
+        function testYearSelector() {
+            const result = document.getElementById('year-test-result');
+            const selector = document.getElementById('test-year-selector');
+            
+            let output = `當前選中年份: ${selector.value}\n`;
+            
+            selector.addEventListener('change', function(e) {
+                output += `年份變更為: ${e.target.value}\n`;
+                result.innerHTML = output;
+                
+                // 模擬 updateModalMetrics 調用
+                if (window.updateModalMetrics) {
+                    window.updateModalMetrics(e.target.value);
+                    output += `✅ 調用了 window.updateModalMetrics(${e.target.value})\n`;
+                } else {
+                    output += `❌ window.updateModalMetrics 不存在\n`;
+                }
+                result.innerHTML = output;
+            });
+            
+            result.innerHTML = output + '✅ 事件監聽器已設置，請改變年份選擇';
+        }
+        
+        async function simulateModal() {
+            const result = document.getElementById('modal-test-result');
+            result.innerHTML = '模擬模態視窗打開...';
+            
+            const data = await loadTestData();
+            if (!data) {
+                result.innerHTML = '❌ 無法載入數據';
+                return;
+            }
+            
+            const user = data.leaderboard[0];
+            let output = `模擬用戶: ${user.name}\n`;
+            
+            // 模擬年份選擇器填充邏輯
+            if (user.monthlyData) {
+                const availableYears = Object.keys(user.monthlyData).sort((a, b) => b - a);
+                output += `可用年份: ${availableYears.join(', ')}\n`;
+                output += `默認年份: ${availableYears[0]}\n`;
+                
+                // 模擬計算 2025 年數據
+                const year2025 = user.monthlyData['2025'];
+                if (year2025) {
+                    let totalClicks = 0, totalOrders = 0, totalRevenue = 0;
+                    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August'];
+                    
+                    monthNames.forEach(month => {
+                        if (year2025[month]) {
+                            totalClicks += year2025[month].clicks || 0;
+                            totalOrders += year2025[month].orders || 0;
+                            totalRevenue += year2025[month].revenue || 0;
+                        }
+                    });
+                    
+                    const cvr = totalClicks > 0 ? ((totalOrders / totalClicks) * 100).toFixed(2) : 0;
+                    const aov = totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0;
+                    
+                    output += `2025年累計數據:\n`;
+                    output += `- 點擊: ${totalClicks.toLocaleString()}\n`;
+                    output += `- 訂單: ${totalOrders.toLocaleString()}\n`;
+                    output += `- 收入: $${totalRevenue.toLocaleString()}\n`;
+                    output += `- CVR: ${cvr}%\n`;
+                    output += `- AOV: $${aov}\n`;
+                }
+            }
+            
+            result.innerHTML = output;
+        }
+        
+        // 頁面載入時自動測試
+        window.addEventListener('load', () => {
+            console.log('測試頁面已載入');
+            testDataStructure();
+        });
+    </script>
+</body>
+</html>

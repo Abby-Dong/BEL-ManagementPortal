@@ -1,15 +1,6 @@
 /**
  * Data Loader Module - Loads and manages JSON data files
- * Handles asynchronous loading of                 const dataFiles = [
-                    { name: "userProfile", file: "userProfile.json" },
-                    { name: "header", file: "header.json" },
-                    { name: "dashboard", file: "dashboard.json" },
-                    { name: "payouts", file: "payouts.json" },
-                    { name: "orders", file: "orders.json" },
-                    { name: "content", file: "content.json" },
-                    { name: "contactSupport", file: "contactSupport.json" },
-                    { name: "announcements", file: "announcements.json" }
-                ]ation and application data
+ * Handles asynchronous loading of configuration and application data
  */
 
 class DataLoader {
@@ -108,9 +99,13 @@ class DataLoader {
                     { name: "userProfile", file: "userProfile.json" },
                     { name: "header", file: "header.json" },
                     { name: "dashboard", file: "dashboard.json" },
-                    { name: "payoutsAndOrders", file: "payoutsAndOrders.json" },
+                    { name: "payouts", file: "payouts.json" },
+                    { name: "orders", file: "orders.json" },
                     { name: "content", file: "content.json" },
-                    { name: "supportAndComm", file: "supportAndComm.json" }
+                    { name: "contactSupport", file: "contactSupport.json" },
+                    { name: "announcements", file: "announcements.json" },
+                    { name: "belProfiles", file: "belProfiles.json" },
+                    { name: "productCatalog", file: "productCatalog.json" }
                 ]
             },
             'data/userProfile.json': {
@@ -127,7 +122,6 @@ class DataLoader {
             'data/dashboard.json': {
                 summaryStats: {},
                 performanceByLevel: { distribution: { labels: [], data: [], colors: [] }, details: [] },
-                leaderboard: [],
                 productAnalysis: { categoryData: {}, topProducts: [] }
             },
             'data/payouts.json': {
@@ -144,6 +138,16 @@ class DataLoader {
             },
             'data/announcements.json': {
                 announcements: []
+            },
+            'data/belProfiles.json': {
+                leaderboard: []
+            },
+            'data/productCatalog.json': {
+                productCatalog: [
+                    { name: 'ADAM-6017-D', description: '8-ch Analog Input Modbus/RTU Module', category: 'Remote I/O Modules', avgPrice: 429, levelFactor: { Exploder: 1.3, Leader: 1.3, Enabler: 1.4, Builder: 1.6 } },
+                    { name: 'WISE-4050E', description: '4-ch DI, 4-ch DO, Modbus/TCP, WISE-PaaS', category: 'Remote I/O Modules', avgPrice: 359, levelFactor: { Exploder: 1.4, Leader: 1.1, Enabler: 1.5, Builder: 1.6 } },
+                    { name: 'EKI-2711PSI-A', description: 'Industrial 25W PoE splitter', category: 'Network Communications', avgPrice: 199, levelFactor: { Exploder: 1.3, Leader: 1.2, Enabler: 1.4, Builder: 1.1 } }
+                ]
             }
         };
 
@@ -163,7 +167,9 @@ class DataLoader {
             orders: this.getFallbackData('data/orders.json'),
             content: this.getFallbackData('data/content.json'),
             contactSupport: this.getFallbackData('data/contactSupport.json'),
-            announcements: this.getFallbackData('data/announcements.json')
+            announcements: this.getFallbackData('data/announcements.json'),
+            belProfiles: this.getFallbackData('data/belProfiles.json'),
+            productCatalog: this.getFallbackData('data/productCatalog.json')
         };
     }
 

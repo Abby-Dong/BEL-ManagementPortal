@@ -1,32 +1,11 @@
 {
   "announcements": [
     {
-      "created": "2025-08-30",
-      "category": "Admin Alert",
-      "title": "Support Ticket Volume Increased",
-      "body": "Support ticket submissions have increased by 40% this week. Consider adding temporary support staff.",
-      "link": "https://example.com/support-analytics"
-    },
-    {
-      "created": "2025-08-30",
-      "category": "Security",
-      "title": "Security Audit Completed",
-      "body": "Monthly security audit completed. 3 minor vulnerabilities found and patched.",
-      "link": "https://example.com/security-report"
-    },
-    {
-      "created": "2025-08-29",
-      "category": "User Management",
-      "title": "BEL Account Review Required",
-      "body": "15 BEL accounts showing unusual activity patterns require manual review.",
-      "link": "https://example.com/account-review"
-    },
-    {
-      "created": "2025-08-28",
-      "category": "Revenue Alert",
-      "title": "Monthly Revenue Target Exceeded",
-      "body": "August revenue has exceeded target by 15%. Commission payouts will be processed early.",
-      "link": "https://example.com/revenue-report"
+      "created": "2025-08-26",
+      "category": "Important",
+      "title": "Urgent System Alert",
+      "body": "Critical security update required",
+      "link": "https://example.com/security-update"
     },
     {
       "created": "2025-08-25",
@@ -41,13 +20,6 @@
       "title": "New ADAM Series Available",
       "body": "Latest ADAM series now available for promotion",
       "link": "https://example.com/adam-series"
-    },
-    {
-      "created": "2025-08-18",
-      "category": "Policy Update",
-      "title": "Updated Commission Structure",
-      "body": "New commission rates effective September 1st",
-      "link": "https://example.com/commission-update"
     },
     {
       "created": "2025-08-15",

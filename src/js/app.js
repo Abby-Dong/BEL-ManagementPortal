@@ -12,600 +12,73 @@ document.addEventListener('DOMContentLoaded', () => {
        ======================================================================== */
     
     // Centralized data structure (will be loaded from JSON files)
-    const APP_DATA = {
-        userProfile: {
-            name: "Abby Dong",
-            email: "Abby.dong@advantech.com",
-            level: "Admin",
-            avatar: "https://irp.cdn-website.com/56869327/dms3rep/multi/AVATAR-G.png"
-        },
-        header: {
-            portalTitle: "BEL Portal",
-            logo: "https://irp.cdn-website.com/56869327/dms3rep/multi/iotmart-logo.svg",
-            notifications: [
-                {
-                    type: "admin-alert",
-                    tagText: "Admin Alert",
-                    title: "New Support Ticket - Payment Issue",
-                    date: "2025-08-30",
-                    details: "User Referral ID: KTWBELF9A submitted a ticket regarding payment delays"
-                },
-                {
-                    type: "admin-alert",
-                    tagText: "Admin Alert", 
-                    title: "Multiple Login Attempts Detected",
-                    date: "2025-08-30",
-                    details: "Unusual login activity detected from IP: 192.168.1.100"
-                },
-                {
-                    type: "admin-system",
-                    tagText: "System",
-                    title: "Database Backup Completed",
-                    date: "2025-08-30",
-                    details: "Daily backup completed successfully at 02:00 AM"
-                },
-                {
-                    type: "admin-user",
-                    tagText: "User Management",
-                    title: "5 New BEL Registrations Pending",
-                    date: "2025-08-29",
-                    details: "Review required for new user applications"
-                },
-                {
-                    type: "admin-revenue",
-                    tagText: "Revenue Alert",
-                    title: "Commission Threshold Exceeded",
-                    date: "2025-08-29",
-                    details: "User Maxwell Chen exceeded monthly commission limit"
-                },
-                {
-                    type: "important",
-                    tagText: "Important",
-                    title: "September Earnings Payout Postponed",
-                    date: "2025-08-26"
-                },
-                {
-                    type: "new-product",
-                    tagText: "New Campaign",
-                    title: "ADAM Remote I/O Series are now available for promotion",
-                    date: "2025-08-25"
-                }
-            ]
-        },
-        dashboard: {
-            summaryStats: {
-                belCount: { title: "BEL Count (#)", value: "152", icon: "fas fa-users", trend: "+5.1%", trendText: "MoM", status: "positive" },
-                totalClicks: { title: "Total Clicks (#)", value: "13,492", icon: "fas fa-mouse-pointer", trend: "+12.3%", trendText: "MoM", status: "positive" },
-                totalOrders: { title: "Total Orders (#)", value: "851", icon: "fas fa-shopping-cart", trend: "+8.2%", trendText: "MoM", status: "positive" },
-                revenue: { title: "Revenue ($)", value: "$120k", icon: "fas fa-dollar-sign", trend: "+15.8%", trendText: "MoM", status: "positive" },
-                convRate: { title: "Conv Rate (%)", value: "6.31%", icon: "fas fa-bullseye", trend: "-0.5%", trendText: "MoM", status: "negative" },
-                aov: { title: "AOV ($)", value: "$141.5", icon: "fas fa-file-invoice-dollar", trend: "+2.1%", trendText: "MoM", status: "positive" }
-            },
-            performanceByLevel: {
-                distribution: {
-                    labels: ["Builder", "Enabler", "Explorer", "Leader"],
-                    data: [75, 45, 25, 7],
-                    colors: ["#006EFF", "#00893a", "#f39800", "#db3a3a"]
-                },
-                details: [
-                    { level: "Builder", clicks: "8,000", revenue: "$65,000", orders: 510, convRate: "6.8%", aov: "$127.45" },
-                    { level: "Enabler", clicks: "3,500", revenue: "$35,000", orders: 255, convRate: "6.1%", aov: "$137.25" },
-                    { level: "Explorer", clicks: "1,500", revenue: "$15,000", orders: 75, convRate: "5.5%", aov: "$200.00" },
-                    { level: "Leader", clicks: "492", revenue: "$5,000", orders: 11, convRate: "5.1%", aov: "$454.55" }
-                ]
-            },
-            leaderboard: [
-                { id: "KTWADVANT", name: "Maxwell Walker", email: "maxwell.walker@advantech.com", level: "Explorer", clicks: 1280, orders: 35, revenue: 8500, convRate: "2.73%", aov: 242.86 },
-                { id: "KUSOLVACE", name: "Olivia Chen", email: "olivia.chen@tech-solutions.com", level: "Builder", clicks: 1150, orders: 32, revenue: 7800, convRate: "2.78%", aov: 243.75 },
-                { id: "KDEIMULER", name: "Liam Müller", email: "liam.muller@industrie4.de", level: "Enabler", clicks: 980, orders: 28, revenue: 7200, convRate: "2.86%", aov: 257.14 },
-                { id: "KFRDUBOIS", name: "Sophia Dubois", email: "sophia.dubois@automation-fr.com", level: "Builder", clicks: 950, orders: 25, revenue: 6500, convRate: "2.63%", aov: 260.00 },
-                { id: "KJPTANAKA", name: "Kenji Tanaka", email: "kenji.tanaka@iot-japan.co.jp", level: "Leader", clicks: 880, orders: 22, revenue: 6100, convRate: "2.50%", aov: 277.27 },
-                { id: "KITROSSIT", name: "Isabella Rossi", email: "isabella.rossi@smart-italy.eu", level: "Enabler", clicks: 820, orders: 21, revenue: 5800, convRate: "2.56%", aov: 276.19 },
-                { id: "KKRNOAHIM", name: "Noah Kim", email: "noah.kim@korean-tech.kr", level: "Builder", clicks: 790, orders: 20, revenue: 5500, convRate: "2.53%", aov: 275.00 },
-                { id: "KDESCHMIT", name: "Ava Schmidt", email: "ava.schmidt@automation-gmbh.de", level: "Builder", clicks: 750, orders: 18, revenue: 5100, convRate: "2.40%", aov: 283.33 },
-                { id: "KMXGARCIA", name: "Lucas Garcia", email: "lucas.garcia@industria-es.com", level: "Explorer", clicks: 710, orders: 17, revenue: 4800, convRate: "2.39%", aov: 282.35 },
-                { id: "KCNMIAWAN", name: "Mia Wang", email: "mia.wang@smart-manufacturing.cn", level: "Enabler", clicks: 680, orders: 15, revenue: 4500, convRate: "2.21%", aov: 300.00 },
-            ],
-            productAnalysis: {
-                categoryData: {
-                    "Remote IO & Communication": [{ product: "ADAM-6017", units: 20 }, { product: "WISE-4012E", units: 11 }],
-                    "Wireless Sensing & Solutions": [{ product: "WISE-2410", units: 8 }, { product: "WISE-2200-M", units: 5 }],
-                    "Embedded Computers": [{ product: "UNO-2271G", units: 4 }, { product: "ARK-1220", units: 6 }],
-                    "Panel PC, HMI & Displays": [{ product: "TPC-1551T", units: 3 }, { product: "PPC-3150", units: 2 }],
-                    "Edge AI Solutions": [{ product: "AIR-101", units: 2 }, { product: "MIC-730AI", units: 1 }]
-                },
-                topProducts: [
-                    { rank: 1, product: "ADAM-6017", price: "$150", units: 20, total: "$3000" },
-                    { rank: 2, product: "AIM-68G0", price: "$280", units: 8, total: "$2,240" },
-                    { rank: 3, product: "ARK-1220", price: "$410", units: 6, total: "$2,460" },
-                    { rank: 4, product: "PCE-5129", price: "$520", units: 5, total: "$2,600" },
-                    { rank: 5, product: "UNO-2271G", price: "$350", units: 4, total: "$1,400" },
-                    { rank: 6, product: "EKI-2525", price: "$90", units: 15, total: "$1,350" },
-                    { rank: 7, product: "WISE-4012E", price: "$120", units: 11, total: "$1,320" },
-                    { rank: 8, product: "TPC-1551T", price: "$800", units: 3, total: "$2,400" },
-                    { rank: 9, product: "MIC-770", price: "$1,200", units: 2, total: "$2,400" },
-                    { rank: 10, product: "ADAM-6250", price: "$210", units: 7, total: "$1,470" }
-                ]
+    let APP_DATA = {};
+
+    // Initialize DataLoader
+    const dataLoader = new DataLoader();
+
+    // Load all data and initialize application
+    async function initializeApp() {
+        try {
+            // Show loading indicator
+            console.log('Loading application data...');
+            
+            // Load all data from JSON files
+            APP_DATA = await dataLoader.loadAllData();
+            
+            // Make data available globally
+            window.appData = APP_DATA;
+            window.APP_DATA = APP_DATA; // 確保全域可存取
+            
+            console.log('Data loaded successfully:', APP_DATA);
+            console.log('belProfiles data:', APP_DATA.belProfiles);
+            
+            // 測試 belProfiles 資料可用性
+            if (APP_DATA.belProfiles && APP_DATA.belProfiles.leaderboard) {
+                console.log('✅ belProfiles.leaderboard loaded:', APP_DATA.belProfiles.leaderboard.length, 'entries');
+            } else {
+                console.log('❌ belProfiles.leaderboard not found');
             }
-        },
-        payoutsAndOrders: {
-            payouts: {
-                payoutDayMessage: "Payout Day: 5th of each month",
-                history: [
-                    {
-                        date: "2025-08-05",
-                        total: 15420.50,
-                        belCount: 45,
-                        details: [
-                            {
-                                payoutId: "RP-000001",
-                                referralId: "KTWADVANT",
-                                belName: "Maxwell Walker",
-                                gross: 850.25,
-                                fees: 17.01,
-                                tax: 42.51,
-                                net: 790.73,
-                                paid: true,
-                                status: "Success"
-                            },
-                            {
-                                payoutId: "RP-000002",
-                                referralId: "KUSOLVACE",
-                                belName: "Olivia Chen",
-                                gross: 720.50,
-                                fees: 14.41,
-                                tax: 36.03,
-                                net: 670.06,
-                                paid: true,
-                                status: "Success"
-                            },
-                            {
-                                payoutId: "RP-000003",
-                                referralId: "KDEIMULER",
-                                belName: "Liam Müller",
-                                gross: 612.80,
-                                fees: 12.26,
-                                tax: 30.64,
-                                net: 569.90,
-                                paid: false,
-                                status: "Failed"
-                            }
-                        ]
-                    },
-                    {
-                        date: "2025-07-05",
-                        total: 12350.75,
-                        belCount: 38,
-                        details: [
-                            {
-                                payoutId: "RP-000004",
-                                referralId: "KUSOLVACE",
-                                belName: "Olivia Chen",
-                                gross: 720.50,
-                                fees: 14.41,
-                                tax: 36.03,
-                                net: 670.06,
-                                paid: true,
-                                status: "Success"
-                            },
-                            {
-                                payoutId: "RP-000005",
-                                referralId: "KFRDUBOIS",
-                                belName: "Sophia Dubois",
-                                gross: 580.30,
-                                fees: 11.61,
-                                tax: 29.02,
-                                net: 539.67,
-                                paid: true,
-                                status: "Success"
-                            }
-                        ]
-                    }
-                ]
-            }
-        },
-        orders: {
-            history: [
-                { orderDate: "2025-08-20", orderNumber: "IMTW000234", referralId: "KTWADVANT", belName: "Maxwell Walker", amount: 1250.00, currency: "USD", status: "Completed" },
-                { orderDate: "2025-08-19", orderNumber: "IMUS000233", referralId: "KUSOLVACE", belName: "Olivia Chen", amount: 650.50, currency: "EUR", status: "Processing" },
-                { orderDate: "2025-08-18", orderNumber: "IMDE000232", referralId: "KDEIMULER", belName: "Liam Müller", amount: 745.75, currency: "GBP", status: "Processing" },
-                { orderDate: "2025-08-17", orderNumber: "IMFR000231", referralId: "KFRDUBOIS", belName: "Sophia Dubois", amount: 1680.30, currency: "EUR", status: "Completed" },
-                { orderDate: "2025-08-16", orderNumber: "IMJP000230", referralId: "KJPTANAKA", belName: "Kenji Tanaka", amount: 285000, currency: "JPY", status: "Processing" },
-                { orderDate: "2025-08-15", orderNumber: "IMAU000229", referralId: "KAUJOISON", belName: "Emma Johnson", amount: 3200.00, currency: "AUD", status: "Completed" },
-                { orderDate: "2025-08-14", orderNumber: "IMKR000228", referralId: "KKRALEXIM", belName: "Alex Kim", amount: 1850000, currency: "KRW", status: "Processing" },
-                { orderDate: "2025-08-13", orderNumber: "IMMX000227", referralId: "KMXLOPEZZ", belName: "Isabella López", amount: 2750.00, currency: "USD", status: "Completed" },
-                { orderDate: "2025-08-12", orderNumber: "IMMX000226", referralId: "KMXGARCIA", belName: "Lucas Garcia", amount: 1640.00, currency: "USD", status: "Canceled" },
-                { orderDate: "2025-08-11", orderNumber: "IMCN000225", referralId: "KCNMIAWAN", belName: "Mia Wang", amount: 4580.80, currency: "USD", status: "Completed" },
-                { orderDate: "2025-08-10", orderNumber: "IMTW000224", referralId: "KTWADVANT", belName: "Maxwell Walker", amount: 2150.40, currency: "USD", status: "Processing" },
-                { orderDate: "2025-08-09", orderNumber: "IMUS000223", referralId: "KUSOLVACE", belName: "Olivia Chen", amount: 870.25, currency: "EUR", status: "Completed" },
-                { orderDate: "2025-08-08", orderNumber: "IMDE000222", referralId: "KDEIMULER", belName: "Liam Müller", amount: 1185.60, currency: "GBP", status: "Processing" },
-                { orderDate: "2025-08-07", orderNumber: "IMFR000221", referralId: "KFRDUBOIS", belName: "Sophia Dubois", amount: 3720.90, currency: "EUR", status: "Completed" },
-                { orderDate: "2025-08-06", orderNumber: "IMJP000220", referralId: "KJPTANAKA", belName: "Kenji Tanaka", amount: 185000, currency: "JPY", status: "Canceled" },
-                { orderDate: "2025-08-05", orderNumber: "IMAU000219", referralId: "KAUJOISON", belName: "Emma Johnson", amount: 4200.50, currency: "AUD", status: "Completed" },
-                { orderDate: "2025-08-03", orderNumber: "IMMX000217", referralId: "KMXLOPEZZ", belName: "Isabella López", amount: 4180.30, currency: "USD", status: "Completed" },
-                { orderDate: "2025-08-02", orderNumber: "IMMX000216", referralId: "KMXGARCIA", belName: "Lucas Garcia", amount: 990.75, currency: "USD", status: "Processing" },
-                { orderDate: "2025-08-01", orderNumber: "IMCN000215", referralId: "KCNMIAWAN", belName: "Mia Wang", amount: 3650.40, currency: "USD", status: "Completed" },
-                { orderDate: "2025-07-31", orderNumber: "IMTW000214", referralId: "KTWADVANT", belName: "Maxwell Walker", amount: 2280.90, currency: "USD", status: "Canceled" },
-                { orderDate: "2025-07-30", orderNumber: "IMUS000213", referralId: "KUSOLVACE", belName: "Olivia Chen", amount: 1270.25, currency: "EUR", status: "Completed" },
-                { orderDate: "2025-07-29", orderNumber: "IMDE000212", referralId: "KDEIMULER", belName: "Liam Müller", amount: 2890.60, currency: "GBP", status: "Processing" },
-                { orderDate: "2025-07-28", orderNumber: "IMFR000211", referralId: "KFRDUBOIS", belName: "Sophia Dubois", amount: 1820.75, currency: "EUR", status: "Completed" },
-                { orderDate: "2025-07-27", orderNumber: "IMJP000210", referralId: "KJPTANAKA", belName: "Kenji Tanaka", amount: 395000, currency: "JPY", status: "Processing" },
-                { orderDate: "2025-07-26", orderNumber: "IMAU000209", referralId: "KAUJOISON", belName: "Emma Johnson", amount: 1730.25, currency: "AUD", status: "Completed" },
-                { orderDate: "2025-07-25", orderNumber: "IMKR000208", referralId: "KKRALEXIM", belName: "Alex Kim", amount: 3280000, currency: "KRW", status: "Canceled" },
-                { orderDate: "2025-07-24", orderNumber: "IMMX000207", referralId: "KMXLOPEZZ", belName: "Isabella López", amount: 1950.40, currency: "USD", status: "Completed" },
-                { orderDate: "2025-07-23", orderNumber: "IMMX000206", referralId: "KMXGARCIA", belName: "Lucas Garcia", amount: 3140.90, currency: "USD", status: "Processing" },
-                { orderDate: "2025-07-21", orderNumber: "IMTW000204", referralId: "KTWADVANT", belName: "Maxwell Walker", amount: 1690.50, status: "Processing" },
-                { orderDate: "2025-07-20", orderNumber: "IMPL000203", referralId: "KPLKAROLN", belName: "Sarah Wilson", amount: 1450.25, currency: "EUR", status: "Completed" },
-                { orderDate: "2025-07-19", orderNumber: "IMBR000202", referralId: "KBRSILVAN", belName: "Carlos Silva", amount: 2850.60, currency: "USD", status: "Processing" },
-                { orderDate: "2025-07-18", orderNumber: "IMIN000201", referralId: "KINRAJESH", belName: "Rajesh Patel", amount: 125000, currency: "INR", status: "Completed" },
-                { orderDate: "2025-07-17", orderNumber: "IMSG000200", referralId: "KSGJOHNSO", belName: "Michael Johnson", amount: 980.50, currency: "SGD", status: "Processing" },
-                { orderDate: "2025-07-16", orderNumber: "IMTH000199", referralId: "KTHWONGCH", belName: "David Wong", amount: 68500, currency: "THB", status: "Completed" },
-                { orderDate: "2025-07-15", orderNumber: "IMMY000198", referralId: "KMYAHMEDZ", belName: "Ahmad Hassan", amount: 3250, currency: "MYR", status: "Processing" },
-                { orderDate: "2025-07-14", orderNumber: "IMZA000197", referralId: "KZAVANWYC", belName: "Daniel van Wyk", amount: 15500, currency: "ZAR", status: "Completed" },
-                { orderDate: "2025-07-13", orderNumber: "IMNL000196", referralId: "KNLPIETER", belName: "Pieter van Berg", amount: 1890.75, currency: "EUR", status: "Processing" },
-                { orderDate: "2025-07-12", orderNumber: "IMSE000195", referralId: "KSEANDRES", belName: "Anders Larsson", amount: 18500, currency: "SEK", status: "Completed" },
-                { orderDate: "2025-07-11", orderNumber: "IMNO000194", referralId: "KNOERICSO", belName: "Erik Andersen", amount: 16800, currency: "NOK", status: "Processing" },
-                { orderDate: "2025-07-10", orderNumber: "IMCA000193", referralId: "KCAEMILYR", belName: "Emily Robertson", amount: 2650.30, currency: "CAD", status: "Completed" },
-                { orderDate: "2025-07-09", orderNumber: "IMRU000192", referralId: "KRUIVANOV", belName: "Ivan Petrov", amount: 185000, currency: "RUB", status: "Canceled" },
-                { orderDate: "2025-07-08", orderNumber: "IMIL000191", referralId: "KILCOHENM", belName: "Michael Cohen", amount: 3750.80, currency: "ILS", status: "Completed" },
-                { orderDate: "2025-07-07", orderNumber: "IMIT000190", referralId: "KITROSSIT", belName: "Isabella Rossi", amount: 2180.45, currency: "EUR", status: "Processing" },
-                { orderDate: "2025-07-06", orderNumber: "IMKR000189", referralId: "KKRNOAHIM", belName: "Noah Kim", amount: 2450000, currency: "KRW", status: "Completed" },
-                { orderDate: "2025-07-05", orderNumber: "IMDE000188", referralId: "KDESCHMIT", belName: "Ava Schmidt", amount: 1685.20, currency: "EUR", status: "Processing" },
-                { orderDate: "2025-07-04", orderNumber: "IMNL000187", referralId: "KNLPIETER", belName: "Pieter van Berg", amount: 1450.30, currency: "EUR", status: "Completed" },
-                { orderDate: "2025-07-03", orderNumber: "IMSE000186", referralId: "KSEANDRES", belName: "Anders Larsson", amount: 16800, currency: "SEK", status: "Processing" },
-                { orderDate: "2025-07-02", orderNumber: "IMNO000185", referralId: "KNOERICSO", belName: "Erik Andersen", amount: 15200, currency: "NOK", status: "Completed" },
-                { orderDate: "2025-07-01", orderNumber: "IMCA000184", referralId: "KCAEMILYR", belName: "Emily Robertson", amount: 2350.75, currency: "CAD", status: "Processing" }
-            ]
-        },
-        content: {
-            assets: [
-                { uploadDate: "2025-08-15", title: "ADAM-6017 Product Guide", subtitle: "Complete setup and configuration guide for ADAM-6017 series industrial modules", category: "IoTMart Campaign", pageLink: "https://example.com/products/adam-6017" },
-                { uploadDate: "2025-08-10", title: "IoT Solutions Catalog", subtitle: "2025 Product Catalog with comprehensive IoT solutions and pricing", category: "Advantech Resource Website", pageLink: "https://example.com/catalog/2025" }
-            ]
-        },
-        contactSupport: {
-            tickets: [
-                { 
-                    ticketNumber: "TICK-2025-001", 
-                    belName: "Maxwell Walker", 
-                    referralId: "KTWADVANT", 
-                    subject: "Payment inquiry for August", 
-                    status: "Open",
-                    message: "I have questions about my August payout calculation. The amount seems lower than expected based on my orders. Could you please review my account?",
-                    replies: [
-                        {
-                            time: "2025-08-28 14:30",
-                            text: "Thank you for contacting us. We have received your inquiry and our team is reviewing your August payout calculation. We will get back to you within 24 hours."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-002", 
-                    belName: "Olivia Chen", 
-                    referralId: "KUSOLVACE", 
-                    subject: "Technical support for ADAM-6017", 
-                    status: "Resolved",
-                    message: "I'm having trouble setting up the ADAM-6017 device. The configuration seems to reset after each reboot. Could you provide updated firmware or configuration guide?",
-                    replies: [
-                        {
-                            time: "2025-08-25 09:15",
-                            text: "Please try updating to firmware version 2.1.3 available on our support portal. This should resolve the configuration reset issue."
-                        },
-                        {
-                            time: "2025-08-25 16:45",
-                            text: "The firmware update worked perfectly! Thank you for the quick resolution."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-003", 
-                    belName: "Liam Müller", 
-                    referralId: "KDEIMULER", 
-                    subject: "Unable to access dashboard", 
-                    status: "Open",
-                    message: "I cannot log into my BEL dashboard. Getting 'Invalid credentials' error even though I'm using the correct password. Tried password reset but haven't received the email.",
-                    replies: [
-                        {
-                            time: "2025-08-27 11:20",
-                            text: "We found the issue - your account was temporarily locked due to multiple failed login attempts. We've unlocked it and sent you a password reset email. Please check your spam folder as well."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-004", 
-                    belName: "Noah Kim", 
-                    referralId: "KKRNOAHIM", 
-                    subject: "Order status not updating", 
-                    status: "Resolved",
-                    message: "My recent order (IMKR240815) shows as 'Processing' for over a week. Customer is asking for updates. Can you check the status?",
-                    replies: [
-                        {
-                            time: "2025-08-24 13:40",
-                            text: "We checked your order IMKR240815. There was a delay in our warehouse due to inventory restocking. The order has now been shipped and tracking info has been updated."
-                        },
-                        {
-                            time: "2025-08-24 15:20",
-                            text: "Perfect, thank you! Customer received the tracking info and is satisfied."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-005", 
-                    belName: "Sophia Dubois", 
-                    referralId: "KFRDUBOIS", 
-                    subject: "Commission calculation error", 
-                    status: "Resolved",
-                    message: "There seems to be an error in my July commission calculation. The amount is significantly lower than expected.",
-                    replies: [
-                        {
-                            time: "2025-08-22 10:30",
-                            text: "We've reviewed your July activity and found a calculation error. The correct commission has been added to your next payout."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-006", 
-                    belName: "Kenji Tanaka", 
-                    referralId: "KJPTANAKA", 
-                    subject: "Product catalog access issue", 
-                    status: "Closed",
-                    message: "I cannot access the new product catalog section. Getting a 404 error when clicking the link.",
-                    replies: [
-                        {
-                            time: "2025-08-20 14:15",
-                            text: "The catalog link has been updated. Please clear your browser cache and try the new link we've sent via email."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-007", 
-                    belName: "Isabella Rossi", 
-                    referralId: "KITROSSIT", 
-                    subject: "Banking information update request", 
-                    status: "Resolved",
-                    message: "I need to update my banking information for future payouts. What documents are required?",
-                    replies: [
-                        {
-                            time: "2025-08-18 11:45",
-                            text: "Please provide a bank statement and voided check. You can upload these in your profile settings under Banking Information."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-008", 
-                    belName: "Ava Schmidt", 
-                    referralId: "KDESCHMIT", 
-                    subject: "Referral link not working", 
-                    status: "Resolved",
-                    message: "My referral link seems to be broken. Customers are getting an error when they try to use it.",
-                    replies: [
-                        {
-                            time: "2025-08-17 16:20",
-                            text: "The issue has been fixed. Your referral link is now working properly. We've also credited you for any lost referrals during the downtime."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-009", 
-                    belName: "Lucas Garcia", 
-                    referralId: "KMXGARCIA", 
-                    subject: "Training material request", 
-                    status: "Closed",
-                    message: "Could you provide updated training materials for the new IoT product line?",
-                    replies: [
-                        {
-                            time: "2025-08-15 13:30",
-                            text: "Training materials have been uploaded to your resource center. Check the 'Training' section in your dashboard."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-010", 
-                    belName: "Mia Wang", 
-                    referralId: "KCNMIAWAN", 
-                    subject: "Performance report discrepancy", 
-                    status: "Resolved",
-                    message: "The performance report shows different numbers than what I'm seeing in my dashboard analytics.",
-                    replies: [
-                        {
-                            time: "2025-08-14 09:45",
-                            text: "There was a sync issue between the dashboard and reporting systems. This has been resolved and your reports are now accurate."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-011", 
-                    belName: "Emma Johnson", 
-                    referralId: "KAUJOISON", 
-                    subject: "Email notification settings", 
-                    status: "Closed",
-                    message: "I'm not receiving email notifications for new orders. How can I enable them?",
-                    replies: [
-                        {
-                            time: "2025-08-12 15:20",
-                            text: "Email notifications have been enabled for your account. Please check your notification preferences in settings to customize them."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-013", 
-                    belName: "Isabella López", 
-                    referralId: "KMXLOPEZZ", 
-                    subject: "Level upgrade criteria", 
-                    status: "Resolved",
-                    message: "What are the specific criteria to upgrade from Builder to Enabler level?",
-                    replies: [
-                        {
-                            time: "2025-08-10 14:00",
-                            text: "To upgrade to Enabler level, you need 50+ orders and $15,000+ in total revenue. You're currently at 42 orders and $12,800 revenue. Keep up the great work!"
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-014", 
-                    belName: "Sarah Wilson", 
-                    referralId: "KPLKAROLN", 
-                    subject: "Customer contact information update", 
-                    status: "Closed",
-                    message: "Need to update customer contact information for order IMPL240810.",
-                    replies: [
-                        {
-                            time: "2025-08-09 16:40",
-                            text: "Customer information has been updated. The order has been processed with the new contact details."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-015", 
-                    belName: "Carlos Silva", 
-                    referralId: "KBRSILVAN", 
-                    subject: "Pricing update request", 
-                    status: "Resolved",
-                    message: "The pricing sheet for Brazilian market seems outdated. Could you provide the latest pricing?",
-                    replies: [
-                        {
-                            time: "2025-08-08 11:15",
-                            text: "The updated pricing sheet for Brazil has been uploaded to your resource center under 'Regional Pricing'."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-016", 
-                    belName: "Rajesh Patel", 
-                    referralId: "KINRAJESH", 
-                    subject: "Marketing material request", 
-                    status: "Resolved",
-                    message: "I need brochures and presentation materials for an upcoming trade show in Mumbai.",
-                    replies: [
-                        {
-                            time: "2025-08-07 13:15",
-                            text: "Marketing materials have been prepared and shipped to your address. Tracking number: TN12345678."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-017", 
-                    belName: "Michael Johnson", 
-                    referralId: "KSGJOHNSO", 
-                    subject: "Account verification issue", 
-                    status: "Closed",
-                    message: "My account verification is pending for over two weeks. What additional documents are needed?",
-                    replies: [
-                        {
-                            time: "2025-08-06 10:30",
-                            text: "Your account has been successfully verified. You now have access to all BEL features and benefits."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-018", 
-                    belName: "David Wong", 
-                    referralId: "KTHWONGCH", 
-                    subject: "Technical documentation request", 
-                    status: "Resolved",
-                    message: "Could you provide technical specifications for the new EKI series switches?",
-                    replies: [
-                        {
-                            time: "2025-08-05 15:45",
-                            text: "Technical documentation has been added to your resource library under 'Product Specifications'."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-019", 
-                    belName: "Ahmad Hassan", 
-                    referralId: "KMYAHMEDZ", 
-                    subject: "Commission tier advancement", 
-                    status: "Closed",
-                    message: "When will I be eligible for the next commission tier? What are the requirements?",
-                    replies: [
-                        {
-                            time: "2025-08-04 12:20",
-                            text: "Based on your current performance, you're eligible for tier advancement next month. Congratulations!"
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-020", 
-                    belName: "Pieter van Berg", 
-                    referralId: "KNLPIETER", 
-                    subject: "Shipping address update", 
-                    status: "Resolved",
-                    message: "Need to update my shipping address for sample product deliveries.",
-                    replies: [
-                        {
-                            time: "2025-08-03 14:10",
-                            text: "Your shipping address has been updated in our system. Future deliveries will be sent to the new address."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-021", 
-                    belName: "Anders Larsson", 
-                    referralId: "KSEANDRES", 
-                    subject: "Partnership opportunity inquiry", 
-                    status: "Closed",
-                    message: "Interested in exploring strategic partnership opportunities for enterprise clients in Nordic region.",
-                    replies: [
-                        {
-                            time: "2025-08-02 11:55",
-                            text: "Thank you for your interest. Our partnership team will contact you within 48 hours to discuss opportunities."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-022", 
-                    belName: "Erik Andersen", 
-                    referralId: "KNOERICSO", 
-                    subject: "Event registration assistance", 
-                    status: "Resolved",
-                    message: "Having trouble registering for the upcoming BEL conference. The registration form keeps timing out.",
-                    replies: [
-                        {
-                            time: "2025-08-01 09:30",
-                            text: "We've manually registered you for the conference. You'll receive a confirmation email with all event details."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-023", 
-                    belName: "Emily Robertson", 
-                    referralId: "KCAEMILYR", 
-                    subject: "Product sample request", 
-                    status: "Closed",
-                    message: "Could I get samples of the latest sensor products for customer demonstrations in Canada?",
-                    replies: [
-                        {
-                            time: "2025-07-31 16:25",
-                            text: "Sample kit has been prepared and will be shipped tomorrow. You'll receive tracking information via email."
-                        }
-                    ]
-                },
-                { 
-                    ticketNumber: "TICK-2025-024", 
-                    belName: "Daniel van Wyk", 
-                    referralId: "KZAVANWYC", 
-                    subject: "Customer support escalation", 
-                    status: "Resolved",
-                    message: "My customer is experiencing issues with their order and needs immediate assistance.",
-                    replies: [
-                        {
-                            time: "2025-07-30 13:40",
-                            text: "We've contacted your customer directly and resolved their issue. A replacement unit has been expedited."
-                        }
-                    ]
-                }
-            ]
-        },
-        announcements: {
-            announcements: [
-                { created: "2025-08-26", category: "Important", title: "Urgent System Alert", body: "Critical security update required", link: "https://example.com/security-update" },
-                { created: "2025-08-25", category: "System", title: "Platform Maintenance", body: "Scheduled maintenance on September 1st", link: "https://example.com/maintenance" },
-                { created: "2025-08-20", category: "Campaign Launch", title: "New ADAM Series Available", body: "Latest ADAM series now available for promotion", link: "https://example.com/adam-series" },
-                { created: "2025-08-15", category: "Payout Reminder", title: "Monthly Payout Schedule", body: "August payout processing completed", link: "https://example.com/payout-info" }
-            ]
+            
+            // Initialize all components once data is loaded
+            Navigation.init();
+            Dashboard.init();
+            AccountManagement.init();
+            BELModal.init();
+            ContentManager.init();
+            
+            // Initialize additional components that depend on data
+            setTimeout(() => {
+                TableUtils.initializeAllTables();
+                initializeAllAvatars();
+            }, 500);
+            
+            console.log('BEL Management Portal initialized successfully with external data');
+            
+        } catch (error) {
+            console.error('Failed to initialize application:', error);
+            // Use fallback data
+            APP_DATA = dataLoader.getFallbackAppData();
+            
+            // Make fallback data available globally
+            window.appData = APP_DATA;
+            
+            // Still initialize components with fallback data
+            Navigation.init();
+            Dashboard.init();
+            AccountManagement.init();
+            BELModal.init();
+            ContentManager.init();
+            
+            setTimeout(() => {
+                TableUtils.initializeAllTables();
+                initializeAllAvatars();
+            }, 500);
         }
-    };
+    }
+
+    // Start the application
+    initializeApp();
 
     /* ========================================================================
        UI ELEMENTS CACHE
@@ -626,8 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Account Management
         regionSel: document.getElementById('f-region'),
         countrySel: document.getElementById('f-country'),
-        applyBtn: document.getElementById('apply-filters'),
-        resetBtn: document.getElementById('reset-filters'),
         rowsPerPage: document.getElementById('rows-per-page'),
         prevBtn: document.getElementById('prev-page'),
         nextBtn: document.getElementById('next-page'),
@@ -660,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
        ======================================================================== */
     const appState = {
         page: 1, 
-        rowsPerPage: 20, 
+        rowsPerPage: 10, 
         selected: new Set(),
         filters: { keyword: '', referralId: '', level: '', region: '', country: '', start: '', end: '', activity: '' },
         sortDir: 'desc', 
@@ -680,7 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
         historyTicketsPage: 1,
         historyTicketsRowsPerPage: 10,
         annPage: 1, 
-        annRowsPerPage: 10
+        annRowsPerPage: 10,
+        // Account Management pagination state
+        accountGridPage: 1,
+        accountGridRowsPerPage: 12,
+        accountListPage: 1,
+        accountListRowsPerPage: 10
     };
 
     /* ========================================================================
@@ -701,7 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 'GBP': { symbol: 'GBP', decimals: 2, position: 'before' },
                 'JPY': { symbol: 'JPY', decimals: 0, position: 'before' },
                 'KRW': { symbol: 'KRW', decimals: 0, position: 'before' },
-                'AUD': { symbol: 'AUD', decimals: 2, position: 'before' }
+                'AUD': { symbol: 'AUD', decimals: 2, position: 'before' },
+                'TWD': { symbol: 'TWD', decimals: 0, position: 'before' }
             };
             
             const config = currencyConfig[currency] || currencyConfig['USD'];
@@ -852,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return regionMapping[country] || 'Others';
         },
         
-        formatPercent: (decimal) => `${(decimal * 100).toFixed(1)}%`,
+        formatPercent: (decimal) => `${(decimal * 100).toFixed(2)}%`,
         
         parseDate: (dateString) => dateString ? new Date(dateString + 'T00:00:00') : null,
         
@@ -979,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 justify-content: center;
                 font-weight: 600;
                 font-size: ${Math.round(size * 0.35)}px;
-                border: 3px solid var(--ds-color-link);
+                border: 1px solid var(--ds-color-link);
                 box-sizing: border-box;
             ">${initials}</div>`;
         },
@@ -1033,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ">${initials}</div>`;
         },
 
-        // Create random photo avatar for Account Management (simulate real user photos)
+        // Create placeholder avatar for Account Management
         generateAvatarHTMLPlaceholder: (userId = '', size = 40) => {
             // Generate consistent random seed based on userId
             const getRandomSeed = (str) => {
@@ -1049,8 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const seed = getRandomSeed(userId);
             
-            // Use Lorem Picsum for random but consistent photos based on seed
-            // This service provides random photos that are consistent for the same seed
+            // Use external image service for consistent placeholder images
             const photoId = (seed % 1000) + 1; // Use IDs 1-1000
             const photoUrl = `https://picsum.photos/seed/${photoId}/${size}/${size}`;
             
@@ -1193,11 +669,174 @@ document.addEventListener('DOMContentLoaded', () => {
             this.setupViewSwitcher();
         },
 
+        /**
+         * Calculate real-time summary statistics from BEL profiles data
+         * @param {string} year - Year to calculate (defaults to 2025)
+         * @returns {Object} Calculated summary statistics
+         */
+        calculateSummaryStats(year = '2025') {
+            if (!APP_DATA.belProfiles?.leaderboard) {
+                return {
+                    belCount: 0,
+                    totalClicks: 0,
+                    totalOrders: 0,
+                    totalRevenue: 0,
+                    avgConvRate: 0,
+                    avgAov: 0
+                };
+            }
+
+            const leaderboard = APP_DATA.belProfiles.leaderboard;
+            
+            // Calculate totals
+            let totalClicks = 0;
+            let totalOrders = 0;
+            let totalRevenue = 0;
+            let totalConvRateSum = 0;
+            let totalAovSum = 0;
+            let validCvrCount = 0;
+            let validAovCount = 0;
+
+            leaderboard.forEach(leader => {
+                let userClicks = 0;
+                let userOrders = 0;
+                let userRevenue = 0;
+                
+                // Process yearly data
+                if (leader.monthlyData && leader.monthlyData[year]) {
+                    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                    
+                    // For 2025, only sum up to August (since it's September 8, 2025)
+                    let monthsToSum = monthNames;
+                    if (year === '2025') {
+                        monthsToSum = monthNames.slice(0, 8); // January to August
+                    }
+                    
+                    monthsToSum.forEach(monthName => {
+                        const monthData = leader.monthlyData[year][monthName];
+                        if (monthData) {
+                            userClicks += monthData.clicks || 0;
+                            userOrders += monthData.orders || 0;
+                            userRevenue += monthData.revenue || 0;
+                        }
+                    });
+                }
+                
+                totalClicks += userClicks;
+                totalOrders += userOrders;
+                totalRevenue += userRevenue;
+                
+                // Calculate user's CVR dynamically (orders / clicks * 100)
+                if (userClicks > 0) {
+                    const userCvr = (userOrders / userClicks) * 100;
+                    totalConvRateSum += userCvr;
+                    validCvrCount += 1;
+                }
+                
+                // Calculate user's AOV
+                if (userOrders > 0) {
+                    const userAov = userRevenue / userOrders;
+                    totalAovSum += userAov;
+                    validAovCount += 1;
+                }
+            });
+
+            // Calculate final metrics
+            const avgConvRate = validCvrCount > 0 ? totalConvRateSum / validCvrCount : 0;
+            const avgAov = validAovCount > 0 ? totalAovSum / validAovCount : 0;
+
+            return {
+                belCount: leaderboard.length,
+                totalClicks,
+                totalOrders,
+                totalRevenue,
+                avgConvRate,
+                avgAov
+            };
+        },
+
+        /**
+         * Format numbers for display (>99999 shows as K)
+         */
+        formatDisplayValue(num, prefix = '', suffix = '') {
+            if (num >= 100000) {
+                return prefix + Math.round(num / 1000) + 'k' + suffix;
+            } else if (num >= 10000) {
+                return prefix + (num / 1000).toFixed(1) + 'k' + suffix;
+            } else {
+                return prefix + num.toLocaleString() + suffix;
+            }
+        },
+
         renderSummaryStats() {
             const statsContainer = document.querySelector('.bel-stats-cards');
             if (!statsContainer) return;
             
-            const stats = APP_DATA.dashboard.summaryStats;
+            // Calculate real-time statistics from BEL profiles
+            const realTimeStats = this.calculateSummaryStats();
+            
+            // Format values for display
+            const belCountValue = realTimeStats.belCount.toString();
+            const totalClicksValue = this.formatDisplayValue(realTimeStats.totalClicks);
+            const totalOrdersValue = realTimeStats.totalOrders < 100000 ? realTimeStats.totalOrders.toString() : this.formatDisplayValue(realTimeStats.totalOrders);
+            const revenueValue = this.formatDisplayValue(realTimeStats.totalRevenue, '$');
+            const convRateValue = realTimeStats.avgConvRate.toFixed(2) + '%';
+            const aovValue = realTimeStats.avgAov >= 100000 ? this.formatDisplayValue(realTimeStats.avgAov, '$') : '$' + realTimeStats.avgAov.toFixed(1);
+            
+            // Use configuration data for static properties (trends, icons, etc.)
+            const config = APP_DATA.dashboard.summaryStatsConfig;
+            
+            const stats = {
+                belCount: {
+                    title: config.belCount.title,
+                    value: belCountValue,
+                    icon: config.belCount.icon,
+                    trend: config.belCount.trend,
+                    trendText: config.belCount.trendText,
+                    status: config.belCount.status
+                },
+                totalClicks: {
+                    title: config.totalClicks.title,
+                    value: totalClicksValue,
+                    icon: config.totalClicks.icon,
+                    trend: config.totalClicks.trend,
+                    trendText: config.totalClicks.trendText,
+                    status: config.totalClicks.status
+                },
+                totalOrders: {
+                    title: config.totalOrders.title,
+                    value: totalOrdersValue,
+                    icon: config.totalOrders.icon,
+                    trend: config.totalOrders.trend,
+                    trendText: config.totalOrders.trendText,
+                    status: config.totalOrders.status
+                },
+                revenue: {
+                    title: config.revenue.title,
+                    value: revenueValue,
+                    icon: config.revenue.icon,
+                    trend: config.revenue.trend,
+                    trendText: config.revenue.trendText,
+                    status: config.revenue.status
+                },
+                convRate: {
+                    title: config.convRate.title,
+                    value: convRateValue,
+                    icon: config.convRate.icon,
+                    trend: config.convRate.trend,
+                    trendText: config.convRate.trendText,
+                    status: config.convRate.status
+                },
+                aov: {
+                    title: config.aov.title,
+                    value: aovValue,
+                    icon: config.aov.icon,
+                    trend: config.aov.trend,
+                    trendText: config.aov.trendText,
+                    status: config.aov.status
+                }
+            };
+            
             statsContainer.innerHTML = Object.values(stats).map(stat => `
                 <div class="bel-card">
                     <div style="width: 100%;display: flex; flex-direction: row; justify-content: space-between;">
@@ -1216,18 +855,72 @@ document.addEventListener('DOMContentLoaded', () => {
             `).join('');
         },
 
+        /**
+         * Calculate performance data by level using yearly cumulative data from monthly data
+         * @param {string} year - Year to calculate (defaults to 2025)
+         * @returns {Array} Performance details by level
+         */
+        calculatePerformanceByLevel(year = '2025') {
+            if (!APP_DATA.belProfiles?.leaderboard) return [];
+            
+            const levelStats = {
+                'Builder': { clicks: 0, orders: 0, revenue: 0, count: 0 },
+                'Enabler': { clicks: 0, orders: 0, revenue: 0, count: 0 },
+                'Exploder': { clicks: 0, orders: 0, revenue: 0, count: 0 },
+                'Leader': { clicks: 0, orders: 0, revenue: 0, count: 0 }
+            };
+            
+            // Aggregate data for each level
+            APP_DATA.belProfiles.leaderboard.forEach(leader => {
+                const level = leader.level;
+                if (!levelStats[level]) return;
+                
+                // Calculate yearly cumulative data
+                const yearlyData = AccountManagement.calculateYearlyData(leader, year);
+                
+                levelStats[level].clicks += yearlyData.clicks;
+                levelStats[level].orders += yearlyData.orders;
+                levelStats[level].revenue += yearlyData.revenue;
+                levelStats[level].count += 1;
+            });
+            
+            // Convert to performance details format
+            return Object.entries(levelStats).map(([level, stats]) => {
+                const convRate = stats.clicks > 0 ? (stats.orders / stats.clicks) * 100 : 0;
+                const aov = stats.orders > 0 ? stats.revenue / stats.orders : 0;
+                
+                return {
+                    level: level,
+                    clicks: stats.clicks,
+                    revenue: stats.revenue,
+                    orders: stats.orders,
+                    convRate: convRate,
+                    aov: aov,
+                    // Formatted values for display
+                    clicksFormatted: stats.clicks.toLocaleString(),
+                    revenueFormatted: utils.formatMoney(stats.revenue),
+                    ordersFormatted: stats.orders.toLocaleString(),
+                    convRateFormatted: `${convRate.toFixed(2)}%`,
+                    aovFormatted: utils.formatMoney(aov, 2)
+                };
+            });
+        },
+
         renderPerformanceTable() {
             const tableBody = document.querySelector('#performance-table-view tbody');
             if (!tableBody) return;
             
-            tableBody.innerHTML = APP_DATA.dashboard.performanceByLevel.details.map(detail => `
+            // Use dynamic calculation instead of static data
+            const performanceDetails = this.calculatePerformanceByLevel();
+            
+            tableBody.innerHTML = performanceDetails.map(detail => `
                 <tr>
                     <td><span class="bel-badge ${detail.level.toLowerCase()}">${detail.level}</span></td>
-                    <td>${detail.clicks}</td>
-                    <td>${detail.revenue}</td>
-                    <td>${detail.orders}</td>
-                    <td>${detail.convRate}</td>
-                    <td>${detail.aov}</td>
+                    <td data-sort-value="${detail.clicks}">${detail.clicksFormatted}</td>
+                    <td data-sort-value="${detail.revenue}">${detail.revenueFormatted}</td>
+                    <td data-sort-value="${detail.orders}">${detail.ordersFormatted}</td>
+                    <td data-sort-value="${detail.convRate}">${detail.convRateFormatted}</td>
+                    <td data-sort-value="${detail.aov}">${detail.aovFormatted}</td>
                 </tr>
             `).join('');
 
@@ -1268,15 +961,17 @@ document.addEventListener('DOMContentLoaded', () => {
         initializePieChart() {
             const pieCtx = document.getElementById('level-pie-chart');
             if (pieCtx && window.Chart) {
-                const pieData = APP_DATA.dashboard.performanceByLevel.distribution;
+                // Calculate real-time level distribution from BEL profiles
+                const levelCounts = this.calculateLevelDistribution();
+                
                 new Chart(pieCtx, {
                     type: 'doughnut',
                     data: {
-                        labels: pieData.labels,
+                        labels: levelCounts.labels,
                         datasets: [{
                             label: 'BEL Count (#)',
-                            data: pieData.data,
-                            backgroundColor: pieData.colors,
+                            data: levelCounts.data,
+                            backgroundColor: levelCounts.colors,
                             borderColor: '#ffffff',
                             borderWidth: 2
                         }]
@@ -1296,6 +991,45 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
             }
+        },
+
+        /**
+         * Calculate real-time level distribution from BEL profiles data
+         * @returns {Object} Level distribution with labels, data, and colors
+         */
+        calculateLevelDistribution() {
+            if (!APP_DATA.belProfiles?.leaderboard) {
+                return {
+                    labels: ["Builder", "Enabler", "Exploder", "Leader"],
+                    data: [0, 0, 0, 0],
+                    colors: ["#006EFF", "#00893a", "#f39800", "#db3a3a"]
+                };
+            }
+
+            const levelCount = {
+                'Builder': 0,
+                'Enabler': 0,
+                'Exploder': 0,
+                'Leader': 0
+            };
+
+            // Count actual levels from BEL profiles
+            APP_DATA.belProfiles.leaderboard.forEach(leader => {
+                if (levelCount.hasOwnProperty(leader.level)) {
+                    levelCount[leader.level]++;
+                }
+            });
+
+            return {
+                labels: ["Builder", "Enabler", "Exploder", "Leader"],
+                data: [
+                    levelCount.Builder,
+                    levelCount.Enabler,
+                    levelCount.Exploder,
+                    levelCount.Leader
+                ],
+                colors: ["#006EFF", "#00893a", "#f39800", "#db3a3a"]
+            };
         },
 
         initializeProductCategoryChart() {
@@ -1376,23 +1110,30 @@ document.addEventListener('DOMContentLoaded', () => {
         initializePerformanceChart() {
             const performanceCtx = document.getElementById('performance-percentage-chart');
             if (performanceCtx && window.Chart) {
-                const performanceData = APP_DATA.dashboard.performanceByLevel.details;
+                // Use dynamic calculation instead of static data
+                const performanceData = this.calculatePerformanceByLevel();
                 
                 // Get CSS variables for colors
                 const rootStyle = getComputedStyle(document.documentElement);
                 const colors = {
-                    gray90: rootStyle.getPropertyValue('--ds-color-gray-90').trim() || '#0c0c0c',
-                    gray80: rootStyle.getPropertyValue('--ds-color-gray-80').trim() || '#434447',
-                    gray70: rootStyle.getPropertyValue('--ds-color-gray-70').trim() || '#737b7d',
-                    gray60: rootStyle.getPropertyValue('--ds-color-gray-60').trim() || '#b6bfc1'
+                    blue100: rootStyle.getPropertyValue('--ds-color-brand-dark').trim() || '#003160',
+                    blue75: rootStyle.getPropertyValue('--ds-color-brand-light-75').trim() || '#336899',
+                    blue30: rootStyle.getPropertyValue('--ds-color-brand-light-30').trim() || '#DFEBF7',
+                    orange100: rootStyle.getPropertyValue('--ds-color-primary').trim() || '#F39800'
                 };
                 
                 // Prepare data for the chart
                 const labels = performanceData.map(d => d.level);
-                const revenueData = performanceData.map(d => parseFloat(d.revenue.replace(/[$,]/g, '')));
-                const clicksData = performanceData.map(d => parseFloat(d.clicks.replace(/[,]/g, '')));
+                const revenueData = performanceData.map(d => 
+                    typeof d.revenue === 'string' ? parseFloat(d.revenue.replace(/[$,]/g, '')) : d.revenue
+                );
+                const clicksData = performanceData.map(d => 
+                    typeof d.clicks === 'string' ? parseFloat(d.clicks.replace(/[,]/g, '')) : d.clicks
+                );
                 const ordersData = performanceData.map(d => d.orders);
-                const convRateData = performanceData.map(d => parseFloat(d.convRate.replace('%', '')));
+                const convRateData = performanceData.map(d => 
+                    typeof d.convRate === 'string' ? parseFloat(d.convRate.replace('%', '')) : d.convRate
+                );
 
                 new Chart(performanceCtx, {
                     type: 'bar',
@@ -1402,37 +1143,46 @@ document.addEventListener('DOMContentLoaded', () => {
                             {
                                 label: 'Revenue ($000s)',
                                 data: revenueData.map(val => val / 1000), // Convert to thousands
-                                backgroundColor: colors.gray90,
-                                borderColor: colors.gray90,
+                                backgroundColor: colors.blue100,
+                                borderColor: colors.blue100,
                                 borderWidth: 1,
-                                yAxisID: 'y'
+                                yAxisID: 'y',
+                                order: 3
                             },
                             {
-                                label: 'Clicks (000s)',
-                                data: clicksData.map(val => val / 1000), // Convert to thousands
-                                backgroundColor: colors.gray80,
-                                borderColor: colors.gray80,
+                                label: 'Clicks (00s)',
+                                data: clicksData.map(val => val / 100), // Convert to thousands
+                                backgroundColor: colors.blue75,
+                                borderColor: colors.blue75,
                                 borderWidth: 1,
-                                yAxisID: 'y'
+                                yAxisID: 'y',
+                                order: 2
                             },
                             {
                                 label: 'Orders',
                                 data: ordersData,
-                                backgroundColor: colors.gray70,
-                                borderColor: colors.gray70,
+                                backgroundColor: colors.blue30,
+                                borderColor: colors.blue30,
                                 borderWidth: 1,
-                                yAxisID: 'y1'
+                                yAxisID: 'y1',
+                                order: 1
                             },
                             {
                                 label: 'C2O CVR (%)',
                                 data: convRateData,
-                                backgroundColor: colors.gray60,
-                                borderColor: colors.gray60,
-                                borderWidth: 1,
+                                backgroundColor: colors.orange100,
+                                borderColor: colors.orange100,
+                                borderWidth: 3,
                                 type: 'line',
                                 fill: false,
                                 tension: 0.1,
-                                yAxisID: 'y2'
+                                yAxisID: 'y2',
+                                order: 0,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                pointBackgroundColor: colors.orange100,
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 1
                             }
                         ]
                     },
@@ -1487,9 +1237,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                 position: 'left',
                                 title: {
                                     display: true,
-                                    text: 'Revenue ($000s) / Clicks (000s)'
+                                    text: 'Revenue ($000s) / Clicks (00s)'
                                 },
-                                beginAtZero: true
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 30,  
+                                    callback: function(value) {
+                                        return value; 
+                                    }
+                                },
+                                max: 700  
                             },
                             y1: {
                                 type: 'linear',
@@ -1571,6 +1328,49 @@ document.addEventListener('DOMContentLoaded', () => {
             this.renderTable();
         },
 
+        /**
+         * Calculate cumulative yearly data from monthly data
+         * @param {Object} record - BEL record with monthlyData
+         * @param {string} year - Year to calculate (defaults to 2025)
+         * @returns {Object} Cumulative data { clicks, orders, revenue }
+         */
+        calculateYearlyData(record, year = '2025') {
+            let cumulativeClicks = 0;
+            let cumulativeOrders = 0;
+            let cumulativeRevenue = 0;
+            
+            if (record.monthlyData && record.monthlyData[year]) {
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                // For 2025, only sum up to August (since it's September 8, 2025)
+                // For other years, sum the full year
+                let monthsToSum = monthNames;
+                if (year === '2025') {
+                    monthsToSum = monthNames.slice(0, 8); // January to August
+                }
+                
+                monthsToSum.forEach(monthName => {
+                    const monthData = record.monthlyData[year][monthName];
+                    if (monthData) {
+                        cumulativeClicks += monthData.clicks || 0;
+                        cumulativeOrders += monthData.orders || 0;
+                        cumulativeRevenue += monthData.revenue || 0;
+                    }
+                });
+            } else {
+                // If no monthly data available, return empty values
+                cumulativeClicks = 0;
+                cumulativeOrders = 0;
+                cumulativeRevenue = 0;
+            }
+            
+            return {
+                clicks: cumulativeClicks,
+                orders: cumulativeOrders,
+                revenue: cumulativeRevenue
+            };
+        },
+
         generateBelData() {
             // 根據 Referral ID 的前兩碼確定國碼
             const getCountryCode = (id) => {
@@ -1597,24 +1397,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 return countryNames[countryCode] || 'United States';
             };
 
-            this.belData = APP_DATA.dashboard.leaderboard.map(leader => ({
-                id: leader.id,
-                name: leader.name,
-                email: leader.email || `${leader.name.toLowerCase().replace(' ', '.')}@company.com`,
-                code: `${leader.name.split(' ')[0].toUpperCase()}${Math.floor(Math.random() * 100)}`,
-                level: leader.level,
-                clicks30: leader.clicks,
-                orders30: leader.orders,
-                revenue30: leader.revenue,
-                country: getCountryName(getCountryCode(leader.id)),
-                get region() { return utils.getRegionFromCountry(this.country); },
-                tags: ['Top Performer']
-            }));
+            this.belData = APP_DATA.belProfiles.leaderboard.map(leader => {
+                // Calculate yearly cumulative data (defaults to 2025)
+                const yearlyData = this.calculateYearlyData(leader);
+                
+                return {
+                    id: leader.id,
+                    name: leader.name,
+                    email: leader.email || `${leader.name.toLowerCase().replace(' ', '.')}@company.com`,
+                    code: `${leader.name.split(' ')[0].toUpperCase()}${Math.floor(Math.random() * 100)}`,
+                    level: leader.level,
+                    clicks30: yearlyData.clicks,
+                    orders30: yearlyData.orders,
+                    revenue30: yearlyData.revenue,
+                    monthlyData: leader.monthlyData, // Ensure monthlyData is carried over
+                    bankingInfo: leader.bankingInfo, // Include banking information
+                    country: getCountryName(getCountryCode(leader.id)),
+                    get region() { return utils.getRegionFromCountry(this.country); },
+                    tags: ['Top Performer']
+                };
+            });
         },
 
         setupEventListeners() {
-            ui.applyBtn?.addEventListener('click', () => this.applyFilters());
-            ui.resetBtn?.addEventListener('click', () => this.resetFilters());
+            // Remove Apply/Reset button event listeners - direct filtering implemented instead
             ui.rowsPerPage?.addEventListener('change', () => this.changeRowsPerPage());
             ui.prevBtn?.addEventListener('click', () => this.previousPage());
             ui.nextBtn?.addEventListener('click', () => this.nextPage());
@@ -1623,7 +1429,10 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.thead?.addEventListener('click', (e) => this.handleSort(e));
             ui.exportBtn?.addEventListener('click', () => this.exportCSV());
 
-            // Search suggestions
+            // Setup direct filtering for dropdown selects
+            this.setupDirectFiltering();
+
+            // Search suggestions with direct filtering
             this.setupSearchSuggestions();
 
             // Row selection
@@ -1717,7 +1526,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td style="text-align:right;">${record.orders30.toLocaleString()}</td>
                         <td style="text-align:right;">${utils.formatMoney(record.revenue30)}</td>
                         <td style="text-align:right;">${utils.formatPercent(conv)}</td>
-                        <td style="text-align:right;">${record.orders30 ? utils.formatMoney(aov) : '-'}</td>
+                        <td style="text-align:right;">${record.orders30 ? utils.formatMoney(aov, 2) : '-'}</td>
                         <td>${record.region}</td>
                         <td>${record.country}</td>
                     </tr>
@@ -1768,11 +1577,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 activity: document.getElementById('f-activity')?.value || ''
             };
             this.renderTable();
-        },
-
-        resetFilters() {
-            document.getElementById('bel-filters')?.reset();
-            this.applyFilters();
         },
 
         changeRowsPerPage() {
@@ -1826,7 +1630,144 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         exportCSV() {
-            alert('Export CSV functionality is a placeholder for now.');
+            const exportBtn = ui.exportBtn;
+            if (exportBtn) {
+                exportBtn.disabled = true;
+                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+            }
+
+            try {
+                // Get the currently filtered and processed data
+                const processedData = this.getProcessedData();
+                
+                if (processedData.length === 0) {
+                    alert('No data to export. Please adjust your filters and try again.');
+                    return;
+                }
+
+                // Define CSV headers
+                const headers = [
+                    'Referral ID',
+                    'Name', 
+                    'Level',
+                    'Clicks',
+                    'Orders',
+                    'Revenue',
+                    'C2O CVR (%)',
+                    'AOV',
+                    'Region',
+                    'Country'
+                ];
+
+                // Create CSV content
+                let csvContent = headers.join(',') + '\n';
+
+                // Add data rows
+                processedData.forEach(record => {
+                    const conv = record.clicks30 ? (record.orders30 / record.clicks30) * 100 : 0;
+                    const aov = record.orders30 ? record.revenue30 / record.orders30 : 0;
+                    
+                    const row = [
+                        `"${record.id}"`,
+                        `"${record.name}"`,
+                        `"${record.level}"`,
+                        record.clicks30,
+                        record.orders30,
+                        record.revenue30.toFixed(2),
+                        conv.toFixed(2),
+                        aov.toFixed(2),
+                        `"${record.region}"`,
+                        `"${record.country}"`
+                    ];
+                    csvContent += row.join(',') + '\n';
+                });
+
+                // Create and download the CSV file
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                
+                if (link.download !== undefined) {
+                    // Create filename with current date and filter info
+                    const currentDate = new Date().toISOString().split('T')[0];
+                    const filterInfo = this.getFilterSummary();
+                    const filename = `BEL_Performance_Leaderboard_${currentDate}${filterInfo}.csv`;
+                    
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', filename);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    
+                    // Show success message
+                    if (exportBtn) {
+                        exportBtn.innerHTML = '<i class="fas fa-check"></i> Downloaded!';
+                        setTimeout(() => {
+                            exportBtn.innerHTML = '<i class="fas fa-download"></i> Export CSV';
+                        }, 2000);
+                    }
+                } else {
+                    throw new Error('Your browser does not support file downloads');
+                }
+            } catch (error) {
+                console.error('CSV Export Error:', error);
+                alert('Failed to export CSV. Please try again.');
+                
+                if (exportBtn) {
+                    exportBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Export Failed';
+                    setTimeout(() => {
+                        exportBtn.innerHTML = '<i class="fas fa-download"></i> Export CSV';
+                    }, 2000);
+                }
+            } finally {
+                if (exportBtn) {
+                    exportBtn.disabled = false;
+                }
+            }
+        },
+
+        getFilterSummary() {
+            const filters = appState.filters;
+            let summary = '';
+            
+            if (filters.keyword) summary += `_name_${filters.keyword}`;
+            if (filters.referralId) summary += `_id_${filters.referralId}`;
+            if (filters.level) summary += `_level_${filters.level}`;
+            if (filters.region) summary += `_region_${filters.region}`;
+            if (filters.country) summary += `_country_${filters.country}`;
+            if (filters.activity) summary += `_activity_${filters.activity}`;
+            
+            return summary.replace(/[^a-zA-Z0-9_]/g, '').substring(0, 50); // Clean and limit length
+        },
+
+        setupDirectFiltering() {
+            // Setup direct filtering for dropdown selects
+            const levelSelect = document.getElementById('f-level');
+            const regionSelect = ui.regionSel;
+            const countrySelect = ui.countrySel;
+            const activitySelect = document.getElementById('f-activity');
+
+            // Level filter - apply immediately on change
+            levelSelect?.addEventListener('change', () => {
+                this.applyFilters();
+            });
+
+            // Region filter - apply immediately on change
+            regionSelect?.addEventListener('change', () => {
+                this.applyFilters();
+            });
+
+            // Country filter - apply immediately on change
+            countrySelect?.addEventListener('change', () => {
+                this.applyFilters();
+            });
+
+            // Activity filter - apply immediately on change
+            activitySelect?.addEventListener('change', () => {
+                this.applyFilters();
+            });
         },
 
         setupSearchSuggestions() {
@@ -2004,7 +1945,6 @@ document.addEventListener('DOMContentLoaded', () => {
        BEL MODAL MANAGEMENT
        ======================================================================== */
     const BELModal = {
-        individualPerformanceChart: null,
         performanceTrendChart: null,
         
         init() {
@@ -2049,35 +1989,14 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         openModal(id, linkElement = null) {
-            let record = AccountManagement.belData.find(r => r.id === id);
-            
-            if (!record && linkElement) {
-                // Extract data from table row if not found in belData
-                const tr = linkElement.closest('tr');
-                const cells = tr ? Array.from(tr.children) : [];
-                const name = (cells[2]?.textContent || '').trim() || '—';
-                const level = (cells[3]?.textContent || '').trim() || 'Explorer';
-                const clicks = parseInt((cells[5]?.textContent || '').replace(/[^\d.-]/g,''), 10) || 0;
-                const orders = parseInt((cells[6]?.textContent || '').replace(/[^\d.-]/g,''), 10) || 0;
-                const revenue = parseFloat((cells[7]?.textContent || '').replace(/[^0-9.-]/g,'')) || 0;
-                
-                record = {
-                    id: id || `DASH-${Date.now()}`,
-                    name,
-                    code: '—',
-                    level,
-                    clicks30: clicks,
-                    orders30: orders,
-                    revenue30: revenue,
-                    region: '—',
-                    country: '—',
-                    city: '—',
-                    status: 'Active',
-                    tags: []
-                };
-            }
+            // Centralized record fetching
+            const record = this.getBelRecordById(id, linkElement);
 
-            if (!record) return;
+            if (!record) {
+                console.error(`BEL record with ID ${id} not found.`);
+                this.showCustomAlert(`Could not find details for BEL with ID ${id}.`, 'error');
+                return;
+            }
 
             appState.currentReferralId = record.id;
             this.fillModal(record);
@@ -2085,19 +2004,83 @@ document.addEventListener('DOMContentLoaded', () => {
             // Reset to first tab (Performance) when opening modal
             this.resetToFirstTab();
             
+            ui.modal.style.zIndex = ContentManager.getNextModalZIndex();
             ui.modal?.classList.add('show');
             
             // Scroll modal to top when opened
             setTimeout(() => {
-                const modalContent = ui.modal?.querySelector('.modal-content');
-                if (modalContent) {
-                    modalContent.scrollTop = 0;
-                }
-                // Also scroll the modal overlay to top
-                if (ui.modal) {
-                    ui.modal.scrollTop = 0;
-                }
+                const modalBody = ui.modal?.querySelector('.modal-body');
+                if (modalBody) modalBody.scrollTop = 0;
             }, 50);
+        },
+
+        getBelRecordById(id, linkElement = null) {
+            // 1. Check AccountManagement's pre-processed data first
+            let record = AccountManagement.belData.find(r => r.id === id);
+            if (record) {
+                console.log(`Record ${id} found in AccountManagement.belData`);
+                return record;
+            }
+
+            // 2. If not found, check the raw leaderboard data from APP_DATA
+            if (APP_DATA.belProfiles && APP_DATA.belProfiles.leaderboard) {
+                const leaderboardRecord = APP_DATA.belProfiles.leaderboard.find(r => r.id === id);
+                if (leaderboardRecord) {
+                    console.log(`Record ${id} found in APP_DATA.belProfiles.leaderboard`);
+                    // Normalize the record to the format expected by the modal
+                    return {
+                        id: leaderboardRecord.id,
+                        name: leaderboardRecord.name,
+                        email: leaderboardRecord.email,
+                        code: leaderboardRecord.id,
+                        level: leaderboardRecord.level,
+                        clicks30: leaderboardRecord.clicks,
+                        orders30: leaderboardRecord.orders,
+                        revenue30: leaderboardRecord.revenue,
+                        monthlyData: leaderboardRecord.monthlyData,
+                        bankingInfo: leaderboardRecord.bankingInfo,
+                        region: utils.getRegionFromCountry(leaderboardRecord.email?.split('@')[1]?.includes('.') ? 
+                               leaderboardRecord.email.split('@')[1].split('.')[1].toUpperCase() : 'US'),
+                        country: leaderboardRecord.email?.split('@')[1]?.includes('.') ? 
+                                leaderboardRecord.email.split('@')[1].split('.')[1].toUpperCase() : 'US',
+                        city: '—',
+                        status: 'Active',
+                        tags: []
+                    };
+                }
+            }
+
+            // 3. Fallback for records not in main data sources (e.g., from other tables)
+            if (linkElement) {
+                console.log(`Record ${id} not found in data, creating from link element`);
+                const tr = linkElement.closest('tr');
+                if (tr) {
+                    const name = tr.querySelector('td:nth-child(2)')?.textContent.trim();
+                    const level = tr.querySelector('td:nth-child(3)')?.textContent.trim();
+                    const clicks = parseInt(tr.querySelector('td:nth-child(4)')?.textContent.replace(/,/g, '')) || 0;
+                    const orders = parseInt(tr.querySelector('td:nth-child(5)')?.textContent.replace(/,/g, '')) || 0;
+                    const revenue = utils.parseMoney(tr.querySelector('td:nth-child(6)')?.textContent);
+                    
+                    return {
+                        id: id,
+                        name: name,
+                        level: level,
+                        clicks30: clicks,
+                        orders30: orders,
+                        revenue30: revenue,
+                        email: '—',
+                        code: id,
+                        region: '—',
+                        country: '—',
+                        city: '—',
+                        status: 'Active',
+                        tags: []
+                    };
+                }
+            }
+            
+            console.log(`Record ${id} could not be found anywhere.`);
+            return null;
         },
 
         resetToFirstTab() {
@@ -2128,9 +2111,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (firstTabId === 'overview') {
                 // Trigger chart initialization after a short delay to ensure DOM is ready
                 setTimeout(() => {
-                    const record = AccountManagement.belData.find(x => x.id === appState.currentReferralId);
+                    const record = this.getBelRecordById(appState.currentReferralId);
                     if (record) {
-                        this.initializeIndividualPerformanceChart(record);
                         this.initializePerformanceTrendChart(record);
                     }
                 }, 150);
@@ -2178,6 +2160,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Charts will be initialized by resetToFirstTab() function
             
+            // Update Banking Information
+            this.updateBankingInformation(record);
+            
             // Update Customer Insights
             this.updateCustomerInsights(record);
         },
@@ -2191,23 +2176,117 @@ document.addEventListener('DOMContentLoaded', () => {
             const convRateEl = document.getElementById('modal-conv-rate');
             const aovEl = document.getElementById('modal-aov');
             
-            if (totalClicksEl) totalClicksEl.textContent = (record.clicks30 || 0).toLocaleString();
-            if (totalOrdersEl) totalOrdersEl.textContent = (record.orders30 || 0).toLocaleString();
-            if (totalRevenueEl) totalRevenueEl.textContent = utils.formatMoney(record.revenue30 || 0);
+            // Get the currently selected year from year selector, or default to 2025
+            const yearSelector = document.getElementById('year-selector');
+            const selectedYear = yearSelector && yearSelector.value ? yearSelector.value : '2025';
             
-            // Calculate conversion rate and AOV
-            const convRate = record.clicks30 ? (record.orders30 / record.clicks30) * 100 : 0;
-            const aov = record.orders30 ? record.revenue30 / record.orders30 : 0;
+            // Calculate cumulative data from January to current month
+            let cumulativeClicks = 0;
+            let cumulativeOrders = 0;
+            let cumulativeRevenue = 0;
+            
+            if (record.monthlyData && record.monthlyData[selectedYear]) {
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                const currentDate = new Date();
+                
+                // For 2025, only sum up to August (since it's September 8, 2025)
+                // For 2024, sum the full year
+                let monthsToSum = monthNames;
+                if (selectedYear === '2025') {
+                    monthsToSum = monthNames.slice(0, 8); // January to August
+                }
+                
+                monthsToSum.forEach(monthName => {
+                    const monthData = record.monthlyData[selectedYear][monthName];
+                    if (monthData) {
+                        cumulativeClicks += monthData.clicks || 0;
+                        cumulativeOrders += monthData.orders || 0;
+                        cumulativeRevenue += monthData.revenue || 0;
+                    }
+                });
+            } else {
+                // Fallback to record's direct values if no monthly data
+                cumulativeClicks = record.clicks30 || record.clicks || 0;
+                cumulativeOrders = record.orders30 || record.orders || 0;
+                cumulativeRevenue = record.revenue30 || record.revenue || 0;
+            }
+            
+            if (totalClicksEl) totalClicksEl.textContent = cumulativeClicks.toLocaleString();
+            if (totalOrdersEl) totalOrdersEl.textContent = cumulativeOrders.toLocaleString();
+            if (totalRevenueEl) totalRevenueEl.textContent = utils.formatMoney(cumulativeRevenue);
+            
+            // Calculate cumulative conversion rate and AOV
+            let convRate = 0;
+            let aov = 0;
+            
+            if (cumulativeClicks > 0) {
+                convRate = (cumulativeOrders / cumulativeClicks) * 100;
+            }
+            
+            if (cumulativeOrders > 0) {
+                aov = cumulativeRevenue / cumulativeOrders;
+            }
             
             if (convRateEl) convRateEl.textContent = `${convRate.toFixed(2)}%`;
             if (aovEl) aovEl.textContent = utils.formatMoney(aov, 2);
+        },
+
+        updateBankingInformation(record) {
+            if (!record) return;
+            
+            // Get banking information from the record
+            const bankingInfo = record.bankingInfo;
+            
+            // Elements for displaying banking information
+            const bankNameDisplay = document.getElementById('bank-name-display');
+            const swiftCodeDisplay = document.getElementById('swift-code-display');
+            const accountHolderDisplay = document.getElementById('account-holder-display');
+            const phoneDisplay = document.getElementById('phone-display');
+            const addressDisplay = document.getElementById('address-display');
+            
+            // Elements for editing banking information
+            const bankNameEdit = document.getElementById('bank-name-edit');
+            const swiftCodeEdit = document.getElementById('swift-code-edit');
+            const accountHolderEdit = document.getElementById('account-holder-edit');
+            const phoneEdit = document.getElementById('phone-edit');
+            const addressEdit = document.getElementById('address-edit');
+            
+            if (bankingInfo) {
+                // Update display elements
+                if (bankNameDisplay) bankNameDisplay.textContent = bankingInfo.bankName || '-';
+                if (swiftCodeDisplay) swiftCodeDisplay.textContent = bankingInfo.swiftCode || '-';
+                if (accountHolderDisplay) accountHolderDisplay.textContent = bankingInfo.accountHolder || '-';
+                if (phoneDisplay) phoneDisplay.textContent = bankingInfo.phone || '-';
+                if (addressDisplay) addressDisplay.textContent = bankingInfo.address || '-';
+                
+                // Update edit elements
+                if (bankNameEdit) bankNameEdit.value = bankingInfo.bankName || '';
+                if (swiftCodeEdit) swiftCodeEdit.value = bankingInfo.swiftCode || '';
+                if (accountHolderEdit) accountHolderEdit.value = bankingInfo.accountHolder || '';
+                if (phoneEdit) phoneEdit.value = bankingInfo.phone || '';
+                if (addressEdit) addressEdit.value = bankingInfo.address || '';
+            } else {
+                // No banking info available, show placeholder
+                if (bankNameDisplay) bankNameDisplay.textContent = '-';
+                if (swiftCodeDisplay) swiftCodeDisplay.textContent = '-';
+                if (accountHolderDisplay) accountHolderDisplay.textContent = '-';
+                if (phoneDisplay) phoneDisplay.textContent = '-';
+                if (addressDisplay) addressDisplay.textContent = '-';
+                
+                // Clear edit elements
+                if (bankNameEdit) bankNameEdit.value = '';
+                if (swiftCodeEdit) swiftCodeEdit.value = '';
+                if (accountHolderEdit) accountHolderEdit.value = '';
+                if (phoneEdit) phoneEdit.value = '';
+                if (addressEdit) addressEdit.value = '';
+            }
         },
 
         updateCustomerInsights(record) {
             if (!record) return;
             
             const salesData = this.getBelSalesData(record.id);
-            const insights = this.generateDemoInsights(record);
+            const insights = this.generateInsights(record);
             
             // Calculate total sales statistics
             const totalOrders = salesData.reduce((sum, sale) => sum + sale.quantity, 0);
@@ -2288,15 +2367,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (!appState.customerInsights[referralId]) {
-                // Create demo data based on BEL level and characteristics
+                // Generate insights based on BEL level and characteristics
                 const record = AccountManagement.belData.find(x => x.id === referralId);
-                appState.customerInsights[referralId] = this.generateDemoInsights(record);
+                appState.customerInsights[referralId] = this.generateInsights(record);
             }
             
             return appState.customerInsights[referralId];
         },
 
-        generateDemoInsights(record) {
+        generateInsights(record) {
             // Generate insights based on actual sales data for this BEL
             const salesData = this.getBelSalesData(record.id);
             
@@ -2319,8 +2398,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 .map(sale => sale.productName);
             
             return {
-                topCategories: topCategories.length > 0 ? topCategories : ['Remote I/O Modules', 'Network Communications'],
-                topProducts: topProducts.length > 0 ? topProducts : ['ADAM-6017-D', 'WISE-4050E']
+                topCategories: topCategories.length > 0 ? topCategories : ['—', '—'],
+                topProducts: topProducts.length > 0 ? topProducts : ['—', '—']
             };
         },
 
@@ -2331,131 +2410,33 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (!appState.belSalesData[referralId]) {
-                appState.belSalesData[referralId] = this.generateDemoSalesData(referralId);
+                appState.belSalesData[referralId] = this.generateSalesData(referralId);
             }
             
             return appState.belSalesData[referralId];
         },
 
-        generateDemoSalesData(referralId) {
+        generateSalesData(referralId) {
             // Get BEL record to determine sales pattern based on level and performance
             const record = AccountManagement.belData.find(x => x.id === referralId);
-            const level = record?.level || 'Explorer';
-            const revenue = record?.revenue30 || 5000;
+            const level = record?.level || 'Exploder';
+            const revenue = record?.revenue30 || 0;
             
-            // Real product catalog based on actual Advantech products
-            const productCatalog = [
-                // IoT Gateway & Edge Intelligence
-                { name: 'AIR-030-S30A1', description: 'Edge AI NVIDIA AGX Orin 64G inference system', category: 'IoT Gateway & Edge Intelligence', avgPrice: 4999, levelFactor: { Explorer: 0.8, Leader: 2.0, Enabler: 0.5, Builder: 0.6 } },
-                { name: 'UNO-2484G-7731BE', description: 'i7-7600U, 8G RAM w/4xLAN,4xCOM,1xMini', category: 'IoT Gateway & Edge Intelligence', avgPrice: 3299, levelFactor: { Explorer: 1.0, Leader: 1.8, Enabler: 0.4, Builder: 0.7 } },
-                { name: 'ECU-150-12A', description: 'A53 1.3GHz,2xLAN,2xcom,1x', category: 'IoT Gateway & Edge Intelligence', avgPrice: 899, levelFactor: { Explorer: 1.2, Leader: 1.5, Enabler: 1.0, Builder: 0.8 } },
-                { name: 'EKI-1211-A', description: '1-port modbus gateway', category: 'IoT Gateway & Edge Intelligence', avgPrice: 299, levelFactor: { Explorer: 1.3, Leader: 1.2, Enabler: 1.4, Builder: 1.1 } },
-                { name: 'ECU-1251D-R10AA', description: 'Cloud enabled Intelligent Communication Gateway', category: 'IoT Gateway & Edge Intelligence', avgPrice: 1599, levelFactor: { Explorer: 1.1, Leader: 1.6, Enabler: 0.9, Builder: 0.7 } },
-                { name: 'AIR-020X-S9A1', description: 'Edge AI NVIDIA Xavier NX inference system', category: 'IoT Gateway & Edge Intelligence', avgPrice: 2999, levelFactor: { Explorer: 0.9, Leader: 1.9, Enabler: 0.4, Builder: 0.5 } },
-                { name: 'UNO-127-E22BA', description: 'ATOM X6413E, 1.5GHZ, 4G DDR4, 2LAN, 2USB', category: 'IoT Gateway & Edge Intelligence', avgPrice: 799, levelFactor: { Explorer: 1.4, Leader: 1.3, Enabler: 1.2, Builder: 1.0 } },
-                { name: 'UNO-2271G-N231AU', description: 'Pocket-Size Edge IoT Gateway with Intel', category: 'IoT Gateway & Edge Intelligence', avgPrice: 1299, levelFactor: { Explorer: 1.3, Leader: 1.4, Enabler: 1.1, Builder: 0.9 } },
-
-                // Peripherals & Modules  
-                { name: 'SQR-UD4S4G3K2HN', description: 'UDIMM DDR4 3200 4GB 512x16 (0-85) Hynix', category: 'Peripherals & Modules', avgPrice: 89, levelFactor: { Explorer: 1.0, Leader: 1.1, Enabler: 1.2, Builder: 1.8 } },
-                { name: 'SQR-SD4N32G3K2HN', description: 'SODIMM ECC DDR4 3200 32GB 2Gx8 (0-85) Hynix', category: 'Peripherals & Modules', avgPrice: 599, levelFactor: { Explorer: 0.7, Leader: 1.5, Enabler: 0.6, Builder: 1.4 } },
-                { name: 'SQR-UD4N8G3K2HE', description: 'UDIMM ECC DDR4 3200 8GB 1Gx8 (0-85) Hynix', category: 'Peripherals & Modules', avgPrice: 149, levelFactor: { Explorer: 1.1, Leader: 1.2, Enabler: 1.0, Builder: 1.6 } },
-                { name: 'SQR-UD4N16G3K2H', description: 'UDIMM ECC DDR4 3200 16GB 1Gx8 (0-85) Hynix', category: 'Peripherals & Modules', avgPrice: 289, levelFactor: { Explorer: 0.9, Leader: 1.3, Enabler: 0.8, Builder: 1.5 } },
-                { name: 'SQR-UD4N32G3K2H', description: 'UDIMM ECC DDR4 3200 32GB 2Gx8 (0-85) Hynix', category: 'Peripherals & Modules', avgPrice: 589, levelFactor: { Explorer: 0.6, Leader: 1.4, Enabler: 0.5, Builder: 1.3 } },
-                { name: 'SQR-SD4S4G3K2HN', description: 'SODIMM DDR4 3200 4GB 512x16 (0-85) Hynix', category: 'Peripherals & Modules', avgPrice: 79, levelFactor: { Explorer: 1.2, Leader: 1.0, Enabler: 1.3, Builder: 1.9 } },
-                { name: 'SQR-SD4N8G3K2HE', description: 'SODIMM ECC DDR4 3200 8GB 1Gx8 (0-85) Hynix', category: 'Peripherals & Modules', avgPrice: 159, levelFactor: { Explorer: 1.0, Leader: 1.1, Enabler: 1.1, Builder: 1.7 } },
-                { name: 'SQR-SD4N16G3K2H', description: 'SODIMM ECC DDR4 3200 16GB 1Gx8 (0-85) Hynix', category: 'Peripherals & Modules', avgPrice: 299, levelFactor: { Explorer: 0.8, Leader: 1.2, Enabler: 0.9, Builder: 1.6 } },
-
-                // Embedded Computers
-                { name: 'UNO-247-N3N1A', description: 'N97, w/4xLAN, 1xVGA, 1xHDMI, 4xCOM', category: 'Embedded Computers', avgPrice: 1299, levelFactor: { Explorer: 1.3, Leader: 1.4, Enabler: 1.2, Builder: 0.8 } },
-                { name: 'UNO-238-C7N1AE', description: 'i7-8665UE 4xUSB 3.2 DP+HDMI,2xCOM,GPIO/C', category: 'Embedded Computers', avgPrice: 2199, levelFactor: { Explorer: 1.0, Leader: 1.7, Enabler: 0.7, Builder: 0.6 } },
-                { name: 'UNO-238-C5N1AE', description: 'i5-1245UE 4xUSB 3.2 DP+HDMI,2xCOM,GPIO/C', category: 'Embedded Computers', avgPrice: 1799, levelFactor: { Explorer: 1.1, Leader: 1.5, Enabler: 0.8, Builder: 0.7 } },
-                { name: 'UNO-238-C3N1AE', description: 'i3-1215UE 4xUSB 3.2 DP+HDMI,2xCOM,GPIO/C', category: 'Embedded Computers', avgPrice: 1399, levelFactor: { Explorer: 1.2, Leader: 1.3, Enabler: 1.0, Builder: 0.9 } },
-                { name: 'ARK-3534B-00A1', description: 'Intel ADL-S H610E PCIeX4+PCIeX16, 9-36V', category: 'Embedded Computers', avgPrice: 2499, levelFactor: { Explorer: 0.8, Leader: 1.8, Enabler: 0.5, Builder: 0.6 } },
-                { name: 'UNO-2271G-N231AE', description: 'N41x5 1.2GHz, 8-RAM, 64G, 2xGbE, 2xUSB', category: 'Embedded Computers', avgPrice: 999, levelFactor: { Explorer: 1.4, Leader: 1.2, Enabler: 1.3, Builder: 1.0 } },
-                { name: 'ARK-2251-S3A1U', description: 'Intel Raptor Lake i3 1335UE 1.3G 15G&E+6', category: 'Embedded Computers', avgPrice: 1699, levelFactor: { Explorer: 1.0, Leader: 1.4, Enabler: 0.8, Builder: 0.7 } },
-                { name: 'ARK-2251-S2A1U', description: 'Intel Raptor Lake i3 1315UE 1.2G 15G&E+6', category: 'Embedded Computers', avgPrice: 1599, levelFactor: { Explorer: 1.1, Leader: 1.3, Enabler: 0.9, Builder: 0.8 } },
-
-                // Mobile Tablets & Devices
-                { name: 'AIM-77S-SW01000', description: 'Wifi 6E, 4GB/64GB, NFC, ADP, Std. OS', category: 'Mobile Tablets & Devices', avgPrice: 1299, levelFactor: { Explorer: 1.5, Leader: 1.0, Enabler: 1.6, Builder: 0.9 } },
-                { name: 'AIM-77S-SW11000', description: 'Wifi 6E, 6GB/64GB, ADP, Std. OS', category: 'Mobile Tablets & Devices', avgPrice: 1499, levelFactor: { Explorer: 1.4, Leader: 1.1, Enabler: 1.5, Builder: 0.8 } },
-                { name: 'LEO-L50-G0', description: 'LEO-L50 Outdoor Asset Management - Core Unit', category: 'Mobile Tablets & Devices', avgPrice: 899, levelFactor: { Explorer: 1.3, Leader: 1.2, Enabler: 1.4, Builder: 1.0 } },
-                { name: 'AIM-77S-SW00000', description: 'Wifi 6E, 4GB/64GB, NFC, BCR, ADP, Std. OS', category: 'Mobile Tablets & Devices', avgPrice: 1399, levelFactor: { Explorer: 1.4, Leader: 0.9, Enabler: 1.7, Builder: 0.8 } },
-                { name: 'AIM-68S-201B10', description: '10i/N50/8G/128G/Win 11/Wifi 6E/W BCR', category: 'Mobile Tablets & Devices', avgPrice: 1799, levelFactor: { Explorer: 1.2, Leader: 1.3, Enabler: 1.3, Builder: 0.7 } },
-                { name: 'AIM-68S-201B00', description: '10i/N200/8G/128G/Win 11/Wifi 6E/W BCR', category: 'Mobile Tablets & Devices', avgPrice: 1699, levelFactor: { Explorer: 1.3, Leader: 1.2, Enabler: 1.4, Builder: 0.8 } },
-                { name: 'AIM-68S-201010', description: '10i/N200/8G/128G/Win 11/Wifi 6E', category: 'Mobile Tablets & Devices', avgPrice: 1599, levelFactor: { Explorer: 1.4, Leader: 1.1, Enabler: 1.5, Builder: 0.9 } },
-                { name: 'AIM-68S-201000', description: '10i/N200/8G/128G/Win 11/Wifi 6E', category: 'Mobile Tablets & Devices', avgPrice: 1499, levelFactor: { Explorer: 1.5, Leader: 1.0, Enabler: 1.6, Builder: 1.0 } },
-
-                // Industrial Computer Boards
-                { name: 'EPC-R7300U-ALA1NN', description: 'EPC-R7300U-ALA1NN w/ Nano-4GB,Ubuntu 12', category: 'Industrial Computer Boards', avgPrice: 899, levelFactor: { Explorer: 0.9, Leader: 1.4, Enabler: 0.8, Builder: 1.8 } },
-                { name: 'RSB-4411CD-PNA2E', description: 'NXP A2 LMX8 Dual Core/1GB DDR 0~60', category: 'Industrial Computer Boards', avgPrice: 699, levelFactor: { Explorer: 0.8, Leader: 1.2, Enabler: 0.9, Builder: 1.9 } },
-                { name: 'AIMB-788G2-00A1', description: 'LGA1700 ATX Q670E/BMC/DP/HDMI/2', category: 'Industrial Computer Boards', avgPrice: 1299, levelFactor: { Explorer: 0.7, Leader: 1.6, Enabler: 0.6, Builder: 1.6 } },
-                { name: 'RSB-3720Q-ACA2E', description: 'A2 2.5 UIO SBC NXP L MX8M Plus Quad, 6G', category: 'Industrial Computer Boards', avgPrice: 999, levelFactor: { Explorer: 0.8, Leader: 1.3, Enabler: 0.7, Builder: 1.7 } },
-                { name: 'SKY-MXM-A500-4SHA', description: 'Quadro A500 MXM 4GB MS Hybrid mode Type', category: 'Industrial Computer Boards', avgPrice: 1999, levelFactor: { Explorer: 0.5, Leader: 1.8, Enabler: 0.4, Builder: 1.4 } },
-                { name: 'SKY-MXM-A2000-8SDA', description: 'Quadro A2000 MXM 8GB Discrete mode Type', category: 'Industrial Computer Boards', avgPrice: 2999, levelFactor: { Explorer: 0.4, Leader: 2.0, Enabler: 0.3, Builder: 1.3 } },
-                { name: 'AIMB-B2000-15ZE', description: 'AIMB-B2000-Mini-ITX MB chassis w/ 150W P', category: 'Industrial Computer Boards', avgPrice: 799, levelFactor: { Explorer: 0.9, Leader: 1.1, Enabler: 0.8, Builder: 1.9 } },
-                { name: 'AIMB-586QG2-00A1E', description: 'LGA1151 mATX 2DP/HDMI/eDP/6SATA/5', category: 'Industrial Computer Boards', avgPrice: 1199, levelFactor: { Explorer: 0.7, Leader: 1.4, Enabler: 0.6, Builder: 1.7 } },
-
-                // Edge AI Solutions
-                { name: 'MIC743AT7A1-ES', description: 'AI Inference System, NVIDIA Jetson Thor', category: 'Edge AI Solutions', avgPrice: 5999, levelFactor: { Explorer: 0.5, Leader: 2.2, Enabler: 0.3, Builder: 0.4 } },
-                { name: 'MIC-711D-ON3A2', description: 'NVIDIA Jetson Orin Nano 8G Developer Kit', category: 'Edge AI Solutions', avgPrice: 1999, levelFactor: { Explorer: 0.9, Leader: 1.8, Enabler: 0.6, Builder: 1.2 } },
-                { name: 'MIC-711-ON3A1', description: 'NVIDIA Jetson Orin NX 8G Lite AI System', category: 'Edge AI Solutions', avgPrice: 2499, levelFactor: { Explorer: 0.8, Leader: 1.9, Enabler: 0.5, Builder: 1.0 } },
-                { name: 'MIC-711D-OX4A1', description: 'NVIDIA Jetson Orin NX 16G Lite AI System', category: 'Edge AI Solutions', avgPrice: 2999, levelFactor: { Explorer: 0.7, Leader: 2.0, Enabler: 0.4, Builder: 0.9 } },
-                { name: 'MIC-711-OX4A1', description: 'NVIDIA Jetson Orin NX 16G Lite AI System', category: 'Edge AI Solutions', avgPrice: 2799, levelFactor: { Explorer: 0.7, Leader: 1.9, Enabler: 0.4, Builder: 1.0 } },
-                { name: 'MIC-713S-ON3A1', description: 'NVIDIA Jetson Orin Nano 8GB AI Solution Kit', category: 'Edge AI Solutions', avgPrice: 2199, levelFactor: { Explorer: 0.8, Leader: 1.7, Enabler: 0.5, Builder: 1.1 } },
-                { name: 'MIC-713S-ON2A1', description: 'NVIDIA Jetson Orin Nano 4GB AI Solution Kit', category: 'Edge AI Solutions', avgPrice: 1899, levelFactor: { Explorer: 0.9, Leader: 1.6, Enabler: 0.6, Builder: 1.2 } },
-
-                // Network Communications
-                { name: 'EKI-7720E-4FI-BE', description: '16FE+4SFP Port Managed Ethernet Switch Wide Temp', category: 'Network Communications', avgPrice: 1599, levelFactor: { Explorer: 1.0, Leader: 1.6, Enabler: 0.8, Builder: 0.7 } },
-                { name: 'SFP-GSM3-40K', description: 'IE-SFP/1250-ED, SM1310/LONG-LC', category: 'Network Communications', avgPrice: 299, levelFactor: { Explorer: 1.2, Leader: 1.3, Enabler: 1.1, Builder: 1.0 } },
-                { name: 'EKI-2711PSI-A', description: 'Industrial 25W PoE splitter', category: 'Network Communications', avgPrice: 199, levelFactor: { Explorer: 1.3, Leader: 1.2, Enabler: 1.4, Builder: 1.1 } },
-                { name: 'EKI-2541S-BE', description: 'Ethernet to Single mode fiber media converter', category: 'Network Communications', avgPrice: 159, levelFactor: { Explorer: 1.2, Leader: 1.1, Enabler: 1.3, Builder: 1.2 } },
-                { name: 'EKI-2541M-BE', description: 'Ethernet to Multi mode Fiber Media converter', category: 'Network Communications', avgPrice: 149, levelFactor: { Explorer: 1.3, Leader: 1.0, Enabler: 1.4, Builder: 1.3 } },
-                { name: 'SFP-XSS-40KTX-LC', description: 'SFP+-10G, SSLX-SM-LC (1270XMT/1330RCV)', category: 'Network Communications', avgPrice: 399, levelFactor: { Explorer: 0.9, Leader: 1.4, Enabler: 0.8, Builder: 0.9 } },
-                { name: 'SFP-XSS-40KRX-LC', description: 'SFP+-10G, SSLX-SM-LC (1330XMT/1270RCV)', category: 'Network Communications', avgPrice: 389, levelFactor: { Explorer: 0.9, Leader: 1.4, Enabler: 0.8, Builder: 0.9 } },
-
-                // Remote I/O Modules
-                { name: 'ADAM-6018-D', description: '8-ch Thermocouple Input Modbus/RTU Module', category: 'Remote I/O Modules', avgPrice: 599, levelFactor: { Explorer: 1.1, Leader: 1.4, Enabler: 1.2, Builder: 1.3 } },
-                { name: 'ADAM-6015-D', description: '7-ch Isolated RTD Input Modbus/RTU Module', category: 'Remote I/O Modules', avgPrice: 549, levelFactor: { Explorer: 1.2, Leader: 1.3, Enabler: 1.3, Builder: 1.4 } },
-                { name: 'WISE-4012E', description: '4-ch DI, 2-ch AI, 2-ch DO, Modbus/TCP, WISE-PaaS', category: 'Remote I/O Modules', avgPrice: 399, levelFactor: { Explorer: 1.3, Leader: 1.2, Enabler: 1.4, Builder: 1.5 } },
-                { name: 'WISE-4050E', description: '4-ch DI, 4-ch DO, Modbus/TCP, WISE-PaaS', category: 'Remote I/O Modules', avgPrice: 359, levelFactor: { Explorer: 1.4, Leader: 1.1, Enabler: 1.5, Builder: 1.6 } },
-                { name: 'ADAM-6050-D', description: '12-ch Isolated Digital I/O Modbus/RTU Module', category: 'Remote I/O Modules', avgPrice: 459, levelFactor: { Explorer: 1.2, Leader: 1.2, Enabler: 1.3, Builder: 1.5 } },
-                { name: 'ADAM-6017-D', description: '8-ch Analog Input Modbus/RTU Module', category: 'Remote I/O Modules', avgPrice: 429, levelFactor: { Explorer: 1.3, Leader: 1.3, Enabler: 1.4, Builder: 1.6 } },
-                { name: 'ADAM-6052-D', description: '8-ch Isolated Digital I/O, Modbus/TCP, WISE-PaaS', category: 'Remote I/O Modules', avgPrice: 489, levelFactor: { Explorer: 1.2, Leader: 1.2, Enabler: 1.3, Builder: 1.5 } },
-                { name: 'WISE-4051-A', description: '4-ch DI, 4-ch DO, Modbus/TCP, WISE-PaaS', category: 'Remote I/O Modules', avgPrice: 339, levelFactor: { Explorer: 1.4, Leader: 1.0, Enabler: 1.6, Builder: 1.7 } },
-
-                // Wireless Sensing & Solutions
-                { name: 'WISE-4250-S214', description: 'WISE-4250 with 4AI+4DI', category: 'Wireless Sensing & Solutions', avgPrice: 599, levelFactor: { Explorer: 1.3, Leader: 1.2, Enabler: 1.4, Builder: 1.5 } },
-                { name: 'WISE-4250-S252', description: 'WISE-4250 with 12DI+12DO', category: 'Wireless Sensing & Solutions', avgPrice: 649, levelFactor: { Explorer: 1.2, Leader: 1.3, Enabler: 1.3, Builder: 1.4 } },
-                { name: 'WISE-4250-S232', description: 'WISE-4250 with Temperature & Humidity Sensor', category: 'Wireless Sensing & Solutions', avgPrice: 559, levelFactor: { Explorer: 1.4, Leader: 1.1, Enabler: 1.5, Builder: 1.6 } },
-                { name: 'OPT1-ANT-5GSSW-30', description: '5G NR MIMO / 4G / 3G / 2G, WiFi 2.4/5.0/6 GHz', category: 'Wireless Sensing & Solutions', avgPrice: 899, levelFactor: { Explorer: 1.0, Leader: 1.4, Enabler: 0.9, Builder: 1.0 } },
-                { name: 'ICR-2437-DE', description: 'Cellular Router, Cat4, LTE450, 2x ETH', category: 'Wireless Sensing & Solutions', avgPrice: 799, levelFactor: { Explorer: 1.1, Leader: 1.3, Enabler: 1.0, Builder: 0.9 } },
-                { name: 'WISE-4252-A', description: 'WISE-4250 12DI/12DO I/O Module', category: 'Wireless Sensing & Solutions', avgPrice: 459, levelFactor: { Explorer: 1.3, Leader: 1.0, Enabler: 1.4, Builder: 1.7 } },
-                { name: '1751000717-01', description: 'Dipole Ant.WiFi 6E SMA/M-R RG178 BLK L18', category: 'Wireless Sensing & Solutions', avgPrice: 49, levelFactor: { Explorer: 1.5, Leader: 0.8, Enabler: 1.6, Builder: 2.0 } },
-                { name: 'AIW-169BN-GX1', description: 'Wi-Fi 6E M.2 solution based on Realtek R', category: 'Wireless Sensing & Solutions', avgPrice: 159, levelFactor: { Explorer: 1.2, Leader: 0.9, Enabler: 1.3, Builder: 1.8 } },
-
-                // AIoT Software & Solutions
-                { name: 'LEO-S592-AQE0', description: 'LEO-S LoRaWAN 7 in 1 AQI sensor 868', category: 'AIoT Software & Solutions', avgPrice: 399, levelFactor: { Explorer: 1.2, Leader: 1.4, Enabler: 1.3, Builder: 1.1 } },
-                { name: 'LEO-S572-TPE0', description: 'LEO-S LoRaWAN Temp Probe sensor 868', category: 'AIoT Software & Solutions', avgPrice: 299, levelFactor: { Explorer: 1.3, Leader: 1.2, Enabler: 1.4, Builder: 1.2 } },
-                { name: 'LEO-S592-TPG0', description: 'LEO-S LoRaWAN Insertion Temperature Sensor', category: 'AIoT Software & Solutions', avgPrice: 329, levelFactor: { Explorer: 1.2, Leader: 1.3, Enabler: 1.3, Builder: 1.1 } },
-                { name: 'LEO-S573-C2G0', description: 'LEO-S LoRaWAN CO2 sensor 915', category: 'AIoT Software & Solutions', avgPrice: 449, levelFactor: { Explorer: 1.1, Leader: 1.4, Enabler: 1.2, Builder: 1.0 } },
-                { name: 'LEO-S550-DAG0', description: 'LEO-S LoRaWAN DAQ Controller 915', category: 'AIoT Software & Solutions', avgPrice: 599, levelFactor: { Explorer: 1.0, Leader: 1.5, Enabler: 1.1, Builder: 0.9 } },
-                { name: 'PCIE-1154-BE', description: 'PCI Express x4, 4-Port USB 3.0 Host Adapter', category: 'AIoT Software & Solutions', avgPrice: 199, levelFactor: { Explorer: 1.2, Leader: 1.1, Enabler: 1.3, Builder: 1.6 } },
-                { name: 'LEO-S595-MSG0', description: 'LEO-S LoRaWAN Magnetic Switch 915', category: 'AIoT Software & Solutions', avgPrice: 159, levelFactor: { Explorer: 1.4, Leader: 1.0, Enabler: 1.5, Builder: 1.3 } },
-                { name: 'PCI-1245L-AE', description: 'Basic 4-Axis SoftMotion Controller', category: 'AIoT Software & Solutions', avgPrice: 799, levelFactor: { Explorer: 0.8, Leader: 1.6, Enabler: 0.9, Builder: 1.1 } },
-
-                // Industrial Servers & IPC
-                { name: 'MIC-7330B-C42N', description: 'Xeon w/ C422 6xUSB 3.1 3xLAN 1xHDMI 2xDP', category: 'Industrial Servers & IPC', avgPrice: 4999, levelFactor: { Explorer: 0.4, Leader: 2.1, Enabler: 0.2, Builder: 0.3 } },
-                { name: 'ARK-3510P-U2A1E', description: 'Intel i5-12500TE 65W with', category: 'Industrial Servers & IPC', avgPrice: 2799, levelFactor: { Explorer: 0.6, Leader: 1.8, Enabler: 0.4, Builder: 0.5 } },
-                { name: 'MIC-7700-11110AE', description: 'i7-12700E 1.5G 64G DDR5 2xLAN 1xCOM', category: 'Industrial Servers & IPC', avgPrice: 3599, levelFactor: { Explorer: 0.5, Leader: 1.9, Enabler: 0.3, Builder: 0.4 } },
-                { name: 'MIC-7700-01100AE', description: 'i5-12500E 1.5G 64G DDR5 2xLAN 1xCOM', category: 'Industrial Servers & IPC', avgPrice: 2999, levelFactor: { Explorer: 0.6, Leader: 1.7, Enabler: 0.4, Builder: 0.5 } },
-
-                // Industrial IoT Gateways  
-                { name: 'ECU-1251D-R10AA', description: 'Cloud enabled Intelligent Communication Gateway', category: 'Industrial IoT Gateways', avgPrice: 1599, levelFactor: { Explorer: 1.1, Leader: 1.6, Enabler: 0.9, Builder: 0.7 } },
-                { name: 'UNO-137-E42BA', description: 'Core i7-1185G7E 4.8GHz, 16G DDR4', category: 'Industrial IoT Gateways', avgPrice: 2299, levelFactor: { Explorer: 0.8, Leader: 1.7, Enabler: 0.6, Builder: 0.5 } },
-                { name: 'ECU-1251D-E10AA', description: 'Cloud enabled Intelligent Communication Gateway', category: 'Industrial IoT Gateways', avgPrice: 1399, levelFactor: { Explorer: 1.2, Leader: 1.5, Enabler: 1.0, Builder: 0.8 } },
-                { name: 'ECU-1251D-E10AE', description: 'Cloud enabled Intelligent Communication Gateway', category: 'Industrial IoT Gateways', avgPrice: 1499, levelFactor: { Explorer: 1.1, Leader: 1.5, Enabler: 0.9, Builder: 0.7 } },
-                { name: 'UNO-137-E42B', description: 'Core i7-1185G7E 4.8GHz, 16G DDR4', category: 'Industrial IoT Gateways', avgPrice: 2199, levelFactor: { Explorer: 0.8, Leader: 1.7, Enabler: 0.6, Builder: 0.5 } }
-            ];
+            // If no revenue, return empty sales data
+            if (revenue === 0) {
+                return [];
+            }
+            
+            // Get product catalog from loaded data
+            let productCatalog = [];
+            if (window.appData && window.appData.productCatalog) {
+                productCatalog = window.appData.productCatalog.productCatalog || [];
+            }
+            
+            // Fallback to basic products if catalog not loaded
+            if (productCatalog.length === 0) {
+                return [];
+            }
             
             // Generate sales data based on BEL's revenue and level preferences
             const salesData = [];
@@ -2478,120 +2459,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             
-            // Sort by quantity and ensure minimum variety
+            // Sort by quantity
             salesData.sort((a, b) => b.quantity - a.quantity);
-            
-            if (salesData.length < 10) {
-                // Add some default items for BELs with low sales
-                const defaultItems = [
-                    { productName: 'ADAM-6017-D', productDescription: '8-ch Analog Input Modbus/RTU Module', category: 'Remote I/O Modules', quantity: 2, avgPrice: 429, totalRevenue: 858 },
-                    { productName: 'WISE-4050E', productDescription: '4-ch DI, 4-ch DO, Modbus/TCP, WISE-PaaS', category: 'Remote I/O Modules', quantity: 3, avgPrice: 359, totalRevenue: 1077 },
-                    { productName: 'EKI-2711PSI-A', productDescription: 'Industrial 25W PoE splitter', category: 'Network Communications', quantity: 1, avgPrice: 199, totalRevenue: 199 }
-                ];
-                salesData.push(...defaultItems);
-            }
             
             return salesData;
         },
 
-        initializeIndividualPerformanceChart(record) {
-            const ctx = document.getElementById('bel-individual-performance-chart');
-            if (!ctx || !window.Chart || !record) return;
-            
-            // Destroy existing chart if it exists
-            if (this.individualPerformanceChart) {
-                this.individualPerformanceChart.destroy();
+        initializePerformanceTrendChart(record) {
+            console.log('Initializing performance trend chart for record:', record);
+            console.log('Record has monthlyData:', !!record.monthlyData);
+            if (record.monthlyData) {
+                console.log('Available years in monthlyData:', Object.keys(record.monthlyData));
             }
             
-            // Get CSS colors - Blue color palette
-            const rootStyle = getComputedStyle(document.documentElement);
-            const blueColors = {
-                primary: '#006EFF',      // Primary blue
-                light: '#025324',        // Light blue  
-                medium: '#F7C265',       // Medium blue
-                dark: '#1A365D'          // Dark blue
-            };
-            
-            // Prepare data based on the record
-            const clicksValue = record.clicks30 || 0;
-            const ordersValue = record.orders30 || 0;
-            const revenueValue = record.revenue30 || 0;
-            const convRate = clicksValue ? ((ordersValue / clicksValue) * 100) : 0;
-            
-            this.individualPerformanceChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Clicks (000s)', 'Orders', 'Revenue ($000s)', 'C2O CVR (%)'],
-                    datasets: [{
-                        label: 'Performance Metrics',
-                        data: [
-                            clicksValue / 1000, // Convert to thousands
-                            ordersValue,
-                            revenueValue / 1000, // Convert to thousands
-                            convRate
-                        ],
-                        backgroundColor: [
-                            blueColors.primary,    // Clicks
-                            blueColors.light,      // Orders  
-                            blueColors.medium,     // Revenue
-                            blueColors.dark        // C2O CVR (%)
-                        ],
-                        borderColor: [
-                            blueColors.primary,
-                            blueColors.light,
-                            blueColors.medium,
-                            blueColors.dark
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                title: (tooltipItems) => tooltipItems[0].label,
-                                label: (context) => {
-                                    const label = context.label;
-                                    let value = context.parsed.y;
-                                    
-                                    if (label.includes('Clicks')) {
-                                        return `Clicks: ${(value * 1000).toLocaleString()}`;
-                                    } else if (label.includes('Revenue')) {
-                                        return `Revenue: ${utils.formatMoney(value * 1000)}`;
-                                    } else if (label.includes('C2O CVR (%)')) {
-                                        return `Conversion Rate: ${value.toFixed(2)}%`;
-                                    } else {
-                                        return `Orders: ${value.toLocaleString()}`;
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Value'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Metrics'
-                            }
-                        }
-                    }
-                }
-            });
-        },
-
-        initializePerformanceTrendChart(record) {
             const ctx = document.getElementById('bel-performance-trend-chart');
             if (!ctx || !window.Chart || !record) return;
             
@@ -2600,57 +2480,134 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.performanceTrendChart.destroy();
             }
             
-            // Generate mock trend data for the last 6 months
-            const months = ['Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
-            const currentMonth = record.clicks30 || 0;
-            const currentOrders = record.orders30 || 0;
-            const currentRevenue = record.revenue30 || 0;
+            // Get or populate year selector
+            const yearSelector = document.getElementById('year-selector');
+            if (yearSelector) {
+                // Populate year options from data if not already populated
+                if (yearSelector.children.length === 0) {
+                    this.populateYearSelector(record, yearSelector);
+                }
+                
+                // Remove existing event listeners and add new one
+                const currentValue = yearSelector.value; // 保存當前選中的值
+                yearSelector.replaceWith(yearSelector.cloneNode(true));
+                const newYearSelector = document.getElementById('year-selector');
+                
+                // Re-populate after cloning only if needed
+                if (newYearSelector.children.length === 0) {
+                    this.populateYearSelector(record, newYearSelector);
+                }
+                
+                // 恢復選中的值
+                if (currentValue && newYearSelector.querySelector(`option[value="${currentValue}"]`)) {
+                    newYearSelector.value = currentValue;
+                } else {
+                    newYearSelector.value = this.getDefaultYear(record);
+                }
+                
+                newYearSelector.addEventListener('change', () => {
+                    this.initializePerformanceTrendChart(record);
+                    this.updatePerformanceMetrics(record); // Update performance metrics when year changes
+                });
+            }
             
-            // Generate trend data with some variation
-            const clicksTrend = months.map((_, index) => {
-                const factor = 0.7 + (index * 0.05) + (Math.random() * 0.2);
-                return Math.round(currentMonth * factor);
-            });
+            // Get selected year (default to most recent available year)
+            const selectedYear = yearSelector && yearSelector.value ? yearSelector.value : this.getDefaultYear(record);
+            console.log('Selected year:', selectedYear);
             
-            const ordersTrend = months.map((_, index) => {
-                const factor = 0.6 + (index * 0.06) + (Math.random() * 0.25);
-                return Math.round(currentOrders * factor);
-            });
+            // Generate 12 months labels
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             
-            const revenueTrend = months.map((_, index) => {
-                const factor = 0.65 + (index * 0.055) + (Math.random() * 0.22);
-                return Math.round(currentRevenue * factor);
-            });
+            // Get monthly data for the selected year
+            let clicksTrend = [];
+            let ordersTrend = [];
+            let revenueTrend = [];
+            let c2oCvrTrend = [];
+            
+            if (record.monthlyData && record.monthlyData[selectedYear]) {
+                console.log('Using monthly data for year:', selectedYear);
+                const yearData = record.monthlyData[selectedYear];
+                const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                                  'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                monthNames.forEach(monthName => {
+                    const monthData = yearData[monthName];
+                    if (monthData) {
+                        clicksTrend.push(monthData.clicks || 0);
+                        ordersTrend.push(monthData.orders || 0);
+                        revenueTrend.push(monthData.revenue || 0);
+                        // Calculate C2O CVR dynamically: orders / clicks * 100
+                        const clicks = monthData.clicks || 0;
+                        const orders = monthData.orders || 0;
+                        const c2oCvr = clicks > 0 ? (orders / clicks) * 100 : 0;
+                        c2oCvrTrend.push(Number(c2oCvr.toFixed(2)));
+                    } else {
+                        clicksTrend.push(0);
+                        ordersTrend.push(0);
+                        revenueTrend.push(0);
+                        c2oCvrTrend.push(0);
+                    }
+                });
+            } else {
+                console.log('Using fallback data - no monthly data available');
+                // Fallback: use current values for last month, zeros for others
+                const currentMonth = record.clicks30 || record.clicks || 0;
+                const currentOrders = record.orders30 || record.orders || 0;
+                const currentRevenue = record.revenue30 || record.revenue || 0;
+                const currentCvr = currentMonth > 0 ? (currentOrders / currentMonth) * 100 : 0;
+                
+                clicksTrend = Array(11).fill(0).concat([currentMonth]);
+                ordersTrend = Array(11).fill(0).concat([currentOrders]);
+                revenueTrend = Array(11).fill(0).concat([currentRevenue]);
+                c2oCvrTrend = Array(11).fill(0).concat([Number(currentCvr.toFixed(2))]);
+            }
+            
+            console.log('Chart data - Clicks:', clicksTrend);
+            console.log('Chart data - Orders:', ordersTrend);
+            console.log('Chart data - Revenue:', revenueTrend);
+            console.log('Chart data - C2O CVR:', c2oCvrTrend);
             
             this.performanceTrendChart = new Chart(ctx, {
-                type: 'line',
+                type: 'bar', // Default type for mixed chart
                 data: {
                     labels: months,
                     datasets: [
                         {
+                            type: 'bar',
                             label: 'Clicks',
                             data: clicksTrend,
-                            borderColor: '#006EFF',      // Primary blue
-                            backgroundColor: '#006EFF',
-                            tension: 0.1,
-                            fill: false
+                            backgroundColor: '#003160',      // Primary blue with transparency
+                            yAxisID: 'y'
                         },
                         {
+                            type: 'bar',
                             label: 'Orders',
                             data: ordersTrend,
-                            borderColor: '#025324',      // Light blue
-                            backgroundColor: '#025324',
-                            tension: 0.1,
-                            fill: false
+                            backgroundColor: '#336899',        // Green with transparency
+                            yAxisID: 'y1'
                         },
                         {
+                            type: 'bar',
                             label: 'Revenue',
                             data: revenueTrend,
-                            borderColor: '#F7C265',      // Medium blue
-                            backgroundColor: '#F7C265',
-                            tension: 0.1,
+                            backgroundColor: '#80A0BF',    // Yellow with transparency
+                            yAxisID: 'y2'
+                        },
+                        {
+                            type: 'line',
+                            label: 'C2O CVR (%)',
+                            data: c2oCvrTrend,
+                            borderColor: '#F39800',      
+                            backgroundColor: '#F39800',
                             fill: false,
-                            yAxisID: 'y1'
+                            tension: 0,   
+                            pointBackgroundColor: '#F39800',
+                            pointBorderColor: '#FFFFFF',
+                            pointBorderWidth: 0.5,
+                            pointRadius: 4,
+                            pointHoverRadius: 5,
+                            yAxisID: 'y3'
                         }
                     ]
                 },
@@ -2666,18 +2623,28 @@ document.addEventListener('DOMContentLoaded', () => {
                             position: 'top',
                             labels: {
                                 boxWidth: 12,
-                                padding: 15
+                                padding: 15,
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
                             }
                         },
                         tooltip: {
                             callbacks: {
-                                title: (tooltipItems) => `${tooltipItems[0].label} 2025`,
+                                title: (tooltipItems) => `${tooltipItems[0].label || 'Unknown'} ${selectedYear}`,
                                 label: (context) => {
                                     const label = context.dataset.label;
                                     const value = context.parsed.y;
                                     
                                     if (label === 'Revenue') {
                                         return `${label}: ${utils.formatMoney(value)}`;
+                                    } else if (label === 'C2O CVR (%)') {
+                                        return `${label}: ${value}%`;
+                                    } else if (label === 'Clicks') {
+                                        return `${label}: ${value.toLocaleString()}`;
+                                    } else if (label === 'Orders') {
+                                        return `${label}: ${value.toLocaleString()}`;
                                     } else {
                                         return `${label}: ${value.toLocaleString()}`;
                                     }
@@ -2689,7 +2656,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Month'
+                                text: `Month (${selectedYear})`,
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
                             }
                         },
                         y: {
@@ -2698,9 +2669,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             position: 'left',
                             title: {
                                 display: true,
-                                text: 'Clicks / Orders'
+                                text: 'Clicks',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
                             },
-                            beginAtZero: true
+                            beginAtZero: true,
+                            max: 1200,  // 調整為縮小後的範圍
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
                         },
                         y1: {
                             type: 'linear',
@@ -2708,9 +2687,34 @@ document.addEventListener('DOMContentLoaded', () => {
                             position: 'right',
                             title: {
                                 display: true,
-                                text: 'Revenue ($)'
+                                text: 'Orders',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
                             },
                             beginAtZero: true,
+                            max: 50,  // 調整為縮小後的範圍
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        },
+                        y2: {
+                            type: 'linear',
+                            display: false, // 隱藏Revenue軸但保持功能
+                            position: 'right',
+                            beginAtZero: true,
+                            max: 35000,  // 調整為縮小後的範圍
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        },
+                        y3: {
+                            type: 'linear',
+                            display: false, // 隱藏CVR軸
+                            position: 'right',
+                            beginAtZero: true,
+                            max: 5, // CVR百分比範圍保持不變
                             grid: {
                                 drawOnChartArea: false
                             }
@@ -2720,15 +2724,56 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
+        populateYearSelector(record, yearSelector) {
+            console.log('Populating year selector for record:', record.id);
+            // Clear existing options
+            yearSelector.innerHTML = '';
+            
+            let availableYears = [];
+            
+            // Get available years from monthlyData
+            if (record.monthlyData) {
+                availableYears = Object.keys(record.monthlyData).sort((a, b) => b - a); // Sort descending (newest first)
+                console.log('Available years from monthlyData:', availableYears);
+            }
+            
+            // If no monthly data available, use current year as fallback
+            if (availableYears.length === 0) {
+                const currentYear = new Date().getFullYear().toString();
+                availableYears = [currentYear];
+                console.log('Using fallback year:', currentYear);
+            }
+            
+            // Populate options
+            availableYears.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelector.appendChild(option);
+            });
+            
+            // Set default selection to most recent year
+            if (availableYears.length > 0) {
+                yearSelector.value = availableYears[0];
+                console.log('Set default year to:', availableYears[0]);
+            }
+        },
+
+        getDefaultYear(record) {
+            if (record.monthlyData) {
+                const years = Object.keys(record.monthlyData).sort((a, b) => b - a);
+                if (years.length > 0) {
+                    return years[0]; // Return most recent year
+                }
+            }
+            return new Date().getFullYear().toString(); // Fallback to current year
+        },
+
         closeModal() {
             ui.modal?.classList.remove('show');
             appState.currentReferralId = null;
             
             // Clean up charts
-            if (this.individualPerformanceChart) {
-                this.individualPerformanceChart.destroy();
-                this.individualPerformanceChart = null;
-            }
             if (this.performanceTrendChart) {
                 this.performanceTrendChart.destroy();
                 this.performanceTrendChart = null;
@@ -2750,7 +2795,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 record.level = newLevel;
                 
                 // Sync the change back to the original dashboard data
-                const dashboardRecord = APP_DATA.dashboard.leaderboard.find(x => x.id === appState.currentReferralId);
+                const dashboardRecord = APP_DATA.belProfiles.leaderboard.find(x => x.id === appState.currentReferralId);
                 if (dashboardRecord) {
                     dashboardRecord.level = newLevel;
                 }
@@ -2869,6 +2914,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             document.body.appendChild(confirmModal);
+            confirmModal.style.zIndex = ContentManager.getNextModalZIndex();
             confirmModal.classList.add('show');
 
             // Get elements
@@ -2955,7 +3001,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showCustomAlert(message, type = 'info') {
             const alertModal = document.createElement('div');
             alertModal.className = 'custom-modal-overlay';
-            alertModal.style.zIndex = '2003';
+            alertModal.style.zIndex = ContentManager.getNextModalZIndex();
             
             const iconMap = {
                 success: 'fas fa-check-circle',
@@ -3029,12 +3075,8 @@ document.addEventListener('DOMContentLoaded', () => {
         showBankingHistory() {
             if (!appState.currentReferralId) return;
 
-            // Initialize demo history if none exists
-            if (!appState.bankingHistory[appState.currentReferralId] || appState.bankingHistory[appState.currentReferralId].length === 0) {
-                this.createDemoBankingHistory();
-            }
-
-            const history = appState.bankingHistory[appState.currentReferralId] || [];
+            // Check if history exists for this user
+            const history = appState.bankingHistory?.[appState.currentReferralId] || [];
             
             if (history.length === 0) {
                 alert('No banking edit history found for this user.');
@@ -3088,7 +3130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Create a simple modal for history display
             const historyModal = document.createElement('div');
             historyModal.className = 'modal-overlay';
-            historyModal.style.zIndex = '2001';
+            historyModal.style.zIndex = ContentManager.getNextModalZIndex();
             historyModal.innerHTML = `
                 <div class="modal-content" style="max-width: 800px;">
                     <div class="modal-header">
@@ -3103,66 +3145,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.body.appendChild(historyModal);
             historyModal.classList.add('show');
-        },
-
-        createDemoBankingHistory() {
-            if (!appState.currentReferralId) return;
-
-            // Initialize banking history if not exists
-            if (!appState.bankingHistory) {
-                appState.bankingHistory = {};
-            }
-
-            if (!appState.bankingHistory[appState.currentReferralId]) {
-                appState.bankingHistory[appState.currentReferralId] = [];
-            }
-
-            // Get current user email for banking history
-            const currentRecord = AccountManagement.belData.find(x => x.id === appState.currentReferralId);
-            const userEmail = currentRecord?.email || 'maxwell.walker@advantech.com';
-
-            // Create demo history data
-            const demoHistory = [
-                {
-                    bankName: 'Chase Bank',
-                    swiftCode: 'CHASUS33',
-                    accountHolder: 'Maxwell Walker',
-                    phone: '+1-555-0123',
-                    address: '123 Main Street, New York, NY 10001, USA',
-                    timestamp: new Date('2025-08-25T14:30:00').toISOString(),
-                    changedBy: 'admin@belportal.com',
-                    changeId: 'demo-003',
-                    reason: 'Updated phone number per user request',
-                    userEmail: userEmail
-                },
-                {
-                    bankName: 'Chase Bank',
-                    swiftCode: 'CHASUS33',
-                    accountHolder: 'Maxwell Walker',
-                    phone: '+1-555-9999',
-                    address: '123 Main Street, New York, NY 10001, USA',
-                    timestamp: new Date('2025-08-15T10:15:00').toISOString(),
-                    changedBy: 'manager@belportal.com',
-                    changeId: 'demo-002',
-                    reason: 'Address verification completed',
-                    userEmail: userEmail
-                },
-                {
-                    bankName: 'Bank of America',
-                    swiftCode: 'BOFAUS3N',
-                    accountHolder: 'Maxwell J. Walker',
-                    phone: '+1-555-8888',
-                    address: '456 Oak Avenue, Boston, MA 02101, USA',
-                    timestamp: new Date('2025-07-20T16:45:00').toISOString(),
-                    changedBy: 'kyc@belportal.com',
-                    changeId: 'demo-001',
-                    reason: 'Initial banking information setup',
-                    userEmail: userEmail
-                }
-            ];
-
-            // Add demo data to history
-            appState.bankingHistory[appState.currentReferralId] = demoHistory;
         },
 
         addNote() {
@@ -3222,6 +3204,12 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmModalEl: null,
         formModalEl: null,
         historyTicketsModalEl: null,
+        currentModalZIndex: 2000, // Base z-index for modals
+        
+        getNextModalZIndex() {
+            this.currentModalZIndex += 10; // Increment by 10 to allow for intermediate elements
+            return this.currentModalZIndex;
+        },
         
         init() {
             this.setupEventListeners(); // 先設置事件監聽器
@@ -3240,7 +3228,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // 檢查是否已經有帳戶容器，如果沒有則不需要做任何事
             // HTML中已經包含了帳戶容器的結構
             const accountContainer = accountManagementRoot.querySelector('#account-container');
-            if (accountContainer && APP_DATA.dashboard?.leaderboard) {
+            const appData = window.APP_DATA || APP_DATA;
+            if (accountContainer && appData?.belProfiles?.leaderboard) {
                 this.renderAccountCards();
                 this.setupAccountFilters();
             }
@@ -3256,36 +3245,238 @@ document.addEventListener('DOMContentLoaded', () => {
             // Real-time filtering on input change
             if (nameInput) {
                 nameInput.addEventListener('input', () => {
+                    this.resetAccountPagination();
                     this.renderCurrentView();
                 });
             }
 
             if (idInput) {
                 idInput.addEventListener('input', () => {
+                    this.resetAccountPagination();
                     this.renderCurrentView();
                 });
             }
 
             if (levelSelect) {
                 levelSelect.addEventListener('change', () => {
+                    this.resetAccountPagination();
                     this.renderCurrentView();
                 });
             }
 
             if (regionSelect) {
                 regionSelect.addEventListener('change', () => {
+                    this.resetAccountPagination();
                     this.renderCurrentView();
                 });
             }
 
             if (sortSelect) {
                 sortSelect.addEventListener('change', () => {
+                    this.resetAccountPagination();
                     this.renderCurrentView();
                 });
             }
 
+            // Setup search suggestions for Account Management
+            this.setupAccountSearchSuggestions();
+
             // Setup View Switcher
             this.setupViewSwitcher();
+
+            // Setup pagination
+            this.setupAccountPagination();
+        },
+
+        resetAccountPagination() {
+            appState.accountGridPage = 1;
+            appState.accountListPage = 1;
+        },
+
+        setupAccountSearchSuggestions() {
+            // Setup for Name search
+            this.setupAccountSearchForField('account-f-name', 'account-search-suggestions-name', 'name');
+            // Setup for Referral ID search
+            this.setupAccountSearchForField('account-f-referral-id', 'account-search-suggestions-id', 'id');
+        },
+
+        setupAccountSearchForField(inputId, suggestionsId, searchField) {
+            const searchInput = document.getElementById(inputId);
+            const suggestionsContainer = document.getElementById(suggestionsId);
+            
+            if (!searchInput || !suggestionsContainer) return;
+
+            let selectedIndex = -1;
+            let suggestions = [];
+
+            // Get BEL data for suggestions
+            const getBelData = () => {
+                const appData = window.APP_DATA || APP_DATA;
+                if (!appData?.belProfiles?.leaderboard) return [];
+                
+                return appData.belProfiles.leaderboard.map(leader => ({
+                    name: leader.name,
+                    id: leader.id,
+                    level: leader.level
+                }));
+            };
+
+            // Input event for showing suggestions
+            searchInput.addEventListener('input', utils.debounce((e) => {
+                const query = e.target.value.trim().toLowerCase();
+                selectedIndex = -1;
+                
+                if (query.length === 0) {
+                    this.hideAccountSuggestions(suggestionsContainer);
+                    return;
+                }
+
+                const belData = getBelData();
+                
+                // Find matching records based on search field
+                if (searchField === 'name') {
+                    suggestions = belData
+                        .filter(record => record.name.toLowerCase().includes(query))
+                        .slice(0, 8) // Limit to 8 suggestions
+                        .map(record => ({
+                            name: record.name,
+                            id: record.id,
+                            displayText: record.name,
+                            searchField: 'name'
+                        }));
+                } else if (searchField === 'id') {
+                    suggestions = belData
+                        .filter(record => record.id.toLowerCase().includes(query))
+                        .slice(0, 8) // Limit to 8 suggestions
+                        .map(record => ({
+                            name: record.name,
+                            id: record.id,
+                            displayText: `${record.id} - ${record.name}`,
+                            searchField: 'id'
+                        }));
+                }
+
+                if (suggestions.length > 0) {
+                    this.showAccountSuggestions(suggestions, query, suggestionsContainer, searchInput);
+                } else {
+                    this.hideAccountSuggestions(suggestionsContainer);
+                }
+            }, 150));
+
+            // Keyboard navigation
+            searchInput.addEventListener('keydown', (e) => {
+                const suggestionItems = suggestionsContainer.querySelectorAll('.search-suggestion-item');
+                
+                switch (e.key) {
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        selectedIndex = Math.min(selectedIndex + 1, suggestionItems.length - 1);
+                        this.highlightAccountSuggestion(suggestionItems, selectedIndex);
+                        break;
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        selectedIndex = Math.max(selectedIndex - 1, -1);
+                        this.highlightAccountSuggestion(suggestionItems, selectedIndex);
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        if (selectedIndex >= 0 && suggestionItems[selectedIndex]) {
+                            this.selectAccountSuggestion(suggestions[selectedIndex], searchInput);
+                        } else {
+                            // Apply filter with current input value - trigger rendering
+                            this.resetAccountPagination();
+                            this.renderCurrentView();
+                        }
+                        break;
+                    case 'Escape':
+                        this.hideAccountSuggestions(suggestionsContainer);
+                        searchInput.blur();
+                        break;
+                }
+            });
+
+            // Click outside to hide suggestions
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                    this.hideAccountSuggestions(suggestionsContainer);
+                }
+            });
+
+            // Focus event to show suggestions if there's a value
+            searchInput.addEventListener('focus', () => {
+                if (searchInput.value.trim().length > 0) {
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+            });
+        },
+
+        showAccountSuggestions(suggestions, query, suggestionsContainer, searchInput) {
+            if (!suggestionsContainer) return;
+
+            const html = suggestions.map((suggestion, index) => {
+                if (suggestion.searchField === 'id') {
+                    // For Referral ID search: Black ID, gray name
+                    const highlightedId = this.highlightAccountMatch(suggestion.id, query);
+                    return `
+                        <div class="search-suggestion-item" data-index="${index}">
+                            <div class="suggestion-id-main">${highlightedId}</div>
+                            <div class="suggestion-name-sub">${suggestion.name}</div>
+                        </div>
+                    `;
+                } else {
+                    // For name search: use original format
+                    const highlightedName = this.highlightAccountMatch(suggestion.name, query);
+                    return `
+                        <div class="search-suggestion-item" data-index="${index}">
+                            <div class="suggestion-content">${highlightedName}</div>
+                        </div>
+                    `;
+                }
+            }).join('');
+
+            suggestionsContainer.innerHTML = html;
+            suggestionsContainer.classList.add('show');
+
+            // Add click listeners to suggestion items
+            suggestionsContainer.querySelectorAll('.search-suggestion-item').forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    this.selectAccountSuggestion(suggestions[index], searchInput);
+                });
+            });
+        },
+
+        hideAccountSuggestions(suggestionsContainer) {
+            if (suggestionsContainer) {
+                suggestionsContainer.classList.remove('show');
+                suggestionsContainer.innerHTML = '';
+            }
+        },
+
+        highlightAccountSuggestion(items, index) {
+            items.forEach((item, i) => {
+                item.classList.toggle('highlighted', i === index);
+            });
+        },
+
+        selectAccountSuggestion(suggestion, searchInput) {
+            if (searchInput) {
+                if (suggestion.searchField === 'name') {
+                    searchInput.value = suggestion.name;
+                } else if (suggestion.searchField === 'id') {
+                    searchInput.value = suggestion.id;
+                }
+                const suggestionsContainer = searchInput.nextElementSibling;
+                this.hideAccountSuggestions(suggestionsContainer);
+                this.resetAccountPagination();
+                this.renderCurrentView();
+            }
+        },
+
+        highlightAccountMatch(text, query) {
+            if (!query) return text;
+            
+            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<mark style="background-color: var(--ds-color-primary-light-30); font-weight: var(--fw-semibold);">$1</mark>');
         },
 
         setupViewSwitcher() {
@@ -3341,7 +3532,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderAccountCards() {
             const container = document.getElementById('account-container');
-            if (!container || !APP_DATA.dashboard?.leaderboard) return;
+            const appData = window.APP_DATA || APP_DATA;
+            
+            if (!container || !appData?.belProfiles?.leaderboard) {
+                console.log('Account Management: Missing container or belProfiles data');
+                return;
+            }
 
             // Get filter values
             const nameFilter = document.getElementById('account-f-name')?.value.toLowerCase() || '';
@@ -3372,17 +3568,21 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             // 使用現有的 leaderboard 資料來渲染帳戶卡片
-            let accountData = APP_DATA.dashboard.leaderboard.map(account => {
+            let accountData = appData.belProfiles.leaderboard.map(account => {
                 const country = getCountryFromId(account.id);
+                
+                // Calculate yearly cumulative data (defaults to 2025)
+                const yearlyData = AccountManagement.calculateYearlyData(account);
+                
                 return {
                     referralId: account.id,
                     name: account.name,
                     level: account.level,
-                    clicks: account.clicks,
-                    orders: account.orders,
-                    revenue: account.revenue,
-                    c20cvr: parseFloat(account.convRate.replace('%', '')),
-                    aov: account.aov,
+                    clicks: yearlyData.clicks,
+                    orders: yearlyData.orders,
+                    revenue: yearlyData.revenue,
+                    c20cvr: yearlyData.clicks > 0 ? parseFloat(((yearlyData.orders / yearlyData.clicks) * 100).toFixed(2)) : 0,
+                    aov: yearlyData.orders > 0 ? yearlyData.revenue / yearlyData.orders : 0,
                     email: account.email,
                     country: country,
                     region: utils.getRegionFromCountry(country)
@@ -3419,8 +3619,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'id':
                         return a.referralId.localeCompare(b.referralId);
                     case 'level':
-                        // Sort by level hierarchy: Leader > Explorer > Enabler > Builder
-                        const levelOrder = { 'Leader': 4, 'Explorer': 3, 'Enabler': 2, 'Builder': 1 };
+                        // Sort by level hierarchy: Leader > Exploder > Enabler > Builder
+                        const levelOrder = { 'Leader': 4, 'Exploder': 3, 'Enabler': 2, 'Builder': 1 };
                         return (levelOrder[b.level] || 0) - (levelOrder[a.level] || 0);
                     case 'orders':
                         return b.orders - a.orders; // Descending order
@@ -3433,15 +3633,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            // Apply pagination
+            const totalCards = accountData.length;
+            const startIndex = (appState.accountGridPage - 1) * appState.accountGridRowsPerPage;
+            const endIndex = Math.min(startIndex + appState.accountGridRowsPerPage, totalCards);
+            const paginatedData = accountData.slice(startIndex, endIndex);
+
             container.innerHTML = '';
             
             // Show message if no results
-            if (accountData.length === 0) {
+            if (totalCards === 0) {
                 container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #666;">No accounts found matching the current filters.</div>';
+                this.updateAccountGridPaginationUI(0, 0, 0);
                 return;
             }
 
-            accountData.forEach(account => {
+            paginatedData.forEach(account => {
                 const card = document.createElement('div');
                 card.className = 'bel-acct-mgmt-card flex flex-col space-y-4';
                 card.style.cursor = 'pointer';
@@ -3475,7 +3682,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span class="bel-acct-mgmt-text-xs-var">Orders</span>
                             </span>
                             <span class="flex items-center space-x-1">
-                                <span class="bel-acct-mgmt-text-cvr-var">${account.c20cvr}%</span>
+                                <span class="bel-acct-mgmt-text-cvr-var">${account.c20cvr.toFixed(2)}%</span>
                                 <span class="bel-acct-mgmt-text-xs-var">C2O CVR</span>
                             </span>
                         </div>
@@ -3492,6 +3699,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 container.appendChild(card);
             });
 
+            // Update pagination UI
+            this.updateAccountGridPaginationUI(totalCards, startIndex, endIndex);
+
             // 添加點擊事件處理
             this.setupAccountCardEvents();
         },
@@ -3503,7 +3713,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 防止子元素的事件冒泡（如email鏈接）
                     const accountId = card.getAttribute('data-account-id');
                     // 觸發現有的BEL詳情模態框
-                    const accountData = APP_DATA.dashboard.leaderboard.find(account => account.id === accountId);
+                    const accountData = APP_DATA.belProfiles.leaderboard.find(account => account.id === accountId);
                     if (accountData) {
                         // 使用現有的模態框邏輯
                         BELModal.openModal(accountData.id);
@@ -3514,7 +3724,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderAccountList() {
             const tableBody = document.querySelector('#account-list-table tbody');
-            if (!tableBody || !APP_DATA.dashboard?.leaderboard) return;
+            const appData = window.APP_DATA || APP_DATA;
+            if (!tableBody || !appData?.belProfiles?.leaderboard) return;
 
             // Get filter values (same logic as grid view)
             const nameFilter = document.getElementById('account-f-name')?.value.toLowerCase() || '';
@@ -3545,17 +3756,21 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             // 使用現有的 leaderboard 資料來渲染帳戶列表
-            let accountData = APP_DATA.dashboard.leaderboard.map(account => {
+            let accountData = appData.belProfiles.leaderboard.map(account => {
                 const country = getCountryFromId(account.id);
+                
+                // Calculate yearly cumulative data (defaults to 2025)
+                const yearlyData = AccountManagement.calculateYearlyData(account);
+                
                 return {
                     referralId: account.id,
                     name: account.name,
                     level: account.level,
-                    clicks: account.clicks,
-                    orders: account.orders,
-                    revenue: account.revenue,
-                    c20cvr: parseFloat(account.convRate.replace('%', '')),
-                    aov: account.aov,
+                    clicks: yearlyData.clicks,
+                    orders: yearlyData.orders,
+                    revenue: yearlyData.revenue,
+                    c20cvr: yearlyData.clicks > 0 ? parseFloat(((yearlyData.orders / yearlyData.clicks) * 100).toFixed(2)) : 0,
+                    aov: yearlyData.orders > 0 ? yearlyData.revenue / yearlyData.orders : 0,
                     email: account.email,
                     country: country,
                     region: utils.getRegionFromCountry(country)
@@ -3592,8 +3807,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'id':
                         return a.referralId.localeCompare(b.referralId);
                     case 'level':
-                        // Sort by level hierarchy: Leader > Explorer > Enabler > Builder
-                        const levelOrder = { 'Leader': 4, 'Explorer': 3, 'Enabler': 2, 'Builder': 1 };
+                        // Sort by level hierarchy: Leader > Exploder > Enabler > Builder
+                        const levelOrder = { 'Leader': 4, 'Exploder': 3, 'Enabler': 2, 'Builder': 1 };
                         return (levelOrder[b.level] || 0) - (levelOrder[a.level] || 0);
                     case 'orders':
                         return b.orders - a.orders; // Descending order
@@ -3612,15 +3827,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            // Apply pagination
+            const totalRows = accountData.length;
+            const startIndex = (appState.accountListPage - 1) * appState.accountListRowsPerPage;
+            const endIndex = Math.min(startIndex + appState.accountListRowsPerPage, totalRows);
+            const paginatedData = accountData.slice(startIndex, endIndex);
+
             tableBody.innerHTML = '';
             
             // Show message if no results
-            if (accountData.length === 0) {
+            if (totalRows === 0) {
                 tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 2rem; color: #666;">No accounts found matching the current filters.</td></tr>';
+                this.updateAccountListPaginationUI(0, 0, 0);
                 return;
             }
 
-            accountData.forEach(account => {
+            paginatedData.forEach(account => {
                 const row = document.createElement('tr');
                 row.style.cursor = 'pointer';
                 row.setAttribute('data-account-id', account.referralId);
@@ -3632,8 +3854,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td style="text-align: right;">${account.clicks.toLocaleString()}</td>
                     <td style="text-align: right;">${account.orders.toLocaleString()}</td>
                     <td style="text-align: right;">$${account.revenue.toLocaleString()}</td>
-                    <td style="text-align: right;">${account.c20cvr.toFixed(1)}%</td>
-                    <td style="text-align: right;">${account.aov}</td>
+                    <td style="text-align: right;">${account.c20cvr.toFixed(2)}%</td>
+                    <td style="text-align: right;">${utils.formatMoney(account.aov, 2)}</td>
                     <td>${account.region}</td>
                     <td>${account.country}</td>
                 `;
@@ -3641,8 +3863,125 @@ document.addEventListener('DOMContentLoaded', () => {
                 tableBody.appendChild(row);
             });
 
+            // Update pagination UI
+            this.updateAccountListPaginationUI(totalRows, startIndex, endIndex);
+
             // 添加點擊事件處理
             this.setupAccountListEvents();
+        },
+
+        updateAccountGridPaginationUI(total, startIndex, endIndex) {
+            const rangeLabel = document.getElementById('account-grid-range-label');
+            const prevBtn = document.getElementById('account-grid-prev-page');
+            const nextBtn = document.getElementById('account-grid-next-page');
+            const rowsSelect = document.getElementById('account-grid-rows-per-page');
+
+            if (rangeLabel) {
+                const from = total === 0 ? 0 : startIndex + 1;
+                const to = endIndex;
+                rangeLabel.textContent = `${from}–${to} of ${total}`;
+            }
+
+            if (prevBtn) {
+                prevBtn.disabled = appState.accountGridPage === 1;
+            }
+
+            if (nextBtn) {
+                nextBtn.disabled = endIndex >= total;
+            }
+
+            if (rowsSelect) {
+                const availableOptions = ['6', '12', '24'];
+                const currentValue = appState.accountGridRowsPerPage.toString();
+                rowsSelect.value = availableOptions.includes(currentValue) ? currentValue : '12';
+            }
+        },
+
+        updateAccountListPaginationUI(total, startIndex, endIndex) {
+            const rangeLabel = document.getElementById('account-list-range-label');
+            const prevBtn = document.getElementById('account-list-prev-page');
+            const nextBtn = document.getElementById('account-list-next-page');
+            const rowsSelect = document.getElementById('account-list-rows-per-page');
+
+            if (rangeLabel) {
+                const from = total === 0 ? 0 : startIndex + 1;
+                const to = endIndex;
+                rangeLabel.textContent = `${from}–${to} of ${total}`;
+            }
+
+            if (prevBtn) {
+                prevBtn.disabled = appState.accountListPage === 1;
+            }
+
+            if (nextBtn) {
+                nextBtn.disabled = endIndex >= total;
+            }
+
+            if (rowsSelect) {
+                const availableOptions = ['5', '10', '20'];
+                const currentValue = appState.accountListRowsPerPage.toString();
+                rowsSelect.value = availableOptions.includes(currentValue) ? currentValue : '10';
+            }
+        },
+
+        setupAccountPagination() {
+            // Grid view pagination
+            const gridPrevBtn = document.getElementById('account-grid-prev-page');
+            const gridNextBtn = document.getElementById('account-grid-next-page');
+            const gridRowsSelect = document.getElementById('account-grid-rows-per-page');
+
+            if (gridPrevBtn) {
+                gridPrevBtn.addEventListener('click', () => {
+                    if (appState.accountGridPage > 1) {
+                        appState.accountGridPage--;
+                        this.renderAccountCards();
+                    }
+                });
+            }
+
+            if (gridNextBtn) {
+                gridNextBtn.addEventListener('click', () => {
+                    appState.accountGridPage++;
+                    this.renderAccountCards();
+                });
+            }
+
+            if (gridRowsSelect) {
+                gridRowsSelect.addEventListener('change', (e) => {
+                    appState.accountGridRowsPerPage = parseInt(e.target.value, 10);
+                    appState.accountGridPage = 1; // Reset to first page
+                    this.renderAccountCards();
+                });
+            }
+
+            // List view pagination
+            const listPrevBtn = document.getElementById('account-list-prev-page');
+            const listNextBtn = document.getElementById('account-list-next-page');
+            const listRowsSelect = document.getElementById('account-list-rows-per-page');
+
+            if (listPrevBtn) {
+                listPrevBtn.addEventListener('click', () => {
+                    if (appState.accountListPage > 1) {
+                        appState.accountListPage--;
+                        this.renderAccountList();
+                    }
+                });
+            }
+
+            if (listNextBtn) {
+                listNextBtn.addEventListener('click', () => {
+                    appState.accountListPage++;
+                    this.renderAccountList();
+                });
+            }
+
+            if (listRowsSelect) {
+                listRowsSelect.addEventListener('change', (e) => {
+                    appState.accountListRowsPerPage = parseInt(e.target.value, 10);
+                    appState.accountListPage = 1; // Reset to first page
+                    this.renderAccountList();
+                });
+            }
         },
 
         setupAccountListEvents() {
@@ -3654,7 +3993,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     const accountId = row.getAttribute('data-account-id');
                     // 觸發現有的BEL詳情模態框
-                    const accountData = APP_DATA.dashboard.leaderboard.find(account => account.id === accountId);
+                    const accountData = APP_DATA.belProfiles.leaderboard.find(account => account.id === accountId);
                     if (accountData) {
                         BELModal.openModal(accountData.id);
                     }
@@ -3671,7 +4010,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="bel-panel" id="payouts-history-panel">
                     <div class="panel-header">
                         <h3 style="margin:0;">Payout History 
-                            <span class="bel-badge approved" style="margin-left:4px;">${APP_DATA.payoutsAndOrders.payouts.payoutDayMessage}</span>
+                            <span class="bel-badge approved" style="margin-left:4px;">${APP_DATA.payouts.payoutDayMessage}</span>
                         </h3>
                     </div>
                     <div class="scrollable-table-container">
@@ -3743,7 +4082,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!contentRoot) return;
 
             contentRoot.innerHTML = `
-                <h1 class="bel-h1">Publish Resource</h1>
+                <h1 class="bel-h1">Publish Resources</h1>
                 <div class="bel-panel" id="content-mgmt-panel">
                     <div class="panel-header">
                         <h3 style="margin:0;">Content Management</h3>
@@ -3840,7 +4179,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const tableBody = document.querySelector('#payout-history-table tbody');
             if (!tableBody) return;
             
-            const payouts = APP_DATA.payoutsAndOrders.payouts.history;
+            const payouts = APP_DATA.payouts.history;
             tableBody.innerHTML = payouts.map(payout => `
                 <tr>
                     <td>${payout.date}</td>
@@ -4186,6 +4525,7 @@ document.addEventListener('DOMContentLoaded', () => {
         openHistoryTicketsModal() {
             const modal = this.ensureHistoryTicketsModal();
             this.renderHistoryTicketsModal();
+            modal.style.zIndex = this.getNextModalZIndex();
             modal.classList.add('show');
         },
 
@@ -4303,7 +4643,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         openPayoutModal(payoutDate) {
-            const payout = APP_DATA.payoutsAndOrders.payouts.history.find(p => p.date === payoutDate);
+            const payout = APP_DATA.payouts.history.find(p => p.date === payoutDate);
             if (!payout) return;
 
             const modal = this.ensurePayoutModal();
@@ -4332,6 +4672,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 TableUtils.makeTableSortable(table);
             }
 
+            modal.style.zIndex = this.getNextModalZIndex();
             modal.classList.add('show');
         },
 
@@ -4342,56 +4683,53 @@ document.addEventListener('DOMContentLoaded', () => {
             wrap.className = 'modal-overlay';
             wrap.id = 'support-ticket-modal';
             wrap.innerHTML = `
-                <div class="modal-content" style="max-width:600px;">
-                    <div class="modal-header">
-                        <h3 style="margin:0;">Support Ticket</h3>
-                        <button class="close-button" aria-label="Close">&times;</button>
+                <div class="modal-content" style="max-width:700px;">
+                    <div class="modal-header" style="border-bottom: none; padding-bottom: 8px;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <h3 id="sup-modal-title" style="margin:0; font-size: 1.4rem; font-weight: 600;">Support Ticket</h3>
+                                <span id="sup-modal-status"></span>
+                            </div>
+                            <div id="sup-modal-ticket-num" style="color: #666; font-size: 0.9rem; margin-top: 4px;">Ticket #</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <button class="close-button" aria-label="Close">&times;</button>
+                        </div>
                     </div>
-                    <div class="modal-body-grid" style="grid-template-columns: 1fr;">
+                    
+                    <hr style="margin-bottom: 16px; border: none; border-top: 1px solid #e5e7eb; opacity: 0.6;">
+                    
+                    <div class="modal-body-grid" style="grid-template-columns: 1fr; padding: 0 0px 0px;">
                         <div>
-                            <div class="bel-grid-container grid-cols-2" style="margin-bottom:12px;">
-                                <div class="bel-card" style="padding:4px;">
-                                    <div class="bel-card-title">Ticket #</div>
-                                    <div id="sup-t-id" class="bel-card-value" style="font-size:1.1rem;"></div>
-                                </div>
-                                <div class="bel-card" style="padding:4px;">
-                                    <div class="bel-card-title">Status</div>
-                                    <div id="sup-t-status" class="bel-card-value" style="font-size:1.1rem;"></div>
-                                </div>
-                            </div>
-
-                            <div class="bel-grid-container grid-cols-2" style="margin-bottom:12px;">
-                                <div class="bel-card" style="padding:4px;">
-                                    <div class="bel-card-title">BEL Name</div>
-                                    <div id="sup-bel-name" class="bel-card-value" style="font-size:1.1rem; display: flex; align-items: center; gap: 10px;"></div>
-                                </div>
-                                <div class="bel-card" style="padding:4px;">
-                                    <div class="bel-card-title">Referral ID</div>
-                                    <div id="sup-referral-id" class="bel-card-value" style="font-size:1.1rem;"></div>
+                            <!-- Question Message Box -->
+                            <div class="support-question-box">
+                                <div class="support-bel-profile">
+                                    <div id="sup-bel-avatar" class="support-bel-avatar"></div>
+                                    <div class="support-profile-info">
+                                        <div class="support-profile-header">
+                                            <strong id="sup-bel-name" class="support-bel-name"></strong>
+                                            <span id="sup-referral-id" class="support-referral-id"></span>
+                                        </div>
+                                        <div id="sup-message" class="support-message"></div>
+                                        <div id="sup-message-time" class="support-reply-meta" style="margin-top: 8px;"></div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="bel-card" style="padding:4px; margin-bottom:12px;">
-                                <div class="bel-card-title">Subject</div>
-                                <div id="sup-subject" style="font-weight:400;"></div>
+                            <!-- Replies Section (only for Closed tickets) -->
+                            <div id="conversation-title" class="support-conversation-section" style="display: none;">
+                                <div id="sup-replies" class="support-replies-container"></div>
                             </div>
 
-                            <div class="bel-card" style="padding:4px; margin-bottom:12px;">
-                                <div class="bel-card-title">Message</div>
-                                <div id="sup-message" class="small-text"></div>
-                            </div>
-
-                            <div class="bel-card" style="padding:4px; margin-bottom:12px;">
-                                <div class="bel-card-title">Replies</div>
-                                <div id="sup-replies" class="small-text" style="margin-top:6px; display:flex; flex-direction:column; gap:8px;"></div>
-                            </div>
-
-                            <div class="bel-card" id="sup-reply-section" style="padding:4px;">
-                                <div class="bel-card-title">Reply</div>
-                                <textarea id="sup-reply-input" placeholder="Type your reply..." style="width:100%; min-height:90px; border:1px solid var(--bel-border-color); border-radius:4px; padding:8px; margin-top:6px;"></textarea>
-                                <div class="modal-actions" style="margin-top:10px; display:flex; flex-direction:row; justify-content:space-between; gap:8px;">
-                                    <button class="bel-btn danger" id="sup-case-close-btn" style="width:100%;background-color: var(--ds-color-success); color: white;"><i class="fas fa-times-circle"></i> Case Close</button>
-                                    <button class="bel-btn primary" id="sup-send-btn" style="width:100%;"><i class="fas fa-paper-plane"></i> Send</button>
+                            <!-- Reply Section (only for Open tickets) -->
+                            <div id="sup-reply-section" class="support-reply-section">
+                                <div class="support-reply-form-header">
+                                    <i class="fas fa-reply" style="color: #6b7280;"></i>
+                                    <span class="support-reply-form-title">Your Reply</span>
+                                </div>
+                                <textarea id="sup-reply-input" placeholder="Type your reply..." class="support-reply-textarea"></textarea>
+                                <div class="support-reply-actions">
+                                    <button class="bel-btn primary" id="sup-send-btn" style="flex: 1;"><i class="fas fa-reply"></i> Send Reply</button>
                                 </div>
                             </div>
                         </div>
@@ -4405,27 +4743,6 @@ document.addEventListener('DOMContentLoaded', () => {
             this.supportModalEl.querySelector('.close-button')?.addEventListener('click', close);
             this.supportModalEl.addEventListener('click', (e) => { 
                 if (e.target === this.supportModalEl) close(); 
-            });
-
-            // Case close functionality
-            this.supportModalEl.querySelector('#sup-case-close-btn')?.addEventListener('click', () => {
-                const ticketId = this.supportModalEl.dataset.ticketId;
-                const ticket = APP_DATA.contactSupport.tickets.find(t => t.ticketNumber === ticketId);
-                if (!ticket) return;
-                
-                // Confirm case close
-                if (confirm('Are you sure you want to close this case? This action cannot be undone.')) {
-                    ticket.status = 'Closed';
-                    // Add a system reply indicating case closure
-                    ticket.replies = ticket.replies || [];
-                    ticket.replies.push({ 
-                        time: new Date().toISOString().slice(0, 16).replace('T', ' '), 
-                        text: 'Case closed by admin.' 
-                    });
-                    
-                    this.fillSupportModal(ticket);
-                    this.renderContactSupportTickets();
-                }
             });
 
             // send reply functionality
@@ -4447,7 +4764,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     text: txt 
                 });
                 
-                if (ticket.status !== 'Closed') ticket.status = 'Replied';
+                // 回覆後直接關閉ticket
+                ticket.status = 'Closed';
                 textarea.value = '';
                 this.fillSupportModal(ticket);
                 this.renderContactSupportTickets();
@@ -4459,29 +4777,65 @@ document.addEventListener('DOMContentLoaded', () => {
         fillSupportModal(ticket) {
             const modal = this.ensureSupportModal();
             modal.dataset.ticketId = ticket.ticketNumber;
-            modal.querySelector('#sup-t-id').textContent = ticket.ticketNumber;
-            modal.querySelector('#sup-t-status').innerHTML = `<span class="bel-badge ${ticket.status === 'Open' ? 'pending' : ticket.status === 'Resolved' ? 'completed' : ticket.status === 'Closed' ? 'completed' : 'processing'}">${ticket.status}</span>`;
             
-            // Create BEL name with avatar
-            const belNameContainer = modal.querySelector('#sup-bel-name');
-            const avatarHTML = utils.generateAvatarHTML(ticket.belName, ticket.referralId, 30);
-            belNameContainer.innerHTML = `<span>${ticket.belName}</span>`;
+            // Update modal title and ticket number
+            modal.querySelector('#sup-modal-title').textContent = ticket.subject || 'Support Ticket';
+            modal.querySelector('#sup-modal-ticket-num').textContent = ticket.ticketNumber;
             
+            // Update status badge
+            modal.querySelector('#sup-modal-status').innerHTML = `<span class="bel-badge ${ticket.status === 'Open' ? 'pending' : 'completed'}">${ticket.status}</span>`;
+            
+            // Create BEL profile with avatar
+            const avatarContainer = modal.querySelector('#sup-bel-avatar');
+            const avatarHTML = utils.generateAvatarHTML(ticket.belName, ticket.referralId, 40);
+            avatarContainer.innerHTML = avatarHTML;
+            
+            modal.querySelector('#sup-bel-name').textContent = ticket.belName;
             modal.querySelector('#sup-referral-id').innerHTML = `<a href="#" class="referral-id-link" data-referral-id="${ticket.referralId}">${ticket.referralId}</a>`;
-            modal.querySelector('#sup-subject').textContent = ticket.subject;
             modal.querySelector('#sup-message').textContent = ticket.message || 'No message provided.';
-
-            const list = modal.querySelector('#sup-replies');
-            list.innerHTML = (ticket.replies && ticket.replies.length)
-                ? ticket.replies.map(r => `<div class="note-item"><p>${r.text}</p><span>${r.time}</span></div>`).join('')
-                : '<p class="text-muted">No replies yet.</p>';
             
-            // Show/hide reply section based on ticket status
-            const replySection = modal.querySelector('#sup-reply-section');
-            if (ticket.status === 'Closed') {
-                replySection.style.display = 'none';
+            // 添加用戶問題的時間戳
+            const messageTimeElement = modal.querySelector('#sup-message-time');
+            if (messageTimeElement) {
+                const questionTime = ticket.questionTime || '—'; // 從ticket中獲取或顯示空值
+                // 從BEL profiles leaderboard中獲取BEL的實際email
+                const appData = window.APP_DATA || APP_DATA;
+                const belProfile = appData?.belProfiles?.leaderboard?.find(bel => bel.id === ticket.referralId);
+                const belEmail = belProfile ? belProfile.email : `${ticket.belName.toLowerCase().replace(' ', '.')}@email.com`;
+                messageTimeElement.textContent = `${questionTime} • ${belEmail}`;
+            }
+
+            // Update replies section - 根據邏輯調整
+            const repliesContainer = modal.querySelector('#sup-replies');
+            const conversationTitle = modal.querySelector('#conversation-title');
+            
+            if (ticket.status === 'Closed' && ticket.replies && ticket.replies.length) {
+                // Closed tickets show conversation history
+                if (conversationTitle) conversationTitle.style.display = 'block';
+                repliesContainer.innerHTML = ticket.replies.map(reply => `
+                    <div class="support-reply-item">
+                        <div class="support-reply-header">
+                            <i class="fas fa-user-circle" style="color: #6b7280;"></i>
+                            <span style="font-weight: 600; color: #374151;">Admin Reply</span>
+                        </div>
+                        <div class="support-reply-content">${reply.text}</div>
+                        <div class="support-reply-meta">
+                            ${reply.time} • admin@advantech.com
+                        </div>
+                    </div>
+                `).join('');
             } else {
+                // Open tickets and other statuses don't show conversation history
+                if (conversationTitle) conversationTitle.style.display = 'none';
+                repliesContainer.innerHTML = '';
+            }
+            
+            // Show/hide reply section - Open tickets always show reply section
+            const replySection = modal.querySelector('#sup-reply-section');
+            if (ticket.status === 'Open') {
                 replySection.style.display = 'block';
+            } else {
+                replySection.style.display = 'none';
             }
         },
 
@@ -4495,6 +4849,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const modal = this.ensureSupportModal();
             this.fillSupportModal(ticket);
+            modal.style.zIndex = this.getNextModalZIndex();
             modal.classList.add('show');
         },
 
@@ -4603,7 +4958,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     category: cat,
                     title,
                     body,
-                    link
+                    link: link || '—'
                 };
 
                 // Add to announcements data
@@ -4691,7 +5046,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Event delegation for send announcement button (new)
                 const announcementBtnNew = e.target.closest('#send-announcement-btn-new');
                 if (announcementBtnNew) {
-                    this.ensureAnnouncementModal().classList.add('show');
+                    const modal = this.ensureAnnouncementModal();
+                    modal.style.zIndex = this.getNextModalZIndex();
+                    modal.classList.add('show');
                     return;
                 }
 
@@ -4754,6 +5111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         openConfirmModal(assetId) {
             const modal = this.ensureConfirmModal();
             modal.setAttribute('data-asset-id', assetId);
+            modal.style.zIndex = this.getNextModalZIndex();
             modal.classList.add('show');
         },
 
@@ -4793,7 +5151,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
                                 <label>Picture <span style="color: #666; font-size: 0.9em;">(Recommended: 1200 × 740 pixels)</span></label>
-                                <div class="picture-upload-area" style="border: 2px dashed var(--bel-border-color); border-radius: 8px; padding: 20px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease;" onclick="document.getElementById('asset-picture').click();">
+                                <div class="picture-upload-area" style="border: 2px dashed var(--bel-border-color); border-radius: 4px; padding: 20px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease;" onclick="document.getElementById('asset-picture').click();">
                                     <div class="upload-icon" style="font-size: 48px; color: #ccc; margin-bottom: 10px;">
                                         <i class="fas fa-cloud-upload-alt"></i>
                                     </div>
@@ -4980,6 +5338,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            modal.style.zIndex = this.getNextModalZIndex();
             modal.classList.add('show');
         },
 
@@ -5150,13 +5509,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         if (!cellA || !cellB) return 0;
                         
-                        let valA = cellA.textContent.trim();
-                        let valB = cellB.textContent.trim();
+                        // Check for data-sort-value attribute first, then fall back to textContent
+                        let valA = cellA.getAttribute('data-sort-value') || cellA.textContent.trim();
+                        let valB = cellB.getAttribute('data-sort-value') || cellB.textContent.trim();
                         
                         if (dataType === 'number') {
-                            // Extract numbers from text (handle currency, percentages, etc.)
-                            valA = parseFloat(valA.replace(/[^0-9.-]/g, '')) || 0;
-                            valB = parseFloat(valB.replace(/[^0-9.-]/g, '')) || 0;
+                            // If we have data-sort-value, use it directly as number, otherwise extract from text
+                            if (cellA.getAttribute('data-sort-value')) {
+                                valA = parseFloat(valA) || 0;
+                                valB = parseFloat(valB) || 0;
+                            } else {
+                                // Extract numbers from text (handle currency, percentages, etc.)
+                                valA = parseFloat(valA.replace(/[^0-9.-]/g, '')) || 0;
+                                valB = parseFloat(valB.replace(/[^0-9.-]/g, '')) || 0;
+                            }
                         } else if (dataType === 'date') {
                             valA = new Date(valA);
                             valB = new Date(valB);
@@ -5185,33 +5551,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    /* ========================================================================
-       APPLICATION INITIALIZATION
-       ======================================================================== */
-    async function initializeApplication() {
-        try {
-            // For now, skip external data loading and use built-in APP_DATA
-            console.log('Using built-in APP_DATA for initialization');
-            
-            // Initialize all modules
-            Navigation.init();
-            Dashboard.init();
-            AccountManagement.init();
-            BELModal.init();
-            ContentManager.init();
-
-            // Initialize sorting for all existing tables
-            setTimeout(() => {
-                TableUtils.initializeAllTables();
-                initializeAllAvatars();
-            }, 500);
-
-            console.log('BEL Management Portal initialized successfully with built-in data');
-        } catch (error) {
-            console.error('Failed to initialize application:', error);
-        }
-    }
-
     // Initialize all avatars in the application
     function initializeAllAvatars() {
         // Replace any remaining static avatars with generated ones
@@ -5225,6 +5564,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Start the application
-    initializeApplication();
 });

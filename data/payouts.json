@@ -38,6 +38,17 @@
           "net": 569.90,
           "paid": false,
           "status": "Failed"
+        },
+        {
+          "payoutId": "RP-000006",
+          "referralId": "KITROSSIT",
+          "belName": "Isabella Rossi",
+          "gross": 945.80,
+          "fees": 18.92,
+          "tax": 47.29,
+          "net": 879.59,
+          "paid": true,
+          "status": "Success"
         }
       ]
     },
