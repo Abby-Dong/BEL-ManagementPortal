@@ -29,7 +29,7 @@
       "status": "positive"
     },
     "convRate": {
-      "title": "Conv Rate (%)",
+      "title": "C2O CVR (%)",
       "icon": "fas fa-bullseye",
       "trend": "-0.5%",
       "trendText": "MoM",
