@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userProfile: document.querySelector('.bel-user-profile'),
         userProfilePanel: document.getElementById('user-profile-panel'),
         
-        // Account Management (legacy filters)
+        // Account Management
         regionSel: document.getElementById('f-region'),
         countrySel: document.getElementById('f-country'),
         rowsPerPage: document.getElementById('rows-per-page'),
@@ -133,16 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         page: 1, 
         rowsPerPage: 10, 
         selected: new Set(),
-        filters: { 
-            keyword: '', 
-            referralId: '', 
-            level: '', 
-            region: '', 
-            country: '', 
-            startDate: '', 
-            endDate: '', 
-            activity: '' 
-        },
+        filters: { keyword: '', referralId: '', level: '', region: '', country: '', start: '', end: '', activity: '' },
         sortDir: 'desc', 
         currentReferralId: null, 
         notes: {},
@@ -150,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         customerInsights: {},
         belSalesData: {},
         payoutPage: 1, 
-        payoutRowsPerPage: 12,
+        payoutRowsPerPage: 10,
         assetPage: 1, 
         assetRowsPerPage: 10,
         orderPagePayout: 1, 
@@ -165,16 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         accountGridPage: 1,
         accountGridRowsPerPage: 12,
         accountListPage: 1,
-        accountListRowsPerPage: 10,
-        // Order filters
-        orderFilters: {
-            dateFrom: '',
-            dateTo: '',
-            search: '',
-            amountMin: '',
-            amountMax: '',
-            status: ''
-        }
+        accountListRowsPerPage: 10
     };
 
     /* ========================================================================
@@ -597,7 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (notificationList) {
                 notificationList.innerHTML = APP_DATA.header.notifications.map(n => `
                     <li class="bel-notification-item">
-                        <div class="title"><span class="bel-badge ${n.type}">${n.tagText}</span>${n.title}</div>
+                        <div class="title"><span class="tag ${n.type}">${n.tagText}</span>${n.title}</div>
                         ${n.details ? `<div class="details" style="font-size: 0.85em; color: #666; margin-top: 4px;">${n.details}</div>` : ''}
                         <div class="date">${n.date}</div>
                     </li>
@@ -654,9 +636,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 targetElement.classList.add('active');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 
-                // Set current content type for filter handling
-                ContentManager.currentContentType = targetId;
-                
                 // 如果切換到Account Management頁面，渲染帳戶卡片和設置過濾器
                 if (targetId === 'Account-Management') {
                     ContentManager.renderAccountCards();
@@ -674,10 +653,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const initialLink = document.querySelector(`.bel-sidebar-nav-link[href="#${initialSection}"]`) ||
                                document.querySelector('.bel-sidebar-nav-link[href="#dashboard"]');
             initialLink?.classList.add('active');
-            
-            // Set initial content type
-            ContentManager.currentContentType = initialSection;
-            
             this.showContent(initialSection);
         }
     };
@@ -687,282 +662,19 @@ document.addEventListener('DOMContentLoaded', () => {
        ======================================================================== */
     const Dashboard = {
         init() {
-            this.setupYearSelector();
             this.renderSummaryStats();
-            // Use default filters for initial render
-            const defaultYear = window.selectedDashboardYear || this.getSelectedYear();
-            const defaultRegion = window.selectedDashboardRegion || 'all';
-            this.renderPerformanceTable(defaultYear, defaultRegion);
-            this.renderTopProducts(defaultYear, defaultRegion);
-            this.renderTop10Leaderboard();
+            this.renderPerformanceTable();
+            this.renderTopProducts();
             this.initializeCharts();
             this.setupViewSwitcher();
-            this.updateDashboardRegionFilters(); // Add this line to update region filters
-        },
-
-        /**
-         * Dynamically generate year selector based on available data
-         */
-        setupYearSelector() {
-            // Find all available years from BEL profiles data
-            const availableYears = new Set();
-            
-            if (APP_DATA.belProfiles?.leaderboard) {
-                APP_DATA.belProfiles.leaderboard.forEach(leader => {
-                    if (leader.monthlyData) {
-                        Object.keys(leader.monthlyData).forEach(year => {
-                            availableYears.add(year);
-                        });
-                    }
-                });
-            }
-            
-            // Convert to sorted array (newest first)
-            const sortedYears = Array.from(availableYears).sort((a, b) => b - a);
-            
-            // Setup header filter instead of dashboard selector
-            if (sortedYears.length > 0) {
-                this.setupHeaderFilter(sortedYears);
-            }
-        },
-
-        /**
-         * Setup header filter dropdown with years and future region filter
-         */
-        setupHeaderFilter(years) {
-            console.log('Setting up header filter with years:', years);
-            
-            // Wait for DOM to be ready
-            const waitForElements = () => {
-                // Get header filter elements
-                const yearSelect = document.getElementById('header-year-filter');
-                const regionSelect = document.getElementById('header-region-filter');
-                
-                console.log('Filter elements found:', {
-                    yearSelect: !!yearSelect,
-                    regionSelect: !!regionSelect
-                });
-                
-                if (!yearSelect || !regionSelect) {
-                    console.warn('Header filter elements not found, retrying in 100ms...');
-                    
-                    // Retry after a short delay
-                    setTimeout(waitForElements, 100);
-                    return;
-                }
-                
-                // Populate year selector with available years
-                const currentYear = new Date().getFullYear().toString();
-                const defaultYear = years.includes(currentYear) ? currentYear : years[0];
-                
-                console.log('Setting up years:', { currentYear, defaultYear, years });
-                
-                // Clear existing options and add "All Years" + available years
-                yearSelect.innerHTML = `
-                    <option value="all">All Years</option>
-                    ${years.map(year => 
-                        `<option value="${year}" ${year === defaultYear ? 'selected' : ''}>${year}</option>`
-                    ).join('')}
-                `;
-                
-                // Populate region selector with available regions from data
-                this.setupRegionSelector(regionSelect);
-                
-                // Setup year change handler
-                yearSelect.addEventListener('change', (e) => {
-                    const selectedYear = e.target.value;
-                    const selectedRegion = regionSelect.value;
-                    console.log(`Filter changed - Year: ${selectedYear}, Region: ${selectedRegion}`);
-                    
-                    this.applyFilters(selectedYear, selectedRegion);
-                });
-                
-                // Setup region change handler
-                regionSelect.addEventListener('change', (e) => {
-                    const selectedYear = yearSelect.value;
-                    const selectedRegion = e.target.value;
-                    console.log(`Filter changed - Year: ${selectedYear}, Region: ${selectedRegion}`);
-                    
-                    this.applyFilters(selectedYear, selectedRegion);
-                });
-                
-                // Set initial selected year
-                window.selectedDashboardYear = defaultYear;
-                window.selectedDashboardRegion = 'all';
-                
-                console.log('Header filter setup completed');
-            };
-            
-            // Start the setup process
-            waitForElements();
-        },
-
-        /**
-         * Check which regions have actual data
-         */
-        getRegionsWithData() {
-            if (!APP_DATA.belProfiles?.leaderboard) {
-                return new Set();
-            }
-            
-            const regionsWithData = new Set();
-            APP_DATA.belProfiles.leaderboard.forEach(leader => {
-                if (leader.region) {
-                    regionsWithData.add(leader.region);
-                }
-            });
-            
-            return regionsWithData;
-        },
-
-        /**
-         * Setup region selector with standard regions from getRegionFromCountry function
-         * Disable regions that have no data
-         */
-        setupRegionSelector(regionSelect) {
-            // Use standard regions defined in getRegionFromCountry function
-            // These are the ONLY allowed regions - no additions or modifications
-            const standardRegions = [
-                'AAU / NZ',
-                'ASEAN', 
-                'China',
-                'Europe',
-                'India',
-                'Japan',
-                'Korea',
-                'LATAM',
-                'ME&A',
-                'North America',
-                'Taiwan',
-                'Russia & CIS',
-                'Others'
-            ];
-            
-            // Get regions that have actual data
-            const regionsWithData = this.getRegionsWithData();
-            
-            console.log('Using standard regions from getRegionFromCountry:', standardRegions);
-            console.log('Regions with data:', Array.from(regionsWithData));
-            
-            // Clear existing options and add "All Regions" + standard regions
-            const regionOptions = standardRegions.map(region => {
-                const hasData = regionsWithData.has(region);
-                const disabled = hasData ? '' : ' disabled';
-                const style = hasData ? '' : ' style="color: #999; font-style: italic;"';
-                const suffix = hasData ? '' : ' (No data)';
-                
-                return `<option value="${region}"${disabled}${style}>${region}${suffix}</option>`;
-            }).join('');
-            
-            regionSelect.innerHTML = `
-                <option value="all">All Regions</option>
-                ${regionOptions}
-            `;
-        },
-
-        /**
-         * Apply both year and region filters
-         */
-    applyFilters(selectedYear, selectedRegion) {
-            // Store selected filters
-            window.selectedDashboardYear = selectedYear;
-            window.selectedDashboardRegion = selectedRegion;
-            
-            // Update all dashboard components with filters
-            this.renderSummaryStats(selectedYear, selectedRegion);
-            this.renderPerformanceTable(selectedYear, selectedRegion);
-            this.renderTopProducts(selectedYear, selectedRegion);
-            this.renderTop10Leaderboard(selectedYear, selectedRegion);
-            
-            // Always initialize charts first
-            this.initializeCharts(selectedYear, selectedRegion);
-            
-            // Check which view is currently visible and force update (use computed style for reliability)
-            const chartView = document.getElementById('performance-chart-view');
-            const tableView = document.getElementById('performance-table-view');
-            const isChartVisible = chartView ? getComputedStyle(chartView).display !== 'none' : false;
-            const isTableVisible = tableView ? getComputedStyle(tableView).display !== 'none' : false;
-
-            // Always force chart refresh if chart view is visible
-            if (isChartVisible) {
-                console.log('Force updating Performance Chart with filters:', selectedYear, selectedRegion);
-                // Force refresh both Pie Chart and Performance Chart
-                setTimeout(() => {
-                    this.initializePieChart(selectedYear, selectedRegion);
-                    this.initializePerformanceChart(selectedYear, selectedRegion);
-                    // Ensure chart layout recalculates after DOM/style changes
-                    try { window.performanceChart && window.performanceChart.resize(); } catch (e) {}
-                }, 60);
-            }
-
-            // If table view is visible, ensure it's updated too
-            if (isTableVisible) {
-                console.log('Force updating Performance Table with filters:', selectedYear, selectedRegion);
-                this.renderPerformanceTable(selectedYear, selectedRegion);
-            }
-            
-            // Update BEL table to reflect header filters
-            AccountManagement.updateBelDataForHeaderFilters(selectedYear, selectedRegion);
-            AccountManagement.renderTable();
-            
-            // Update Payout & Orders page if it's currently active
-            if (ContentManager.currentContentType === 'payouts-order') {
-                console.log('Updating Payout & Orders with filters:', selectedYear, selectedRegion);
-                ContentManager.renderPayoutStatsCards(selectedYear, selectedRegion);
-                ContentManager.renderPayoutHistory(selectedYear, selectedRegion);
-                ContentManager.renderOrdersInPayout(selectedYear, selectedRegion);
-            }
-            
-            // Update Dashboard region filters after data changes
-            this.updateDashboardRegionFilters();
-        },
-
-        /**
-         * Filter BEL profiles data based on year and region
-         */
-        getFilteredData(year = null, region = null) {
-            if (!APP_DATA.belProfiles?.leaderboard) {
-                return [];
-            }
-            
-            let filteredData = APP_DATA.belProfiles.leaderboard;
-            
-            // Apply region filter
-            if (region && region !== 'all') {
-                filteredData = filteredData.filter(leader => 
-                    leader.region === region
-                );
-                console.log(`Filtered by region "${region}": ${filteredData.length} BELs`);
-            }
-            
-            return filteredData;
-        },
-
-        /**
-         * Get currently selected year from header filter
-         */
-        getSelectedYear() {
-            const yearSelect = document.getElementById('header-year-filter');
-            if (yearSelect && yearSelect.value !== 'all') {
-                return yearSelect.value;
-            }
-            
-            // Default to current year or latest available year
-            const currentYear = new Date().getFullYear().toString();
-            return window.selectedDashboardYear || currentYear;
         },
 
         /**
          * Calculate real-time summary statistics from BEL profiles data
-         * @param {string} year - Year to calculate (defaults to current selected year)
-         * @param {string} region - Region to filter by (defaults to current selected region)
+         * @param {string} year - Year to calculate (defaults to 2025)
          * @returns {Object} Calculated summary statistics
          */
-        calculateSummaryStats(year = null, region = null) {
-            // Use selected year/region or default
-            const selectedYear = year || this.getSelectedYear();
-            const selectedRegion = region || window.selectedDashboardRegion || 'all';
-            
+        calculateSummaryStats(year = '2025') {
             if (!APP_DATA.belProfiles?.leaderboard) {
                 return {
                     belCount: 0,
@@ -974,8 +686,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
 
-            // Get filtered data based on region
-            const filteredLeaderboard = this.getFilteredData(selectedYear, selectedRegion);
+            const leaderboard = APP_DATA.belProfiles.leaderboard;
             
             // Calculate totals
             let totalClicks = 0;
@@ -986,58 +697,29 @@ document.addEventListener('DOMContentLoaded', () => {
             let validCvrCount = 0;
             let validAovCount = 0;
 
-            filteredLeaderboard.forEach(leader => {
+            leaderboard.forEach(leader => {
                 let userClicks = 0;
                 let userOrders = 0;
                 let userRevenue = 0;
                 
                 // Process yearly data
-                if (leader.monthlyData) {
+                if (leader.monthlyData && leader.monthlyData[year]) {
                     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
                     
-                    if (selectedYear === 'all') {
-                        // For "All Years", sum all available years
-                        Object.keys(leader.monthlyData).forEach(year => {
-                            const currentDate = new Date();
-                            const currentYear = currentDate.getFullYear().toString();
-                            
-                            let monthsToSum = monthNames;
-                            if (year === currentYear) {
-                                // For current year, only sum up to current month
-                                const currentMonth = currentDate.getMonth(); // 0-based
-                                monthsToSum = monthNames.slice(0, currentMonth + 1);
-                            }
-                            
-                            monthsToSum.forEach(monthName => {
-                                const monthData = leader.monthlyData[year][monthName];
-                                if (monthData) {
-                                    userClicks += monthData.clicks || 0;
-                                    userOrders += monthData.orders || 0;
-                                    userRevenue += monthData.revenue || 0;
-                                }
-                            });
-                        });
-                    } else if (leader.monthlyData[selectedYear]) {
-                        // For specific year
-                        const currentDate = new Date();
-                        const currentYear = currentDate.getFullYear().toString();
-                        
-                        let monthsToSum = monthNames;
-                        if (selectedYear === currentYear) {
-                            // For current year, only sum up to current month
-                            const currentMonth = currentDate.getMonth(); // 0-based
-                            monthsToSum = monthNames.slice(0, currentMonth + 1);
-                        }
-                        
-                        monthsToSum.forEach(monthName => {
-                            const monthData = leader.monthlyData[selectedYear][monthName];
-                            if (monthData) {
-                                userClicks += monthData.clicks || 0;
-                                userOrders += monthData.orders || 0;
-                                userRevenue += monthData.revenue || 0;
-                            }
-                        });
+                    // For 2025, only sum up to August (since it's September 8, 2025)
+                    let monthsToSum = monthNames;
+                    if (year === '2025') {
+                        monthsToSum = monthNames.slice(0, 8); // January to August
                     }
+                    
+                    monthsToSum.forEach(monthName => {
+                        const monthData = leader.monthlyData[year][monthName];
+                        if (monthData) {
+                            userClicks += monthData.clicks || 0;
+                            userOrders += monthData.orders || 0;
+                            userRevenue += monthData.revenue || 0;
+                        }
+                    });
                 }
                 
                 totalClicks += userClicks;
@@ -1064,7 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const avgAov = validAovCount > 0 ? totalAovSum / validAovCount : 0;
 
             return {
-                belCount: filteredLeaderboard.length,
+                belCount: leaderboard.length,
                 totalClicks,
                 totalOrders,
                 totalRevenue,
@@ -1086,205 +768,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        /**
-         * Calculate dashboard statistics trends for previous month comparison
-         * @param {string} selectedYear - Year to filter by
-         * @param {string} selectedRegion - Region to filter by
-         * @returns {Object} Previous month statistics and trend information
-         */
-        calculateDashboardTrends(selectedYear = null, selectedRegion = 'all') {
-            const currentDate = new Date();
-            const currentMonth = currentDate.getMonth() + 1; // 1-12
-            const currentYear = currentDate.getFullYear();
-            
-            // Calculate previous month (the month we want to show trends for)
-            let targetMonth = currentMonth - 1;
-            let targetYear = currentYear;
-            if (targetMonth === 0) {
-                targetMonth = 12;
-                targetYear = currentYear - 1;
-            }
-            
-            // Calculate the month before the target month (for comparison)
-            let comparisonMonth = targetMonth - 1;
-            let comparisonYear = targetYear;
-            if (comparisonMonth === 0) {
-                comparisonMonth = 12;
-                comparisonYear = targetYear - 1;
-            }
-            
-            // Get month names
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                              'July', 'August', 'September', 'October', 'November', 'December'];
-            const targetMonthName = monthNames[targetMonth - 1];
-            
-            // Calculate target month stats (e.g., August)
-            const targetMonthStats = this.calculateDashboardStatsForSpecificMonth(targetYear, targetMonth, selectedRegion);
-            
-            // Calculate comparison month stats (e.g., July for comparison with August)
-            const comparisonMonthStats = this.calculateDashboardStatsForSpecificMonth(comparisonYear, comparisonMonth, selectedRegion);
-            
-            // Calculate growth/decline from comparison month to target month
-            const belCountGrowth = targetMonthStats.belCount - comparisonMonthStats.belCount;
-            const totalClicksGrowth = targetMonthStats.totalClicks - comparisonMonthStats.totalClicks;
-            const totalOrdersGrowth = targetMonthStats.totalOrders - comparisonMonthStats.totalOrders;
-            const revenueGrowth = targetMonthStats.totalRevenue - comparisonMonthStats.totalRevenue;
-            const convRateGrowth = targetMonthStats.avgConvRate - comparisonMonthStats.avgConvRate;
-            const aovGrowth = targetMonthStats.avgAov - comparisonMonthStats.avgAov;
-            
-            // Format trend values
-            const formatTrendValue = (growth, isMonetary = false, isPercentage = false) => {
-                if (growth === 0) return '0';
-                const sign = growth > 0 ? '+' : '';
-                
-                if (isPercentage) {
-                    return `${sign}${growth.toFixed(2)}%`;
-                } else if (isMonetary) {
-                    if (Math.abs(growth) >= 100000) {
-                        return `${sign}$${(growth / 1000).toFixed(0)}k`;
-                    } else {
-                        return `${sign}$${Math.abs(growth).toLocaleString('en-US', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })}`;
-                    }
-                } else {
-                    if (Math.abs(growth) >= 1000) {
-                        return `${sign}${(growth / 1000).toFixed(0)}k`;
-                    }
-                    return `${sign}${growth.toLocaleString()}`;
-                }
-            };
-            
-            return {
-                targetMonthName,
-                belCountTrend: {
-                    value: formatTrendValue(belCountGrowth),
-                    status: belCountGrowth >= 0 ? 'positive' : 'negative',
-                    text: `${belCountGrowth >= 0 ? 'Increased' : 'Decreased'} in ${targetMonthName} (MoM)`
-                },
-                totalClicksTrend: {
-                    value: formatTrendValue(totalClicksGrowth),
-                    status: totalClicksGrowth >= 0 ? 'positive' : 'negative',
-                    text: `${totalClicksGrowth >= 0 ? 'Increased' : 'Decreased'} in ${targetMonthName} (MoM)`
-                },
-                totalOrdersTrend: {
-                    value: formatTrendValue(totalOrdersGrowth),
-                    status: totalOrdersGrowth >= 0 ? 'positive' : 'negative',
-                    text: `${totalOrdersGrowth >= 0 ? 'Increased' : 'Decreased'} in ${targetMonthName} (MoM)`
-                },
-                revenueTrend: {
-                    value: formatTrendValue(revenueGrowth, true),
-                    status: revenueGrowth >= 0 ? 'positive' : 'negative',
-                    text: `${revenueGrowth >= 0 ? 'Increased' : 'Decreased'} in ${targetMonthName} (MoM)`
-                },
-                convRateTrend: {
-                    value: formatTrendValue(convRateGrowth, false, true),
-                    status: convRateGrowth >= 0 ? 'positive' : 'negative',
-                    text: `${convRateGrowth >= 0 ? 'Increased' : 'Decreased'} in ${targetMonthName} (MoM)`
-                },
-                aovTrend: {
-                    value: formatTrendValue(aovGrowth, true),
-                    status: aovGrowth >= 0 ? 'positive' : 'negative',
-                    text: `${aovGrowth >= 0 ? 'Increased' : 'Decreased'} in ${targetMonthName} (MoM)`
-                }
-            };
-        },
-
-        /**
-         * Calculate dashboard statistics for a specific month
-         * @param {number} year - Specific year
-         * @param {number} month - Specific month (1-12)
-         * @param {string} selectedRegion - Region to filter by
-         * @returns {Object} Statistics for the specific month
-         */
-        calculateDashboardStatsForSpecificMonth(year, month, selectedRegion = 'all') {
-            if (!APP_DATA.belProfiles?.leaderboard) {
-                return {
-                    belCount: 0,
-                    totalClicks: 0,
-                    totalOrders: 0,
-                    totalRevenue: 0,
-                    avgConvRate: 0,
-                    avgAov: 0
-                };
-            }
-            
-            // Get month names
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                              'July', 'August', 'September', 'October', 'November', 'December'];
-            const monthName = monthNames[month - 1];
-            
-            // Get filtered data based on region
-            const filteredLeaderboard = this.getFilteredData(year, selectedRegion);
-            
-            let totalClicks = 0;
-            let totalOrders = 0;
-            let totalRevenue = 0;
-            let totalConvRateSum = 0;
-            let totalAovSum = 0;
-            let validCvrCount = 0;
-            let validAovCount = 0;
-            let activeBelCount = 0;
-
-            filteredLeaderboard.forEach(leader => {
-                // Get data for specific month
-                if (leader.monthlyData && leader.monthlyData[year.toString()]) {
-                    const monthData = leader.monthlyData[year.toString()][monthName];
-                    if (monthData) {
-                        const userClicks = monthData.clicks || 0;
-                        const userOrders = monthData.orders || 0;
-                        const userRevenue = monthData.revenue || 0;
-                        
-                        // Only count BELs who had activity in this month
-                        if (userClicks > 0 || userOrders > 0 || userRevenue > 0) {
-                            activeBelCount++;
-                        }
-                        
-                        totalClicks += userClicks;
-                        totalOrders += userOrders;
-                        totalRevenue += userRevenue;
-                        
-                        // Calculate user's CVR for this month
-                        if (userClicks > 0) {
-                            const userCvr = (userOrders / userClicks) * 100;
-                            totalConvRateSum += userCvr;
-                            validCvrCount += 1;
-                        }
-                        
-                        // Calculate user's AOV for this month
-                        if (userOrders > 0) {
-                            const userAov = userRevenue / userOrders;
-                            totalAovSum += userAov;
-                            validAovCount += 1;
-                        }
-                    }
-                }
-            });
-            
-            // Calculate final metrics
-            const avgConvRate = validCvrCount > 0 ? totalConvRateSum / validCvrCount : 0;
-            const avgAov = validAovCount > 0 ? totalAovSum / validAovCount : 0;
-            
-            return {
-                belCount: activeBelCount,
-                totalClicks,
-                totalOrders,
-                totalRevenue,
-                avgConvRate,
-                avgAov
-            };
-        },
-
-        renderSummaryStats(year = null, region = null) {
+        renderSummaryStats() {
             const statsContainer = document.querySelector('.bel-stats-cards');
             if (!statsContainer) return;
             
             // Calculate real-time statistics from BEL profiles
-            const realTimeStats = this.calculateSummaryStats(year, region);
-            
-            // Calculate dynamic trends based on month-over-month comparison
-            const trends = this.calculateDashboardTrends(year, region);
+            const realTimeStats = this.calculateSummaryStats();
             
             // Format values for display
             const belCountValue = realTimeStats.belCount.toString();
@@ -1294,7 +783,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const convRateValue = realTimeStats.avgConvRate.toFixed(2) + '%';
             const aovValue = realTimeStats.avgAov >= 100000 ? this.formatDisplayValue(realTimeStats.avgAov, '$') : '$' + realTimeStats.avgAov.toFixed(1);
             
-            // Use configuration data for static properties (icons) but dynamic trends
+            // Use configuration data for static properties (trends, icons, etc.)
             const config = APP_DATA.dashboard.summaryStatsConfig;
             
             const stats = {
@@ -1302,49 +791,49 @@ document.addEventListener('DOMContentLoaded', () => {
                     title: config.belCount.title,
                     value: belCountValue,
                     icon: config.belCount.icon,
-                    trend: trends.belCountTrend.value,
-                    trendText: trends.belCountTrend.text,
-                    status: trends.belCountTrend.status
+                    trend: config.belCount.trend,
+                    trendText: config.belCount.trendText,
+                    status: config.belCount.status
                 },
                 totalClicks: {
                     title: config.totalClicks.title,
                     value: totalClicksValue,
                     icon: config.totalClicks.icon,
-                    trend: trends.totalClicksTrend.value,
-                    trendText: trends.totalClicksTrend.text,
-                    status: trends.totalClicksTrend.status
+                    trend: config.totalClicks.trend,
+                    trendText: config.totalClicks.trendText,
+                    status: config.totalClicks.status
                 },
                 totalOrders: {
                     title: config.totalOrders.title,
                     value: totalOrdersValue,
                     icon: config.totalOrders.icon,
-                    trend: trends.totalOrdersTrend.value,
-                    trendText: trends.totalOrdersTrend.text,
-                    status: trends.totalOrdersTrend.status
+                    trend: config.totalOrders.trend,
+                    trendText: config.totalOrders.trendText,
+                    status: config.totalOrders.status
                 },
                 revenue: {
                     title: config.revenue.title,
                     value: revenueValue,
                     icon: config.revenue.icon,
-                    trend: trends.revenueTrend.value,
-                    trendText: trends.revenueTrend.text,
-                    status: trends.revenueTrend.status
+                    trend: config.revenue.trend,
+                    trendText: config.revenue.trendText,
+                    status: config.revenue.status
                 },
                 convRate: {
                     title: config.convRate.title,
                     value: convRateValue,
                     icon: config.convRate.icon,
-                    trend: trends.convRateTrend.value,
-                    trendText: trends.convRateTrend.text,
-                    status: trends.convRateTrend.status
+                    trend: config.convRate.trend,
+                    trendText: config.convRate.trendText,
+                    status: config.convRate.status
                 },
                 aov: {
                     title: config.aov.title,
                     value: aovValue,
                     icon: config.aov.icon,
-                    trend: trends.aovTrend.value,
-                    trendText: trends.aovTrend.text,
-                    status: trends.aovTrend.status
+                    trend: config.aov.trend,
+                    trendText: config.aov.trendText,
+                    status: config.aov.status
                 }
             };
             
@@ -1368,14 +857,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /**
          * Calculate performance data by level using yearly cumulative data from monthly data
-         * @param {string} year - Year to calculate (defaults to current selected year)
+         * @param {string} year - Year to calculate (defaults to 2025)
          * @returns {Array} Performance details by level
          */
-        calculatePerformanceByLevel(year = null, region = null) {
-            // Use selected year/region or default
-            const selectedYear = year || this.getSelectedYear();
-            const selectedRegion = region || window.selectedDashboardRegion || 'all';
-            
+        calculatePerformanceByLevel(year = '2025') {
             if (!APP_DATA.belProfiles?.leaderboard) return [];
             
             const levelStats = {
@@ -1385,18 +870,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Leader': { clicks: 0, orders: 0, revenue: 0, count: 0 }
             };
             
-            // Get filtered data based on region
-            const filteredLeaderboard = this.getFilteredData(selectedYear, selectedRegion);
-            
             // Aggregate data for each level
-            filteredLeaderboard.forEach(leader => {
+            APP_DATA.belProfiles.leaderboard.forEach(leader => {
                 const level = leader.level;
                 if (!levelStats[level]) return;
                 
                 // Calculate yearly cumulative data
-                const yearlyData = (selectedYear === 'all')
-                    ? AccountManagement.calculateTotalPerformance(leader)
-                    : AccountManagement.calculateYearlyData(leader, selectedYear);
+                const yearlyData = AccountManagement.calculateYearlyData(leader, year);
                 
                 levelStats[level].clicks += yearlyData.clicks;
                 levelStats[level].orders += yearlyData.orders;
@@ -1426,12 +906,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
-        renderPerformanceTable(year = null, region = null) {
+        renderPerformanceTable() {
             const tableBody = document.querySelector('#performance-table-view tbody');
             if (!tableBody) return;
             
             // Use dynamic calculation instead of static data
-            const performanceDetails = this.calculatePerformanceByLevel(year, region);
+            const performanceDetails = this.calculatePerformanceByLevel();
             
             tableBody.innerHTML = performanceDetails.map(detail => `
                 <tr>
@@ -1451,144 +931,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        /**
-         * Update Dashboard region filters with disabled options for regions that have no data
-         */
-        updateDashboardRegionFilters() {
-            // Update the region filter in the Top 10 Performance Leaderboard section
-            const dashboardRegionSelect = document.getElementById('f-region');
-            if (dashboardRegionSelect) {
-                this.updateRegionSelectWithDisabledOptions(dashboardRegionSelect);
-            }
-        },
-
-        /**
-         * Update a region select element with disabled options for regions that have no data
-         */
-        updateRegionSelectWithDisabledOptions(regionSelect) {
-            if (!regionSelect) return;
-
-            // Use standard regions defined in getRegionFromCountry function
-            const standardRegions = [
-                'AAU / NZ',
-                'ASEAN', 
-                'China',
-                'Europe',
-                'India',
-                'Japan',
-                'Korea',
-                'LATAM',
-                'ME&A',
-                'North America',
-                'Taiwan',
-                'Russia & CIS',
-                'Others'
-            ];
-            
-            // Get regions that have actual data
-            const regionsWithData = this.getRegionsWithData();
-            
-            console.log('Updating region select - Regions with data:', Array.from(regionsWithData));
-            
-            // Find the current selected value to preserve it
-            const currentValue = regionSelect.value;
-            
-            // Create region options with disabled state for regions without data
-            const regionOptions = standardRegions.map(region => {
-                const hasData = regionsWithData.has(region);
-                const disabled = hasData ? '' : ' disabled';
-                const style = hasData ? '' : ' style="color: #999; font-style: italic;"';
-                const suffix = hasData ? '' : ' (No data)';
-                const selected = currentValue === region ? ' selected' : '';
-                
-                return `<option value="${region}"${disabled}${style}${selected}>${region}${suffix}</option>`;
-            }).join('');
-            
-            // Update the select element
-            const allRegionsSelected = currentValue === '' || currentValue === 'all' ? ' selected' : '';
-            regionSelect.innerHTML = `
-                <option value=""${allRegionsSelected}>All Regions</option>
-                ${regionOptions}
-            `;
-        },
-
-        // Build Top Products list from category data with Year/Region awareness
-        getTopProductsFor(year = null, region = null) {
-            const categoryData = this.getCategoryDataFor(year, region);
-            const productTotals = new Map(); // product -> {units, price, totalRevenue}
-
-            Object.values(categoryData).forEach(products => {
-                (products || []).forEach(p => {
-                    const productName = p.product;
-                    const units = p.units || 0;
-                    const price = p.price || 0; // 直接從產品數據中讀取價格
-                    
-                    if (productTotals.has(productName)) {
-                        const existing = productTotals.get(productName);
-                        existing.units += units;
-                        existing.totalRevenue += (price * units);
-                        // 使用最新的價格（假設同一產品在不同地區價格相同）
-                        if (price > 0) existing.price = price;
-                    } else {
-                        productTotals.set(productName, {
-                            units: units,
-                            price: price,
-                            totalRevenue: price * units
-                        });
-                    }
-                });
-            });
-
-            // 備用：如果產品數據中沒有價格，則從靜態數據中讀取
-            const topProductsStatic = APP_DATA?.dashboard?.productAnalysis?.topProducts || [];
-            const staticPriceMap = new Map();
-            topProductsStatic.forEach(item => {
-                const priceNum = typeof item.price === 'string'
-                    ? parseFloat(item.price.replace(/[^0-9.]/g, ''))
-                    : (item.price || 0);
-                staticPriceMap.set(item.product, priceNum);
-            });
-
-            // Convert to array and sort by units desc
-            const list = Array.from(productTotals.entries())
-                .map(([product, data]) => {
-                    let price = data.price;
-                    let totalRevenue = data.totalRevenue;
-                    
-                    // 如果沒有價格，嘗試從靜態數據獲取
-                    if (!price && staticPriceMap.has(product)) {
-                        price = staticPriceMap.get(product);
-                        totalRevenue = price * data.units;
-                    }
-                    
-                    return {
-                        product,
-                        units: data.units,
-                        price: price,
-                        totalRevenue: totalRevenue
-                    };
-                })
-                .sort((a, b) => b.units - a.units) // 按銷量排序
-                .slice(0, 20)
-                .map((item, idx) => ({
-                    rank: idx + 1,
-                    product: item.product,
-                    price: item.price > 0 ? `$${item.price.toLocaleString()}` : '-',
-                    units: item.units.toLocaleString(),
-                    total: item.totalRevenue > 0 ? `$${item.totalRevenue.toLocaleString()}` : '-'
-                }));
-
-            return list;
-        },
-
-        renderTopProducts(year = null, region = null) {
+        renderTopProducts() {
             const tableBody = document.querySelector('.product-sales-grid .scrollable-table-container tbody');
             if (!tableBody) return;
             
-            // Use filtered top products computed from category data
-            const items = this.getTopProductsFor(year, region);
-            
-            tableBody.innerHTML = items.map(product => `
+            tableBody.innerHTML = APP_DATA.dashboard.productAnalysis.topProducts.map(product => `
                 <tr>
                     <td>${product.rank}</td>
                     <td>${product.product}</td>
@@ -1605,110 +952,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        /**
-         * Render Top 10 Performance Leaderboard with header filter support
-         * @param {string} year - Year to filter by (defaults to current selected year)
-         * @param {string} region - Region to filter by (defaults to current selected region)
-         */
-        renderTop10Leaderboard(year = null, region = null) {
-            const tableBody = document.querySelector('#bel-table tbody');
-            if (!tableBody) return;
-            
-            // Use selected year/region or default
-            const selectedYear = year || this.getSelectedYear();
-            const selectedRegion = region || window.selectedDashboardRegion || 'all';
-            
-            console.log(`Rendering Top 10 Leaderboard for Year: ${selectedYear}, Region: ${selectedRegion}`);
-            
-            if (!APP_DATA.belProfiles?.leaderboard) {
-                tableBody.innerHTML = `
-                    <tr class="no-results">
-                        <td colspan="11" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
-                            No BEL data available.
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            // Get filtered data based on region
-            let filteredData = this.getFilteredData(selectedYear, selectedRegion);
-            
-            // Calculate yearly performance data for each BEL
-            const belWithPerformance = filteredData.map(leader => {
-                // When 'All Years' is selected, calculate total performance across all years
-                const yearlyData = (selectedYear === 'all')
-                    ? AccountManagement.calculateTotalPerformance(leader)
-                    : AccountManagement.calculateYearlyData(leader, selectedYear);
-
-                const conv = yearlyData.clicks > 0 ? (yearlyData.orders / yearlyData.clicks) * 100 : 0;
-                const aov = yearlyData.orders > 0 ? yearlyData.revenue / yearlyData.orders : 0;
-                
-                return {
-                    ...leader,
-                    clicks: yearlyData.clicks,
-                    orders: yearlyData.orders,
-                    revenue: yearlyData.revenue,
-                    convRate: conv,
-                    aov: aov,
-                    // Calculate a performance score (weighted combination of metrics)
-                    performanceScore: (yearlyData.revenue * 0.4) + (yearlyData.orders * 0.3) + (yearlyData.clicks * 0.2) + (conv * 0.1)
-                };
-            });
-            
-            // Sort by performance score (descending) and take top 10
-            const top10 = belWithPerformance
-                .sort((a, b) => b.performanceScore - a.performanceScore)
-                .slice(0, 10);
-                
-            console.log(`Top 10 BELs filtered:`, top10.length);
-            
-            // Handle empty results
-            if (top10.length === 0) {
-                tableBody.innerHTML = `
-                    <tr class="no-results">
-                        <td colspan="11" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
-                            No accounts found matching the current filters.
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            // Apply sorting to the BEL table
-            const belTable = document.querySelector('#bel-table');
-            if (belTable) {
-                TableUtils.makeTableSortable(belTable);
-            }
+        initializeCharts() {
+            this.initializePieChart();
+            this.initializeProductCategoryChart();
+            this.initializePerformanceChart();
         },
 
-        initializeCharts(year = null, region = null) {
-            console.log('Initializing all charts with filters:', year, region);
-            
-            // Force refresh Level Distribution Pie Chart
-            this.initializePieChart(year, region);
-            
-            // Initialize Product Category Chart with current filters
-            this.initializeProductCategoryChart(year, region);
-            
-            // Force refresh Performance Chart
-            this.initializePerformanceChart(year, region);
-        },
-
-        initializePieChart(year = null, region = null) {
-            console.log('Initializing Level Distribution Pie Chart with filters:', year, region);
+        initializePieChart() {
             const pieCtx = document.getElementById('level-pie-chart');
             if (pieCtx && window.Chart) {
-                console.log('Pie Chart canvas found, updating data...');
                 // Calculate real-time level distribution from BEL profiles
-                const levelCounts = this.calculateLevelDistribution(year, region);
+                const levelCounts = this.calculateLevelDistribution();
                 
-                // Destroy existing chart if it exists
-                if (window.levelPieChart) {
-                    window.levelPieChart.destroy();
-                }
-                
-                window.levelPieChart = new Chart(pieCtx, {
+                new Chart(pieCtx, {
                     type: 'doughnut',
                     data: {
                         labels: levelCounts.labels,
@@ -1739,10 +995,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /**
          * Calculate real-time level distribution from BEL profiles data
-         * @param {string} year - Year to calculate (defaults to current selected year)
          * @returns {Object} Level distribution with labels, data, and colors
          */
-        calculateLevelDistribution(year = null, region = null) {
+        calculateLevelDistribution() {
             if (!APP_DATA.belProfiles?.leaderboard) {
                 return {
                     labels: ["Builder", "Enabler", "Exploder", "Leader"],
@@ -1758,12 +1013,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Leader': 0
             };
 
-            // Get filtered data based on region
-            const selectedRegion = region || window.selectedDashboardRegion || 'all';
-            const filteredLeaderboard = this.getFilteredData(year, selectedRegion);
-
-            // Count actual levels from filtered BEL profiles
-            filteredLeaderboard.forEach(leader => {
+            // Count actual levels from BEL profiles
+            APP_DATA.belProfiles.leaderboard.forEach(leader => {
                 if (levelCount.hasOwnProperty(leader.level)) {
                     levelCount[leader.level]++;
                 }
@@ -1781,131 +1032,36 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         },
 
-        // Resolve category/product units by year/region with sensible fallbacks
-        getCategoryDataFor(year = null, region = null) {
-            const selectedYear = year || this.getSelectedYear();
-            const selectedRegion = region || window.selectedDashboardRegion || 'all';
-            const analysis = APP_DATA?.dashboard?.productAnalysis || {};
-            const byYR = analysis.categoryDataByYearRegion || null;
-
-            // Helper to merge multiple categoryData objects
-            const mergeCategoryData = (dataObjects) => {
-                const result = {};
-                dataObjects.forEach(dataObj => {
-                    if (!dataObj) return;
-                    Object.entries(dataObj).forEach(([category, products]) => {
-                        if (!result[category]) result[category] = [];
-                        (products || []).forEach(p => {
-                            const idx = result[category].findIndex(x => x.product === p.product);
-                            if (idx >= 0) {
-                                // 合併數量，保持價格
-                                result[category][idx].units += (p.units || 0);
-                                // 如果當前產品有價格，使用它（假設同一產品在不同地區價格相同）
-                                if (p.price && p.price > 0) {
-                                    result[category][idx].price = p.price;
-                                }
-                            } else {
-                                // 添加新產品，保留所有字段
-                                result[category].push({ 
-                                    product: p.product, 
-                                    units: p.units || 0,
-                                    price: p.price || 0
-                                });
-                            }
-                        });
-                    });
-                });
-                return result;
-            };
-
-            if (byYR) {
-                // Exact match first
-                const exact = byYR?.[selectedYear]?.[selectedRegion];
-                if (exact) return exact;
-
-                // All years for a specific region
-                if (selectedYear === 'all' && selectedRegion !== 'all') {
-                    const allYears = Object.values(byYR).map(regMap => regMap?.[selectedRegion]).filter(Boolean);
-                    if (allYears.length) return mergeCategoryData(allYears);
-                }
-
-                // All regions for a specific year
-                if (selectedRegion === 'all' && selectedYear !== 'all') {
-                    const regMap = byYR?.[selectedYear] || {};
-                    const allRegions = Object.values(regMap).filter(Boolean);
-                    if (allRegions.length) return mergeCategoryData(allRegions);
-                }
-
-                // Both all -> merge everything
-                if (selectedYear === 'all' && selectedRegion === 'all') {
-                    const everything = [];
-                    Object.values(byYR).forEach(regMap => {
-                        Object.values(regMap || {}).forEach(cat => { if (cat) everything.push(cat); });
-                    });
-                    if (everything.length) return mergeCategoryData(everything);
-                }
-
-                // Fallback
-                const fallback = byYR?.all?.all;
-                if (fallback) return fallback;
-            }
-
-            // Legacy flat data
-            return analysis.categoryData || {};
-        },
-
-        initializeProductCategoryChart(year = null, region = null) {
+        initializeProductCategoryChart() {
             const productCategoryCanvas = document.getElementById('product-category-chart');
             if (productCategoryCanvas && window.Chart) {
-                // Destroy existing instance if present to avoid overlay/duplication
-                if (window.productCategoryChart) {
-                    try { window.productCategoryChart.destroy(); } catch (e) {}
-                }
+                const categoryData = APP_DATA.dashboard.productAnalysis.categoryData;
+                const allProducts = new Set();
+                Object.values(categoryData).forEach(products => {
+                    products.forEach(p => allProducts.add(p.product));
+                });
+                const productList = Array.from(allProducts);
+                const blueShades = ['#003160', '#004280', '#336899', '#80a0bf', '#dfebf7'];
                 
-                // Get category data and calculate total units and revenue for each category
-                const categoryData = this.getCategoryDataFor(year, region);
-                const categoryStats = {};
-                
-                // Calculate total units and revenue for each category
-                Object.keys(categoryData).forEach(category => {
-                    const products = categoryData[category];
-                    const totalUnits = products.reduce((sum, p) => sum + (p.units || 0), 0);
-                    const totalRevenue = products.reduce((sum, p) => sum + ((p.units || 0) * (p.price || 0)), 0);
-                    
-                    categoryStats[category] = {
-                        units: totalUnits,
-                        revenue: totalRevenue
+                const datasets = productList.map((product, index) => {
+                    const data = Object.keys(categoryData).map(category => {
+                        const productInCategory = categoryData[category].find(p => p.product === product);
+                        return productInCategory ? productInCategory.units : 0;
+                    });
+                    return {
+                        label: product,
+                        data: data,
+                        backgroundColor: blueShades[index % blueShades.length],
+                        borderColor: blueShades[index % blueShades.length],
+                        borderWidth: 1
                     };
                 });
-                
-                // Sort categories by total units and take top 5
-                const sortedCategories = Object.entries(categoryStats)
-                    .sort(([,a], [,b]) => b.units - a.units)
-                    .slice(0, 5);
-                
-                const labels = sortedCategories.map(([category]) => category);
-                const data = sortedCategories.map(([, stats]) => stats.units);
-                
-                // Store category stats for tooltip access
-                const categoryStatsMap = {};
-                sortedCategories.forEach(([category, stats]) => {
-                    categoryStatsMap[category] = stats;
-                });
-                
-                // Use gradient blue colors for the bars
-                const blueShades = ['#003160', '#004280', '#336899', '#5a84b3', '#80a0bf'];
 
-                window.productCategoryChart = new Chart(productCategoryCanvas, {
+                new Chart(productCategoryCanvas, {
                     type: 'bar',
                     data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Qty',
-                            data: data,
-                            backgroundColor: blueShades,
-                            borderColor: blueShades,
-                            borderWidth: 1
-                        }]
+                        labels: Object.keys(categoryData),
+                        datasets: datasets
                     },
                     options: {
                         responsive: true,
@@ -1913,57 +1069,37 @@ document.addEventListener('DOMContentLoaded', () => {
                         indexAxis: 'y',
                         plugins: {
                             legend: {
-                                display: false
+                                display: true,
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 8,
+                                    font: { size: 11 }
+                                }
                             },
                             tooltip: {
                                 callbacks: {
                                     title: (tooltipItems) => tooltipItems[0].label,
-                                    label: (context) => {
-                                        const category = context.label;
-                                        const stats = categoryStatsMap[category];
-                                        if (stats) {
-                                            return [
-                                                `Qty: ${stats.units.toLocaleString()}`,
-                                                `Total: $${stats.revenue.toLocaleString()}`
-                                            ];
-                                        }
-                                        return `Qty: ${context.parsed.x.toLocaleString()}`;
+                                    label: (context) => `${context.dataset.label}: ${context.parsed.x} units`,
+                                    afterBody: (tooltipItems) => {
+                                        const categoryIndex = tooltipItems[0].dataIndex;
+                                        const category = Object.keys(categoryData)[categoryIndex];
+                                        const products = categoryData[category];
+                                        const total = products.reduce((sum, p) => sum + p.units, 0);
+                                        return `Total: ${total} units`;
                                     }
                                 }
                             }
                         },
                         scales: {
                             x: {
+                                stacked: true,
                                 beginAtZero: true,
-                                title: { 
-                                    display: true, 
-                                    text: 'Qty',
-                                    font: {
-                                        size: 12,
-                                        weight: 'bold'
-                                    }
-                                },
-                                ticks: {
-                                    callback: function(value) {
-                                        return value.toLocaleString();
-                                    }
-                                }
+                                title: { display: true, text: 'Units Sold' }
                             },
                             y: {
-                                title: { 
-                                    display: true, 
-                                    text: 'Product Categories',
-                                    font: {
-                                        size: 12,
-                                        weight: 'bold'
-                                    }
-                                },
-                                ticks: {
-                                    maxRotation: 0,
-                                    font: {
-                                        size: 11
-                                    }
-                                }
+                                stacked: true,
+                                title: { display: true, text: 'Product Categories' }
                             }
                         }
                     }
@@ -1971,18 +1107,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        initializePerformanceChart(year = null, region = null) {
-            console.log('Initializing Performance Chart with filters:', year, region);
+        initializePerformanceChart() {
             const performanceCtx = document.getElementById('performance-percentage-chart');
             if (performanceCtx && window.Chart) {
-                console.log('Performance Chart canvas found, updating data...');
                 // Use dynamic calculation instead of static data
-                const performanceData = this.calculatePerformanceByLevel(year, region);
-                
-                // Destroy existing chart if it exists
-                if (window.performanceChart) {
-                    window.performanceChart.destroy();
-                }
+                const performanceData = this.calculatePerformanceByLevel();
                 
                 // Get CSS variables for colors
                 const rootStyle = getComputedStyle(document.documentElement);
@@ -2006,7 +1135,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     typeof d.convRate === 'string' ? parseFloat(d.convRate.replace('%', '')) : d.convRate
                 );
 
-                window.performanceChart = new Chart(performanceCtx, {
+                new Chart(performanceCtx, {
                     type: 'bar',
                     data: {
                         labels: labels,
@@ -2165,32 +1294,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (viewType === 'table') {
                         tableView?.style.setProperty('display', 'block');
                         chartView?.style.setProperty('display', 'none');
-                        
-                        // Re-render performance table with current filters
-                        const selectedYear = window.selectedDashboardYear || this.getSelectedYear();
-                        const selectedRegion = window.selectedDashboardRegion || 'all';
-                        this.renderPerformanceTable(selectedYear, selectedRegion);
                     } else {
                         tableView?.style.setProperty('display', 'none');
                         chartView?.style.setProperty('display', 'block');
                         
-                        // Initialize performance chart with current filters
+                        // Initialize performance chart if not already done
                         setTimeout(() => {
                             if (chartView?.style.display !== 'none') {
-                                const selectedYear = window.selectedDashboardYear || this.getSelectedYear();
-                                const selectedRegion = window.selectedDashboardRegion || 'all';
-                                this.initializePerformanceChart(selectedYear, selectedRegion);
+                                this.initializePerformanceChart();
                             }
                         }, 100);
                     }
                 });
             });
 
-            // Initialize chart view by default with current filters
+            // Initialize chart view by default
             setTimeout(() => {
-                const selectedYear = window.selectedDashboardYear || this.getSelectedYear();
-                const selectedRegion = window.selectedDashboardRegion || 'all';
-                this.initializePerformanceChart(selectedYear, selectedRegion);
+                this.initializePerformanceChart();
             }, 100);
         }
     };
@@ -2202,11 +1322,7 @@ document.addEventListener('DOMContentLoaded', () => {
         belData: [],
 
         init() {
-            // Initialize with current header filter values
-            const selectedYear = window.selectedDashboardYear || '2025';
-            const selectedRegion = window.selectedDashboardRegion || 'all';
-            
-            this.updateBelDataForHeaderFilters(selectedYear, selectedRegion);
+            this.generateBelData();
             this.setupEventListeners();
             this.populateFilters();
             this.renderTable();
@@ -2215,39 +1331,26 @@ document.addEventListener('DOMContentLoaded', () => {
         /**
          * Calculate cumulative yearly data from monthly data
          * @param {Object} record - BEL record with monthlyData
-         * @param {string} year - Year to calculate (defaults to current selected year)
+         * @param {string} year - Year to calculate (defaults to 2025)
          * @returns {Object} Cumulative data { clicks, orders, revenue }
          */
-        calculateYearlyData(record, year = null) {
-            // Use Dashboard's selected year if available, otherwise use current year
-            const selectedYear = year || (window.selectedDashboardYear) || new Date().getFullYear().toString();
-            
+        calculateYearlyData(record, year = '2025') {
             let cumulativeClicks = 0;
             let cumulativeOrders = 0;
             let cumulativeRevenue = 0;
             
-            if (record.monthlyData && record.monthlyData[selectedYear]) {
+            if (record.monthlyData && record.monthlyData[year]) {
                 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
                 
-                // Determine how many months to sum based on current date and selected year
+                // For 2025, only sum up to August (since it's September 8, 2025)
+                // For other years, sum the full year
                 let monthsToSum = monthNames;
-                const currentDate = new Date();
-                const currentYear = currentDate.getFullYear().toString();
-                
-                if (selectedYear === currentYear) {
-                    // For current year, only sum up to current month
-                    const currentMonth = currentDate.getMonth(); // 0-based
-                    monthsToSum = monthNames.slice(0, currentMonth + 1);
-                } else if (parseInt(selectedYear) > parseInt(currentYear)) {
-                    // For future years, sum all available months (but there shouldn't be any)
-                    monthsToSum = monthNames;
-                } else {
-                    // For past years, sum the full year
-                    monthsToSum = monthNames;
+                if (year === '2025') {
+                    monthsToSum = monthNames.slice(0, 8); // January to August
                 }
                 
                 monthsToSum.forEach(monthName => {
-                    const monthData = record.monthlyData[selectedYear][monthName];
+                    const monthData = record.monthlyData[year][monthName];
                     if (monthData) {
                         cumulativeClicks += monthData.clicks || 0;
                         cumulativeOrders += monthData.orders || 0;
@@ -2265,32 +1368,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 clicks: cumulativeClicks,
                 orders: cumulativeOrders,
                 revenue: cumulativeRevenue
-            };
-        },
-
-        /**
-         * Calculate total performance across all available years
-         * @param {Object} record - BEL record with monthlyData
-         * @returns {Object} Cumulative data { clicks, orders, revenue }
-         */
-        calculateTotalPerformance(record) {
-            let totalClicks = 0;
-            let totalOrders = 0;
-            let totalRevenue = 0;
-
-            if (record.monthlyData) {
-                for (const year in record.monthlyData) {
-                    const yearlyData = this.calculateYearlyData(record, year);
-                    totalClicks += yearlyData.clicks;
-                    totalOrders += yearlyData.orders;
-                    totalRevenue += yearlyData.revenue;
-                }
-            }
-
-            return {
-                clicks: totalClicks,
-                orders: totalOrders,
-                revenue: totalRevenue
             };
         },
 
@@ -2336,7 +1413,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     monthlyData: leader.monthlyData, // Ensure monthlyData is carried over
                     bankingInfo: leader.bankingInfo, // Include banking information
                     country: getCountryName(getCountryCode(leader.id)),
-                    region: leader.region, // Use the existing region field directly
+                    get region() { return utils.getRegionFromCountry(this.country); },
                     tags: ['Top Performer']
                 };
             });
@@ -2381,63 +1458,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Update Region filter with disabled options for regions without data
-            this.updateRegionFilterWithDisabledOptions();
-        },
-
-        /**
-         * Update Region filter with disabled options for regions that have no data
-         */
-        updateRegionFilterWithDisabledOptions() {
-            const regionSelect = ui.regionSel;
-            if (!regionSelect) return;
-
-            // Use standard regions defined in getRegionFromCountry function
-            const standardRegions = [
-                'AAU / NZ',
-                'ASEAN', 
-                'China',
-                'Europe',
-                'India',
-                'Japan',
-                'Korea',
-                'LATAM',
-                'ME&A',
-                'North America',
-                'Taiwan',
-                'Russia & CIS',
-                'Others'
-            ];
+            // Populate Region filter (regions are populated via HTML options, but we can add dynamic ones if needed)
+            const regions = Array.from(new Set(this.belData.map(r => r.region))).sort();
             
-            // Get regions that have actual data in current belData
-            const regionsWithData = new Set();
-            this.belData.forEach(record => {
-                if (record.region) {
-                    regionsWithData.add(record.region);
-                }
-            });
-            
-            console.log('Account Management - Regions with data:', Array.from(regionsWithData));
-            
-            // Find the current selected value to preserve it
-            const currentValue = regionSelect.value;
-            
-            // Create region options with disabled state for regions without data
-            const regionOptions = standardRegions.map(region => {
-                const hasData = regionsWithData.has(region);
-                const disabled = hasData ? '' : ' disabled';
-                const style = hasData ? '' : ' style="color: #999; font-style: italic;"';
-                const suffix = hasData ? '' : ' (No data)';
-                const selected = currentValue === region ? ' selected' : '';
-                
-                return `<option value="${region}"${disabled}${style}${selected}>${region}${suffix}</option>`;
-            }).join('');
-            
-            // Update the select element
-            regionSelect.innerHTML = `
-                <option value="" ${currentValue === '' ? 'selected' : ''}>All Regions</option>
-                ${regionOptions}
-            `;
+            // Note: Region options are already defined in HTML, but if we need to add dynamic ones:
+            // regions.forEach(region => {
+            //     if (ui.regionSel && !ui.regionSel.querySelector(`option[value="${region}"]`)) {
+            //         ui.regionSel.innerHTML += `<option value="${region}">${region}</option>`;
+            //     }
+            // });
         },
 
         getProcessedData() {
@@ -2484,39 +1513,27 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (!ui.tbody) return;
 
-            // Handle empty results
-            if (pageItems.length === 0) {
-                ui.tbody.innerHTML = `
-                    <tr class="no-results">
-                        <td colspan="11" style="text-align: center; padding: 40px; color: #666; font-style: italic;">
-                            No accounts found matching the current filters.
-                        </td>
+            const rows = pageItems.map(record => {
+                const conv = record.clicks30 ? record.orders30 / record.clicks30 : 0;
+                const aov = record.orders30 ? record.revenue30 / record.orders30 : 0;
+                return `
+                    <tr data-id="${record.id}">
+                        <td><input type="checkbox" class="row-check" data-id="${record.id}" ${appState.selected.has(record.id) ? 'checked' : ''} /></td>
+                        <td><a href="#" class="referral-id-link" data-referral-id="${record.id}">${record.id}</a></td>
+                        <td>${record.name}</td>
+                        <td><span class="bel-badge ${record.level.toLowerCase()}">${record.level}</span></td>
+                        <td style="text-align:right;">${record.clicks30.toLocaleString()}</td>
+                        <td style="text-align:right;">${record.orders30.toLocaleString()}</td>
+                        <td style="text-align:right;">${utils.formatMoney(record.revenue30)}</td>
+                        <td style="text-align:right;">${utils.formatPercent(conv)}</td>
+                        <td style="text-align:right;">${record.orders30 ? utils.formatMoney(aov, 2) : '-'}</td>
+                        <td>${record.region}</td>
+                        <td>${record.country}</td>
                     </tr>
                 `;
-            } else {
-                const rows = pageItems.map(record => {
-                    const conv = record.clicks30 ? record.orders30 / record.clicks30 : 0;
-                    const aov = record.orders30 ? record.revenue30 / record.orders30 : 0;
-                    return `
-                        <tr data-id="${record.id}">
-                            <td><input type="checkbox" class="row-check" data-id="${record.id}" ${appState.selected.has(record.id) ? 'checked' : ''} /></td>
-                            <td>${record.id}</td>
-                            <td>${record.name}</td>
-                            <td><span class="bel-badge ${record.level.toLowerCase()}">${record.level}</span></td>
-                            <td style="text-align:right;">${record.clicks30.toLocaleString()}</td>
-                            <td style="text-align:right;">${record.orders30.toLocaleString()}</td>
-                            <td style="text-align:right;">${utils.formatMoney(record.revenue30)}</td>
-                            <td style="text-align:right;">${utils.formatPercent(conv)}</td>
-                            <td style="text-align:right;">${record.orders30 ? utils.formatMoney(aov, 2) : '-'}</td>
-                            <td>${record.region}</td>
-                            <td>${record.country}</td>
-                        </tr>
-                    `;
-                }).join('');
-                
-                ui.tbody.innerHTML = rows;
-            }
+            }).join('');
             
+            ui.tbody.innerHTML = rows;
             this.updatePaginationUI(total, startIndex, pageItems);
             this.updateSelectionUI();
             this.updateSortUI();
@@ -2921,287 +1938,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
             return text.replace(regex, '<mark style="background-color: var(--ds-color-primary-light-30); font-weight: var(--fw-semibold);">$1</mark>');
-        },
-
-        setupOrderSearchSuggestions() {
-            console.log('Setting up order search suggestions...');
-            
-            const searchInput = document.getElementById('order-search');
-            const suggestionsContainer = document.getElementById('order-search-suggestions');
-            
-            console.log(' Order search elements:', {
-                searchInput: !!searchInput,
-                suggestionsContainer: !!suggestionsContainer
-            });
-            
-            if (!searchInput || !suggestionsContainer) {
-                console.log('� Order search input or suggestions container not found');
-                return;
-            }
-
-            let selectedIndex = -1;
-            let suggestions = [];
-
-            // Input event for showing suggestions
-            searchInput.addEventListener('input', utils.debounce((e) => {
-                const query = e.target.value.trim().toLowerCase();
-                selectedIndex = -1;
-                
-                console.log('🔍 Search query:', query);
-                
-                if (query.length === 0) {
-                    this.hideOrderSuggestions(suggestionsContainer);
-                    return;
-                }
-
-                // Find matching orders based on multiple fields
-                if (!APP_DATA?.orders?.history) {
-                    console.log('No order data available');
-                    this.hideOrderSuggestions(suggestionsContainer);
-                    return;
-                }
-
-                suggestions = [];
-
-                // Search in order number, referral ID, and BEL name
-                APP_DATA.orders.history.forEach(order => {
-                    const orderNumber = order.orderNumber.toLowerCase();
-                    const referralId = order.referralId.toLowerCase();
-                    const belName = order.belName.toLowerCase();
-
-                    if (orderNumber.includes(query)) {
-                        suggestions.push({
-                            orderNumber: order.orderNumber,
-                            referralId: order.referralId,
-                            belName: order.belName,
-                            displayText: order.orderNumber,
-                            searchField: 'orderNumber',
-                            matchValue: order.orderNumber
-                        });
-                    } else if (referralId.includes(query)) {
-                        suggestions.push({
-                            orderNumber: order.orderNumber,
-                            referralId: order.referralId,
-                            belName: order.belName,
-                            displayText: `${order.referralId} - ${order.belName}`,
-                            searchField: 'referralId',
-                            matchValue: order.referralId
-                        });
-                    } else if (belName.includes(query)) {
-                        suggestions.push({
-                            orderNumber: order.orderNumber,
-                            referralId: order.referralId,
-                            belName: order.belName,
-                            displayText: `${order.belName} (${order.referralId})`,
-                            searchField: 'belName',
-                            matchValue: order.belName
-                        });
-                    }
-                });
-
-                // Remove duplicates and limit to 8 suggestions
-                const uniqueSuggestions = [];
-                const seen = new Set();
-                for (const suggestion of suggestions) {
-                    const key = `${suggestion.searchField}-${suggestion.matchValue}`;
-                    if (!seen.has(key) && uniqueSuggestions.length < 8) {
-                        seen.add(key);
-                        uniqueSuggestions.push(suggestion);
-                    }
-                }
-
-                console.log('Found suggestions:', uniqueSuggestions.length);
-
-                if (uniqueSuggestions.length > 0) {
-                    this.showOrderSuggestions(uniqueSuggestions, query, suggestionsContainer, searchInput);
-                } else {
-                    this.hideOrderSuggestions(suggestionsContainer);
-                }
-            }, 150));
-
-            // Keyboard navigation
-            searchInput.addEventListener('keydown', (e) => {
-                const suggestionItems = suggestionsContainer.querySelectorAll('.search-suggestion-item');
-                
-                switch (e.key) {
-                    case 'ArrowDown':
-                        e.preventDefault();
-                        selectedIndex = Math.min(selectedIndex + 1, suggestionItems.length - 1);
-                        this.highlightOrderSuggestion(suggestionItems, selectedIndex);
-                        break;
-                    case 'ArrowUp':
-                        e.preventDefault();
-                        selectedIndex = Math.max(selectedIndex - 1, -1);
-                        this.highlightOrderSuggestion(suggestionItems, selectedIndex);
-                        break;
-                    case 'Enter':
-                        e.preventDefault();
-                        if (selectedIndex >= 0 && suggestionItems[selectedIndex]) {
-                            this.selectOrderSuggestion(suggestions[selectedIndex], searchInput);
-                        }
-                        break;
-                    case 'Escape':
-                        this.hideOrderSuggestions(suggestionsContainer);
-                        searchInput.blur();
-                        break;
-                }
-            });
-
-            // Click outside to hide suggestions
-            document.addEventListener('click', (e) => {
-                if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
-                    this.hideOrderSuggestions(suggestionsContainer);
-                }
-            });
-
-            // Focus event to show suggestions if there's a value
-            searchInput.addEventListener('focus', () => {
-                if (searchInput.value.trim().length > 0) {
-                    searchInput.dispatchEvent(new Event('input'));
-                }
-            });
-            
-            console.log(' Order search suggestions setup completed');
-        },
-
-        showOrderSuggestions(suggestions, query, suggestionsContainer, searchInput) {
-            if (!suggestionsContainer) return;
-
-            const html = suggestions.map((suggestion, index) => {
-                const highlightedText = this.highlightMatch(suggestion.displayText, query);
-                return `
-                    <div class="search-suggestion-item" data-index="${index}">
-                        <div class="suggestion-name">${highlightedText}</div>
-                        <div class="suggestion-id">${suggestion.subText}</div>
-                    </div>
-                `;
-            }).join('');
-
-            suggestionsContainer.innerHTML = html;
-            suggestionsContainer.classList.add('show');
-
-            // Add click listeners to suggestion items
-            suggestionsContainer.querySelectorAll('.search-suggestion-item').forEach((item, index) => {
-                item.addEventListener('click', () => {
-                    this.selectOrderSuggestion(suggestions[index], searchInput);
-                });
-            });
-        },
-
-        hideOrderSuggestions(suggestionsContainer) {
-            if (suggestionsContainer) {
-                suggestionsContainer.classList.remove('show');
-                suggestionsContainer.innerHTML = '';
-            }
-        },
-
-        highlightOrderSuggestion(items, index) {
-            items.forEach((item, i) => {
-                item.classList.toggle('highlighted', i === index);
-            });
-        },
-
-        selectOrderSuggestion(suggestion, searchInput) {
-            if (searchInput) {
-                searchInput.value = suggestion.displayText;
-                const suggestionsContainer = document.getElementById('order-search-suggestions');
-                this.hideOrderSuggestions(suggestionsContainer);
-                
-                // Auto-apply filters after selection
-                appState.orderFilters.search = searchInput.value;
-                appState.orderPagePayout = 1;
-                
-                // Get current year and region filters
-                const selectedYear = document.getElementById('header-year-filter') ? 
-                    document.getElementById('header-year-filter').value : null;
-                const selectedRegion = document.getElementById('header-region-filter') ? 
-                    document.getElementById('header-region-filter').value : 'all';
-                
-                // Update the orders display
-                if (typeof this.renderOrdersInPayout === 'function') {
-                    this.renderOrdersInPayout(selectedYear, selectedRegion);
-                }
-            }
-        },
-
-        /**
-         * Update BEL table data based on header filter selections
-         * @param {string} selectedYear - Year to filter by (or 'all' for all years)
-         * @param {string} selectedRegion - Region to filter by (or 'all' for all regions)
-         */
-    updateBelDataForHeaderFilters(selectedYear, selectedRegion) {
-            // 根據 Referral ID 的前兩碼確定國碼
-            const getCountryCode = (id) => {
-                const prefix = id.substring(1, 3); // 取 K 後面的兩位
-                const countryMap = {
-                    'TW': 'TW', 'US': 'US', 'DE': 'DE', 'FR': 'FR', 'JP': 'JP',
-                    'AU': 'AU', 'KR': 'KR', 'IT': 'IT', 'MX': 'MX', 'CN': 'CN',
-                    'CA': 'CA', 'IN': 'IN', 'NO': 'NO', 'NL': 'NL', 'BR': 'BR',
-                    'SE': 'SE', 'CH': 'CH', 'DA': 'DK', 'PL': 'PL', 'BE': 'BE',
-                    'SG': 'SG', 'TH': 'TH', 'MY': 'MY', 'ZA': 'ZA'
-                };
-                return countryMap[prefix] || 'US';
-            };
-
-            // 將國碼轉換為國家名稱
-            const getCountryName = (countryCode) => {
-                const countryNames = {
-                    'TW': 'Taiwan', 'US': 'United States', 'DE': 'Germany', 'FR': 'France', 'JP': 'Japan',
-                    'AU': 'Australia', 'KR': 'South Korea', 'IT': 'Italy', 'MX': 'Mexico', 'CN': 'China',
-                    'CA': 'Canada', 'IN': 'India', 'NO': 'Norway', 'NL': 'Netherlands', 'BR': 'Brazil',
-                    'SE': 'Sweden', 'CH': 'Switzerland', 'DK': 'Denmark', 'PL': 'Poland', 'BE': 'Belgium',
-                    'SG': 'Singapore', 'TH': 'Thailand', 'MY': 'Malaysia', 'ZA': 'South Africa'
-                };
-                return countryNames[countryCode] || 'United States';
-            };
-
-            // Get all leaderboard data
-            if (!APP_DATA.belProfiles?.leaderboard) {
-                console.warn('No leaderboard data available');
-                return;
-            }
-
-            let dataToProcess = APP_DATA.belProfiles.leaderboard;
-
-            // Apply region filter first if specified
-            if (selectedRegion && selectedRegion !== 'all') {
-                dataToProcess = dataToProcess.filter(leader => {
-                    // Use the existing region field directly from the data
-                    return leader.region === selectedRegion;
-                });
-            }
-
-            // Update BEL data with year-specific calculations
-            this.belData = dataToProcess.map(leader => {
-                // Calculate performance based on selected year
-                const yearlyData = (selectedYear === 'all')
-                    ? this.calculateTotalPerformance(leader)
-                    : this.calculateYearlyData(leader, selectedYear);
-                
-                const countryCode = getCountryCode(leader.id);
-                const countryName = getCountryName(countryCode);
-                
-                return {
-                    id: leader.id,
-                    name: leader.name,
-                    email: leader.email || `${leader.name.toLowerCase().replace(' ', '.')}@company.com`,
-                    code: `${leader.name.split(' ')[0].toUpperCase()}${Math.floor(Math.random() * 100)}`,
-                    level: leader.level,
-                    clicks30: yearlyData.clicks,
-                    orders30: yearlyData.orders,
-                    revenue30: yearlyData.revenue,
-                    monthlyData: leader.monthlyData, // Ensure monthlyData is carried over
-                    bankingInfo: leader.bankingInfo, // Include banking information
-                    country: countryName,
-                    region: leader.region, // Use the existing region field directly
-                    tags: ['Top Performer']
-                };
-            });
-
-            console.log(`Updated BEL data for Year: ${selectedYear}, Region: ${selectedRegion}, Records: ${this.belData.length}`);
-            
-            // Update region filters with disabled options after data change
-            this.updateRegionFilterWithDisabledOptions();
         }
     };
 
@@ -3217,6 +1953,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.setupBankingEdit();
             this.setupAddNoteTextarea();
         },
+
         setupEventListeners() {
             ui.modalClose?.addEventListener('click', () => this.closeModal());
             ui.saveBtn?.addEventListener('click', () => this.saveAccountChanges());
@@ -3224,17 +1961,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.modal?.addEventListener('click', (e) => {
                 if (e.target === ui.modal) this.closeModal();
             });
-            // Handle year selector changes
-            const yearSelector = document.getElementById('year-selector');
-            if (yearSelector) {
-                yearSelector.addEventListener('change', (e) => {
-                    const selectedYear = e.target.value;
-                    const record = this.getBelRecordById(appState.currentReferralId);
-                    if (record) {
-                        this.updatePerformanceMetrics(record);
-                    }
-                });
-            }
+
             // Handle Referral ID link clicks
             document.addEventListener('click', (e) => {
                 const link = e.target.closest('a.referral-id-link');
@@ -3261,7 +1988,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         },
 
-        async openModal(id, linkElement = null) {
+        openModal(id, linkElement = null) {
             // Centralized record fetching
             const record = this.getBelRecordById(id, linkElement);
 
@@ -3269,16 +1996,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error(`BEL record with ID ${id} not found.`);
                 this.showCustomAlert(`Could not find details for BEL with ID ${id}.`, 'error');
                 return;
-            }
-
-            // 確保 payout 數據已載入
-            if (!APP_DATA.payouts && !window.PAYOUT_DATA) {
-                console.log('Loading payout data before opening BEL modal...');
-                try {
-                    await ContentManager.loadPayoutData();
-                } catch (error) {
-                    console.error('Failed to load payout data:', error);
-                }
             }
 
             appState.currentReferralId = record.id;
@@ -3446,61 +2163,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update Banking Information
             this.updateBankingInformation(record);
             
-            // Setup payout year selector and update payout information
-            this.setupPayoutYearSelector(record);
-            
-            // Update Payout Information
-            this.updatePayoutInformation(record);
-
             // Update Customer Insights
             this.updateCustomerInsights(record);
-        },
-
-        setupPayoutYearSelector(record) {
-            const yearSelector = document.getElementById('payout-year-selector');
-            if (!yearSelector) return;
-            
-            // Clear existing options
-            yearSelector.innerHTML = '';
-            
-            // Get available years from payout data
-            const payoutData = APP_DATA.payouts || window.PAYOUT_DATA;
-            let availableYears = [];
-            
-            if (payoutData && payoutData.belPayoutHistory) {
-                const belPayout = payoutData.belPayoutHistory.find(bel => bel.belId === record.id);
-                if (belPayout && belPayout.payoutHistory) {
-                    const yearsSet = new Set(belPayout.payoutHistory.map(p => p.year));
-                    availableYears = Array.from(yearsSet).sort((a, b) => b - a); // Newest first
-                }
-            }
-            
-            // If no payout years found, use current year as fallback
-            if (availableYears.length === 0) {
-                availableYears = [new Date().getFullYear()];
-            }
-            
-            // Add options to selector
-            availableYears.forEach(year => {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                yearSelector.appendChild(option);
-            });
-            
-            // Set default to most recent year (current year or latest available)
-            const currentYear = new Date().getFullYear();
-            if (availableYears.includes(currentYear)) {
-                yearSelector.value = currentYear;
-            } else {
-                yearSelector.value = availableYears[0];
-            }
-            
-            // Add event listener for year changes
-            yearSelector.addEventListener('change', (e) => {
-                const selectedYear = parseInt(e.target.value);
-                this.updatePayoutInformationByYear(record, selectedYear);
-            });
         },
 
         updatePerformanceMetrics(record) {
@@ -3618,238 +2282,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        updatePayoutInformation(record) {
-            if (!record) return;
-            
-            // 確保 payout 數據已載入
-            const payoutData = APP_DATA.payouts || window.PAYOUT_DATA;
-            if (!payoutData || !payoutData.belPayoutHistory) {
-                console.log(`No payout data structure found for BEL ID: ${record.id}`);
-                // Clear payout table if no data found
-                const tbody = document.querySelector('#payout-history-tbody');
-                if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No payout history available</td></tr>';
-                }
-                // Clear summary cards
-                this.updatePayoutSummaryCards({ totalGross: 0, totalWht: 0, totalNet: 0, pendingAmount: 0 });
-                return;
-            }
-            
-            // Find BEL's payout history
-            const belPayout = payoutData.belPayoutHistory.find(bel => bel.belId === record.id);
-            
-            if (!belPayout) {
-                console.log(`No payout history found for BEL ID: ${record.id}`);
-                // Clear payout table if no data found
-                const tbody = document.querySelector('#payout-history-tbody');
-                if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No payout history available</td></tr>';
-                }
-                // Clear summary cards
-                this.updatePayoutSummaryCards({ totalGross: 0, totalWht: 0, totalNet: 0, pendingAmount: 0 });
-                return;
-            }
-            
-            console.log(`Found payout data for BEL ${record.id}:`, belPayout);
-            
-            // Get the selected year from payout year selector, default to current year (2025)
-            const payoutYearSelector = document.getElementById('payout-year-selector');
-            const selectedYear = payoutYearSelector ? parseInt(payoutYearSelector.value) : 2025;
-            
-            this.updatePayoutInformationByYear(record, selectedYear);
-        },
-
-        updatePayoutInformationByYear(record, year) {
-            if (!record) return;
-            
-            // 確保 payout 數據已載入
-            const payoutData = APP_DATA.payouts || window.PAYOUT_DATA;
-            if (!payoutData || !payoutData.belPayoutHistory) {
-                console.log(`No payout data structure found for BEL ID: ${record.id}`);
-                // Clear payout table if no data found
-                const tbody = document.querySelector('#payout-history-tbody');
-                if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No payout history available</td></tr>';
-                }
-                // Clear summary cards
-                this.updatePayoutSummaryCards({ totalGross: 0, totalWht: 0, totalNet: 0, pendingAmount: 0 });
-                return;
-            }
-            
-            // Find BEL's payout history
-            const belPayout = payoutData.belPayoutHistory.find(bel => bel.belId === record.id);
-            
-            if (!belPayout) {
-                console.log(`No payout history found for BEL ID: ${record.id}`);
-                // Clear payout table if no data found
-                const tbody = document.querySelector('#payout-history-tbody');
-                if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No payout history available</td></tr>';
-                }
-                // Clear summary cards
-                this.updatePayoutSummaryCards({ totalGross: 0, totalWht: 0, totalNet: 0, pendingAmount: 0 });
-                return;
-            }
-            
-            console.log(`Processing payout data for BEL ${record.id}, year ${year}:`, belPayout);
-            
-            // Calculate payout summary for selected year
-            const payoutSummary = this.calculatePayoutSummaryByYear(belPayout.payoutHistory, year);
-            
-            // Update payout summary cards
-            this.updatePayoutSummaryCards(payoutSummary);
-            
-            // Update payout history table
-            this.updatePayoutHistoryTable(belPayout.payoutHistory, year);
-        },
-
-        calculatePayoutSummaryByYear(payoutHistory, year) {
-            if (!payoutHistory || !Array.isArray(payoutHistory)) {
-                return { totalGross: 0, totalWht: 0, totalNet: 0, pendingAmount: 0, recentPayouts: [] };
-            }
-            
-            // Filter payouts for the selected year
-            const yearPayouts = payoutHistory.filter(payout => payout.year === year);
-            
-            const totalGross = yearPayouts.reduce((sum, payout) => sum + payout.grossPayout, 0);
-            const totalWht = yearPayouts.reduce((sum, payout) => sum + payout.wht, 0);
-            const totalNet = yearPayouts.reduce((sum, payout) => sum + payout.netPayout, 0);
-            
-            // Get the most recent 10 payouts for the selected year
-            const recentPayouts = yearPayouts
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .slice(0, 10);
-            
-            // Calculate pending amount (To be payout) based on selected year
-            let pendingAmount = 0;
-            const currentYear = new Date().getFullYear();
-            
-            if (year === currentYear) {
-                // For current year (2025), get previous month's revenue from belProfiles.json
-                pendingAmount = this.calculateCurrentYearToBePayout();
-            }
-            // For past years, pendingAmount remains 0 (no "to be payout")
-            
-            return {
-                totalGross,
-                totalWht,
-                totalNet,
-                pendingAmount,
-                recentPayouts,
-                year
-            };
-        },
-        calculatePayoutSummary(payoutHistory) {
-            // This is the old function, now delegates to the year-specific version
-            return this.calculatePayoutSummaryByYear(payoutHistory, 2025);
-        },
-        calculateCurrentYearToBePayout() {
-            // Get current BEL's previous month revenue from belProfiles.json
-            const currentBelId = this.getCurrentBelId();
-            if (!currentBelId) return 0;
-
-            // Find the BEL data in APP_DATA.belProfiles.leaderboard (修正路徑)
-            const belData = APP_DATA.belProfiles?.leaderboard?.find(bel => bel.id === currentBelId);
-            if (!belData || !belData.monthlyData) return 0;
-
-            const currentYear = new Date().getFullYear();
-            const currentMonth = new Date().getMonth(); // 0-based (0=January, 8=September)
-            
-            // Get previous month name
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                              'July', 'August', 'September', 'October', 'November', 'December'];
-            
-            let prevMonthIndex = currentMonth - 1;
-            let targetYear = currentYear;
-            
-            // Handle January case (previous month is December of previous year)
-            if (prevMonthIndex < 0) {
-                prevMonthIndex = 11; // December
-                targetYear = currentYear - 1;
-            }
-            
-            const prevMonthName = monthNames[prevMonthIndex];
-            
-            // Get the revenue from the previous month
-            if (belData.monthlyData[targetYear] && belData.monthlyData[targetYear][prevMonthName]) {
-                const monthData = belData.monthlyData[targetYear][prevMonthName];
-                return monthData.revenue || 0;
-            }
-            
-            return 0;
-        },
-        getCurrentBelId() {
-            // Prefer the ID stored in app state when modal is opened
-            if (appState.currentReferralId) return appState.currentReferralId;
-
-            // Fallback: read from modal DOM if needed (ensure correct modal ID)
-            const modal = document.querySelector('#bel-details-modal');
-            if (!modal) return null;
-
-            const belIdElement = modal.querySelector('#bel-modal-id');
-            return belIdElement ? belIdElement.textContent.trim() : null;
-        },
-        updatePayoutSummaryCards(summary) {
-            // Update "Total Gross Amount" card
-            const totalGrossCard = document.querySelector('#total-gross-amount');
-            if (totalGrossCard) {
-                totalGrossCard.textContent = `$${summary.totalGross.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            }
-            
-            // Update "WHT" card 
-            const totalWhtCard = document.querySelector('#total-wht-amount');
-            if (totalWhtCard) {
-                totalWhtCard.textContent = `-$${summary.totalWht.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            }
-            
-            // Update "Total Net Amount" card
-            const totalNetCard = document.querySelector('#total-net-amount');
-            if (totalNetCard) {
-                totalNetCard.textContent = `$${summary.totalNet.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            }
-            
-            // Update "To be payout" card if exists
-            const pendingAmountCard = document.querySelector('#pending-amount');
-            if (pendingAmountCard) {
-                pendingAmountCard.textContent = `$${summary.pendingAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            }
-        },
-
-        updatePayoutHistoryTable(payoutHistory, year = null) {
-            const tbody = document.querySelector('#payout-history-tbody');
-            if (!tbody) return;
-            
-            if (!payoutHistory || !Array.isArray(payoutHistory)) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No payout history available</td></tr>';
-                return;
-            }
-            
-            // Filter by year if specified, otherwise show all
-            let filteredPayouts = payoutHistory;
-            if (year !== null) {
-                filteredPayouts = payoutHistory.filter(payout => payout.year === year);
-            }
-            
-            if (filteredPayouts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No payout history available for ${year || 'selected period'}</td></tr>`;
-                return;
-            }
-            
-            // Sort payouts by date (most recent first) - show all records
-            const sortedPayouts = filteredPayouts
-                .sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            tbody.innerHTML = sortedPayouts.map(payout => `
-                <tr>
-                    <td>${payout.date}</td>
-                    <td>$${payout.grossPayout.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-                    <td>$${payout.wht.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-                    <td>$${payout.netPayout.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-                    <td><span class="bel-badge ${payout.status.toLowerCase()}">${payout.status}</span></td>
-                </tr>
-            `).join('');
-        },
-
         updateCustomerInsights(record) {
             if (!record) return;
             
@@ -3869,7 +2301,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         .reduce((sum, sale) => sum + sale.totalRevenue, 0);
                     
                     return `
-                        <span class="bel-badge hot-selling" title="${category}: $${categoryRevenue.toLocaleString()} revenue">
+                        <span class="tag hot-selling" title="${category}: $${categoryRevenue.toLocaleString()} revenue">
                             ${category}
                         </span>
                     `;
@@ -4371,11 +2803,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             this.showCustomAlert(`Saved changes for ${record.name}.`, 'success');
             
-            // Update both Account Management and Dashboard with current filters
+            // Update both Account Management and Dashboard
             AccountManagement.renderTable();
-            const selectedYear = window.selectedDashboardYear || Dashboard.getSelectedYear();
-            const selectedRegion = window.selectedDashboardRegion || 'all';
-            Dashboard.renderPerformanceTable(selectedYear, selectedRegion);
+            Dashboard.renderPerformanceTable();
             
             // Update Account Management cards if currently on that page
             const currentSection = document.querySelector('.content-section.active')?.id;
@@ -4459,13 +2889,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h3><i class="fas fa-exclamation-triangle" style="color: #f39800;"></i> Banking Information Update</h3>
                     </div>
                     <div class="custom-modal-body">
-                        <div>
+                        <div style="margin-bottom: 20px;">
                             <label for="change-reason" style="font-weight: bold; display: block; margin-bottom: 8px;">Reason for Change:</label>
                             <textarea id="change-reason" placeholder="Please provide a reason for this banking information change..." 
                                 style="width: 100%; min-height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
                         </div>
                         
-                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 15px;">
+                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 15px; margin-bottom: 20px;">
                             <div style="display: flex; align-items: flex-start; gap: 10px;">
                                 <input type="checkbox" id="confirm-accuracy" style="margin-top: 2px;">
                                 <label for="confirm-accuracy" style="font-size: 0.9rem; line-height: 1.4;">
@@ -4768,7 +3198,6 @@ document.addEventListener('DOMContentLoaded', () => {
        ======================================================================== */
     const ContentManager = {
         payoutModalEl: null,
-        belPayoutModalEl: null,
         supportModalEl: null,
         announcementModalEl: null,
         imageModalEl: null,
@@ -4776,7 +3205,6 @@ document.addEventListener('DOMContentLoaded', () => {
         formModalEl: null,
         historyTicketsModalEl: null,
         currentModalZIndex: 2000, // Base z-index for modals
-        currentContentType: 'dashboard', // Track current active content section
         
         getNextModalZIndex() {
             this.currentModalZIndex += 10; // Increment by 10 to allow for intermediate elements
@@ -5234,7 +3662,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <!-- Name and level pill -->
                             <div class="flex items-center space-x-2">
                                 <h2 class="bel-acct-mgmt-text-xl-var flex-1 whitespace-nowrap overflow-hidden text-ellipsis">${account.name}</h2>
-                                <span class="bel-badge ${account.level.toLowerCase()}">
+                                <span class="bel-acct-mgmt-level-${account.level.toLowerCase()}">
                                     ${account.level}
                                 </span>
                             </div>
@@ -5246,8 +3674,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="flex flex-col space-y-2 mt-4 text-sm">
                         <div class="flex items-center justify-between">
                             <span class="flex items-center space-x-1">
-                                <span class="bel-acct-mgmt-text-clicks-var">${account.revenue > 9999 ? '$' + Math.round(account.revenue / 1000) + 'K' : utils.formatMoney(account.revenue, 0)}</span>
-                                <span class="bel-acct-mgmt-text-xs-var">Rev.</span>
+                                <span class="bel-acct-mgmt-text-clicks-var">${account.clicks.toLocaleString()}</span>
+                                <span class="bel-acct-mgmt-text-xs-var">Clicks</span>
                             </span>
                             <span class="flex items-center space-x-1">
                                 <span class="bel-acct-mgmt-text-orders-var">${account.orders.toLocaleString()}</span>
@@ -5255,7 +3683,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </span>
                             <span class="flex items-center space-x-1">
                                 <span class="bel-acct-mgmt-text-cvr-var">${account.c20cvr.toFixed(2)}%</span>
-                                <span class="bel-acct-mgmt-text-xs-var">C2OCVR</span>
+                                <span class="bel-acct-mgmt-text-xs-var">C2O CVR</span>
                             </span>
                         </div>
                     </div>
@@ -5420,7 +3848,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 row.setAttribute('data-account-id', account.referralId);
                 
                 row.innerHTML = `
-                    <td><a href="#" class="referral-id-link" data-referral-id="${account.referralId}">${account.referralId}</a></td>
+                    <td><a href="#" class="bel-id-link">${account.referralId}</a></td>
                     <td>${account.name}</td>
                     <td><span class="bel-badge ${account.level.toLowerCase()}">${account.level}</span></td>
                     <td style="text-align: right;">${account.clicks.toLocaleString()}</td>
@@ -5560,20 +3988,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const accountRows = document.querySelectorAll('#account-list-table tbody tr[data-account-id]');
             accountRows.forEach(row => {
                 row.addEventListener('click', (e) => {
-                    // 如果點擊的是 referral ID 連結，打開 BEL 詳情模態框
-                    if (e.target.closest('a.referral-id-link')) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const referralId = e.target.closest('a.referral-id-link').getAttribute('data-referral-id');
-                        const accountData = APP_DATA.belProfiles.leaderboard.find(account => account.id === referralId);
-                        if (accountData) {
-                            BELModal.openModal(accountData.id);
-                        }
-                        return;
-                    }
+                    // 允許點擊連結正常工作，但防止ID連結觸發模態框
+                    if (e.target.closest('a.bel-id-link')) return;
                     
-                    // 否則，點擊行的其他部分也會打開模態框
                     const accountId = row.getAttribute('data-account-id');
+                    // 觸發現有的BEL詳情模態框
                     const accountData = APP_DATA.belProfiles.leaderboard.find(account => account.id === accountId);
                     if (accountData) {
                         BELModal.openModal(accountData.id);
@@ -5588,24 +4007,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             payoutsOrderRoot.innerHTML = `
                 <h1 class="bel-h1">Payouts & Orders</h1>
-                
-                <!-- Payout Statistics Cards -->
-                <div class="bel-stats-cards grid-cols-3">
-                    <!-- Cards will be populated by JavaScript -->
-                </div>
-                
                 <div class="bel-panel" id="payouts-history-panel">
                     <div class="panel-header">
                         <h3 style="margin:0;">Payout History 
-                            <span class="bel-badge approved" style="margin-left:4px;">Monthly payout on 12th</span>
+                            <span class="bel-badge approved" style="margin-left:4px;">${APP_DATA.payouts.payoutDayMessage}</span>
                         </h3>
                     </div>
                     <div class="scrollable-table-container">
                         <table class="bel-table" id="payout-history-table">
                             <thead>
                                 <tr>
-                                    <th data-sortable data-type="string">Payout Month</th>
-                                    <th data-sortable data-type="number">Total Amount</th>
+                                    <th data-sortable data-type="string">Payout Date</th>
+                                    <th data-sortable data-type="number">Payout Total</th>
                                     <th data-sortable data-type="number">BEL Count</th>
                                     <th>View Detail</th>
                                 </tr>
@@ -5613,67 +4026,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             <tbody></tbody>
                         </table>
                     </div>
-                    <div class="pagination-bar">
-                        <div class="rows-select">
-                            <label for="payout-rows-per-page">Rows per page</label>
-                            <select id="payout-rows-per-page" class="bel-form-control bel-form-select">
-                                <option>5</option>
-                                <option selected>12</option>
-                                <option>20</option>
-                            </select>
-                        </div>
-                        <div class="pagination-controls">
-                            <span id="payout-range-label" class="text-muted">0–0 of 0</span>
-                            <button class="bel-btn secondary" id="payout-prev-page" aria-label="Previous page">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="bel-btn secondary" id="payout-next-page" aria-label="Next page">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
                 </div>
                 
                 <div class="bel-panel" id="order-tracking-panel-payout" style="margin-top: 20px;">
                     <div class="panel-header">
                         <h3 style="margin:0;">Order Tracking</h3>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="bel-btn secondary" id="order-filter-btn">
-                                <i class="fas fa-filter"></i> Filter
-                            </button>
-                        </div>
                     </div>
-                    
-                    <!-- Filter Panel (initially hidden) -->
-                    <div class="filter-panel" id="order-filter-panel" style="display: none;">
-                        <div class="filter-row">
-                            <div class="filter-group">
-                                <label for="order-date-range">Order Date</label>
-                                <input type="text" id="order-date-range" class="bel-form-control bel-form-input" placeholder="Select date range" autocomplete="off">
-                            </div>
-                            <div class="filter-group">
-                                <label for="order-search">Search</label>
-                                <div class="search-input-container">
-                                    <input type="text" id="order-search" class="bel-form-control bel-form-input" placeholder="Order Number / ID  / Name">
-                                    <div id="order-search-suggestions" class="search-suggestions"></div>
-                                </div>
-                            </div>
-                            <div class="filter-group">
-                                <label for="order-amount">Order Amount(USD)</label>
-                                <input type="text" id="order-amount" class="bel-form-control bel-form-input" placeholder="e.g. 100-500 or >=100" autocomplete="off">
-                            </div>
-                            <div class="filter-group">
-                                <label for="order-status-filter">Status</label>
-                                <select id="order-status-filter" class="bel-form-control bel-form-select">
-                                    <option value="">All Status</option>
-                                    <option value="Completed">Completed</option>
-                                    <option value="Processing">Processing</option>
-                                    <option value="Canceled">Canceled</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <div class="scrollable-table-container">
                         <table class="bel-table" id="order-tracking-table-payout">
                             <thead>
@@ -5682,8 +4040,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <th data-sortable data-type="string">Order Number</th>
                                     <th data-sortable data-type="string">Referral ID</th>
                                     <th data-sortable data-type="string">BEL Name</th>
-                                    <th data-sortable data-type="number">Order Amount(USD)</th>
-                                    <th data-sortable data-type="string">Currency</th>
+                                    <th data-sortable data-type="number">Order Amount</th>
                                     <th data-sortable data-type="string">Status</th>
                                 </tr>
                             </thead>
@@ -5693,7 +4050,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="pagination-bar">
                         <div class="rows-select">
                             <label for="order-rows-per-page-payout">Rows per page</label>
-                            <select id="order-rows-per-page-payout" class="bel-form-control bel-form-select">
+                            <select id="order-rows-per-page-payout" class="bel-select" style="width: 70px;">
                                 <option>5</option>
                                 <option selected>10</option>
                                 <option>20</option>
@@ -5713,341 +4070,11 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             // Render data after DOM injection
-            setTimeout(async () => {
-                await this.loadPayoutData(); // Ensure payout data is loaded first
-                
-                // Get current filter values
-                const selectedYear = document.getElementById('header-year-filter') ? 
-                    document.getElementById('header-year-filter').value : null;
-                const selectedRegion = document.getElementById('header-region-filter') ? 
-                    document.getElementById('header-region-filter').value : 'all';
-                
-                this.renderPayoutStatsCards(selectedYear, selectedRegion);
-                this.renderPayoutHistory(selectedYear, selectedRegion);
-                this.renderOrdersInPayout(selectedYear, selectedRegion);
-                this.setupPayoutPagination();
+            setTimeout(() => {
+                this.renderPayoutHistory();
+                this.renderOrdersInPayout();
                 this.setupOrdersPaginationForPayout();
-                this.setupOrderFilters();
             }, 0);
-        },
-
-        /**
-         * Calculate payout statistics for the stats cards
-         * @param {string} selectedYear - Year to filter by (defaults to current selected year)
-         * @param {string} selectedRegion - Region to filter by (defaults to 'all')
-         * @returns {Object} Calculated payout statistics
-         */
-        calculatePayoutStats(selectedYear = null, selectedRegion = 'all') {
-            // Ensure payout data is loaded
-            if (!window.PAYOUT_DATA || !window.PAYOUT_DATA.belPayoutHistory) {
-                return {
-                    totalPayoutAmount: 0,
-                    activeBelCount: 0,
-                    totalOrderCount: 0
-                };
-            }
-
-            // Get BEL profiles data for order count calculation
-            const belProfilesData = APP_DATA?.belProfiles?.leaderboard || [];
-            
-            let totalPayoutAmount = 0;
-            const activeBelIds = new Set();
-            let totalOrderCount = 0;
-            
-            const currentYear = new Date().getFullYear();
-            const targetYear = selectedYear && selectedYear !== 'all' ? parseInt(selectedYear) : currentYear;
-            
-            // Process all BEL payout records
-            window.PAYOUT_DATA.belPayoutHistory.forEach(bel => {
-                // Filter by selected region if specified
-                if (selectedRegion && selectedRegion !== 'all' && bel.belRegion !== selectedRegion) {
-                    return;
-                }
-                
-                // Filter payout history by year
-                const filteredPayouts = bel.payoutHistory.filter(payout => {
-                    if (selectedYear === 'all') {
-                        return true; // Include all years
-                    }
-                    return payout.year === targetYear;
-                });
-                
-                // Sum up payout amounts and count active BELs
-                if (filteredPayouts.length > 0) {
-                    activeBelIds.add(bel.belId);
-                    filteredPayouts.forEach(payout => {
-                        totalPayoutAmount += payout.netPayout || 0;
-                    });
-                }
-            });
-            
-            // Calculate order count from belProfiles.json leaderboard data
-            belProfilesData.forEach(leader => {
-                // Apply region filter
-                if (selectedRegion && selectedRegion !== 'all' && leader.region !== selectedRegion) {
-                    return;
-                }
-                
-                // Sum orders from monthly data based on year filter
-                if (leader.monthlyData) {
-                    if (selectedYear === 'all') {
-                        // Sum all years
-                        Object.keys(leader.monthlyData).forEach(year => {
-                            Object.keys(leader.monthlyData[year]).forEach(month => {
-                                const monthData = leader.monthlyData[year][month];
-                                if (monthData && monthData.orders) {
-                                    totalOrderCount += monthData.orders;
-                                }
-                            });
-                        });
-                    } else {
-                        // Sum specific year
-                        const yearData = leader.monthlyData[targetYear.toString()];
-                        if (yearData) {
-                            Object.keys(yearData).forEach(month => {
-                                const monthData = yearData[month];
-                                if (monthData && monthData.orders) {
-                                    totalOrderCount += monthData.orders;
-                                }
-                            });
-                        }
-                    }
-                }
-            });
-            
-            return {
-                totalPayoutAmount,
-                activeBelCount: activeBelIds.size,
-                totalOrderCount
-            };
-        },
-
-        /**
-         * Calculate previous month statistics for trend comparison
-         * @param {string} selectedYear - Year to filter by
-         * @param {string} selectedRegion - Region to filter by
-         * @returns {Object} Previous month statistics and trend information
-         */
-        calculatePreviousMonthTrends(selectedYear = null, selectedRegion = 'all') {
-            const currentDate = new Date();
-            const currentMonth = currentDate.getMonth() + 1; // 1-12
-            const currentYear = currentDate.getFullYear();
-            
-            // Calculate previous month (the month we want to show trends for)
-            let targetMonth = currentMonth - 1;
-            let targetYear = currentYear;
-            if (targetMonth === 0) {
-                targetMonth = 12;
-                targetYear = currentYear - 1;
-            }
-            
-            // Calculate the month before the target month (for comparison)
-            let comparisonMonth = targetMonth - 1;
-            let comparisonYear = targetYear;
-            if (comparisonMonth === 0) {
-                comparisonMonth = 12;
-                comparisonYear = targetYear - 1;
-            }
-            
-            // Get month names
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                              'July', 'August', 'September', 'October', 'November', 'December'];
-            const targetMonthName = monthNames[targetMonth - 1];
-            
-            // Calculate target month stats (e.g., August)
-            const targetMonthStats = this.calculatePayoutStatsForSpecificMonth(targetYear, targetMonth, selectedRegion);
-            
-            // Calculate comparison month stats (e.g., July for comparison with August)
-            const comparisonMonthStats = this.calculatePayoutStatsForSpecificMonth(comparisonYear, comparisonMonth, selectedRegion);
-            
-            // Calculate growth/decline from comparison month to target month
-            const payoutAmountGrowth = targetMonthStats.totalPayoutAmount - comparisonMonthStats.totalPayoutAmount;
-            const belCountGrowth = targetMonthStats.activeBelCount - comparisonMonthStats.activeBelCount;
-            const orderCountGrowth = targetMonthStats.totalOrderCount - comparisonMonthStats.totalOrderCount;
-            
-            // Format trend values
-            const formatTrendValue = (growth, isMonetary = false) => {
-                if (growth === 0) return '0';
-                const sign = growth > 0 ? '+' : '';
-                
-                if (isMonetary) {
-                    if (Math.abs(growth) >= 100000) {
-                        return `${sign}$${(growth / 1000).toFixed(0)}k`;
-                    } else {
-                        return `${sign}$${Math.abs(growth).toLocaleString('en-US', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })}`;
-                    }
-                } else {
-                    if (Math.abs(growth) >= 1000) {
-                        return `${sign}${(growth / 1000).toFixed(0)}k`;
-                    }
-                    return `${sign}${growth.toLocaleString()}`;
-                }
-            };
-            
-            return {
-                targetMonthName,
-                payoutAmountTrend: {
-                    value: formatTrendValue(payoutAmountGrowth, true),
-                    status: payoutAmountGrowth >= 0 ? 'positive' : 'negative',
-                    text: `${payoutAmountGrowth >= 0 ? 'Increased' : 'Decreased'} in ${targetMonthName} (MoM)`
-                },
-                belCountTrend: {
-                    value: formatTrendValue(belCountGrowth),
-                    status: belCountGrowth >= 0 ? 'positive' : 'negative',
-                    text: `${belCountGrowth >= 0 ? 'Increased' : 'Decreased'} in ${targetMonthName} (MoM)`
-                },
-                orderCountTrend: {
-                    value: formatTrendValue(orderCountGrowth),
-                    status: orderCountGrowth >= 0 ? 'positive' : 'negative',
-                    text: `${orderCountGrowth >= 0 ? 'Increased' : 'Decreased'} in ${targetMonthName} (MoM)`
-                }
-            };
-        },
-
-        /**
-         * Calculate payout statistics for a specific month
-         * @param {number} year - Specific year
-         * @param {number} month - Specific month (1-12)
-         * @param {string} selectedRegion - Region to filter by
-         * @returns {Object} Statistics for the specific month
-         */
-        calculatePayoutStatsForSpecificMonth(year, month, selectedRegion = 'all') {
-            if (!window.PAYOUT_DATA || !window.PAYOUT_DATA.belPayoutHistory) {
-                return {
-                    totalPayoutAmount: 0,
-                    activeBelCount: 0,
-                    totalOrderCount: 0
-                };
-            }
-
-            // Get BEL profiles data for order count calculation
-            const belProfilesData = APP_DATA?.belProfiles?.leaderboard || [];
-            
-            let totalPayoutAmount = 0;
-            const activeBelIds = new Set();
-            let totalOrderCount = 0;
-            
-            // Process payout data for specific month
-            window.PAYOUT_DATA.belPayoutHistory.forEach(bel => {
-                // Filter by selected region if specified
-                if (selectedRegion && selectedRegion !== 'all' && bel.belRegion !== selectedRegion) {
-                    return;
-                }
-                
-                // Find payouts for the specific month
-                const monthPayouts = bel.payoutHistory.filter(payout => 
-                    payout.year === year && payout.month === month
-                );
-                
-                if (monthPayouts.length > 0) {
-                    activeBelIds.add(bel.belId);
-                    monthPayouts.forEach(payout => {
-                        totalPayoutAmount += payout.netPayout || 0;
-                    });
-                }
-            });
-            
-            // Calculate order count from belProfiles.json for specific month
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                              'July', 'August', 'September', 'October', 'November', 'December'];
-            const monthName = monthNames[month - 1];
-            
-            belProfilesData.forEach(leader => {
-                // Apply region filter
-                if (selectedRegion && selectedRegion !== 'all' && leader.region !== selectedRegion) {
-                    return;
-                }
-                
-                // Get orders for specific year and month
-                if (leader.monthlyData && leader.monthlyData[year.toString()]) {
-                    const monthData = leader.monthlyData[year.toString()][monthName];
-                    if (monthData && monthData.orders) {
-                        totalOrderCount += monthData.orders;
-                    }
-                }
-            });
-            
-            return {
-                totalPayoutAmount,
-                activeBelCount: activeBelIds.size,
-                totalOrderCount
-            };
-        },
-
-        /**
-         * Render payout statistics cards
-         * @param {string} selectedYear - Year to filter by
-         * @param {string} selectedRegion - Region to filter by
-         */
-        renderPayoutStatsCards(selectedYear = null, selectedRegion = 'all') {
-            const statsContainer = document.querySelector('#payouts-order .bel-stats-cards');
-            if (!statsContainer) return;
-            
-            // Calculate statistics based on filters
-            const stats = this.calculatePayoutStats(selectedYear, selectedRegion);
-            
-            // Calculate trends compared to previous month
-            const trends = this.calculatePreviousMonthTrends(selectedYear, selectedRegion);
-            
-            // Format values for display
-            const payoutAmountFormatted = stats.totalPayoutAmount >= 100000 ? 
-                `$${(stats.totalPayoutAmount / 1000).toFixed(0)}k` : 
-                `$${stats.totalPayoutAmount.toLocaleString()}`;
-            
-            const activeBelCountFormatted = stats.activeBelCount.toString();
-            
-            const orderCountFormatted = stats.totalOrderCount >= 100000 ? 
-                `${(stats.totalOrderCount / 1000).toFixed(0)}k` : 
-                stats.totalOrderCount.toLocaleString();
-            
-            // Define the three cards as requested
-            const cardsData = [
-                {
-                    title: 'Payout Amount ($)',
-                    value: payoutAmountFormatted,
-                    icon: 'fas fa-dollar-sign',
-                    trend: trends.payoutAmountTrend.value,
-                    trendText: trends.payoutAmountTrend.text,
-                    status: trends.payoutAmountTrend.status
-                },
-                {
-                    title: 'Active BEL Count (#)',
-                    value: activeBelCountFormatted,
-                    icon: 'fas fa-users',
-                    trend: trends.belCountTrend.value,
-                    trendText: trends.belCountTrend.text,
-                    status: trends.belCountTrend.status
-                },
-                {
-                    title: 'Total Orders (#)',
-                    value: orderCountFormatted,
-                    icon: 'fas fa-shopping-cart',
-                    trend: trends.orderCountTrend.value,
-                    trendText: trends.orderCountTrend.text,
-                    status: trends.orderCountTrend.status
-                }
-            ];
-            
-            // Render the cards
-            statsContainer.innerHTML = cardsData.map(card => `
-                <div class="bel-card">
-                    <div style="width: 100%;display: flex; flex-direction: row; justify-content: space-between;">
-                        <div>
-                            <div class="bel-card-title">${card.title}</div>
-                            <div class="bel-card-value">${card.value}</div>
-                        </div>
-                        <div class="bel-card-icon"><i class="${card.icon}"></i></div>
-                    </div>
-                    <div class="trend-indicator ${card.status}">
-                        <i class="fas fa-caret-${card.status === 'positive' ? 'up' : 'down'}"></i> 
-                        ${card.trend} 
-                        <span class="trend-indicator-text">${card.trendText}</span>
-                    </div>
-                </div>
-            `).join('');
         },
 
         injectContent() {
@@ -6130,7 +4157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <thead>
                                 <tr>
                                     <th data-sortable data-type="string">Created</th>
-                                    <th data-sortable data-type="string">Level</th>
+                                    <th data-sortable data-type="string">Category</th>
                                     <th data-sortable data-type="string">Title</th>
                                     <th data-sortable data-type="string">Body</th>
                                     <th data-sortable data-type="string">Link</th>
@@ -6148,52 +4175,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 0);
         },
 
-        async renderPayoutHistory(selectedYear = null, selectedRegion = 'all') {
+        renderPayoutHistory() {
             const tableBody = document.querySelector('#payout-history-table tbody');
             if (!tableBody) return;
             
-            // Ensure payout data is loaded
-            await this.loadPayoutData();
-            
-            // Initialize year selector if not already done
-            this.initializePayoutYearSelector();
-            
-            // Get selected year from selector if not provided
-            if (selectedYear === null) {
-                const yearSelect = document.getElementById('payout-year-select');
-                selectedYear = yearSelect ? yearSelect.value : null;
-            }
-            
-            // Get selected region from header filter if not provided
-            if (selectedRegion === 'all') {
-                const headerRegionSelect = document.getElementById('header-region-filter');
-                selectedRegion = headerRegionSelect ? headerRegionSelect.value : 'all';
-            }
-            
-            // Calculate monthly statistics from payouts.json with region filtering
-            const monthlyStats = this.calculateMonthlyPayoutStats(selectedYear, selectedRegion);
-            
-            // Apply pagination
-            const totalPayouts = monthlyStats.length;
-            const startIndex = (appState.payoutPage - 1) * appState.payoutRowsPerPage;
-            const endIndex = Math.min(startIndex + appState.payoutRowsPerPage, totalPayouts);
-            const paginatedPayouts = monthlyStats.slice(startIndex, endIndex);
-            
-            tableBody.innerHTML = paginatedPayouts.map(monthData => `
+            const payouts = APP_DATA.payouts.history;
+            tableBody.innerHTML = payouts.map(payout => `
                 <tr>
-                    <td>${monthData.monthYear}</td>
-                    <td>${utils.formatMoney(monthData.totalAmount, 2)}</td>
-                    <td>${monthData.belCount}</td>
+                    <td>${payout.date}</td>
+                    <td>${utils.formatMoney(payout.total, 2)}</td>
+                    <td>${payout.belCount}</td>
                     <td>
-                        <a href="#" class="referral-id-link payout-view-btn" data-payout-month="${monthData.key}">
+                        <button class="bel-btn-s secondary payout-view-btn" data-payout-date="${payout.date}">
                             <i class="fas fa-eye"></i> View Detail
-                        </a>
+                        </button>
                     </td>
                 </tr>
             `).join('');
-
-            // Update pagination UI
-            this.updatePayoutPaginationUI(totalPayouts, startIndex, endIndex);
 
             // Apply sorting to payout history table
             const payoutTable = document.getElementById('payout-history-table');
@@ -6202,216 +4200,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        updatePayoutPaginationUI(totalPayouts, startIndex, endIndex) {
-            const rangeLabel = document.getElementById('payout-range-label');
-            const prevBtn = document.getElementById('payout-prev-page');
-            const nextBtn = document.getElementById('payout-next-page');
-            const rowsSelect = document.getElementById('payout-rows-per-page');
-
-            if (rangeLabel) {
-                const from = totalPayouts === 0 ? 0 : startIndex + 1;
-                const to = endIndex;
-                rangeLabel.textContent = `${from}–${to} of ${totalPayouts} payouts`;
-            }
-
-            if (prevBtn) {
-                prevBtn.disabled = appState.payoutPage === 1;
-            }
-
-            if (nextBtn) {
-                nextBtn.disabled = endIndex >= totalPayouts;
-            }
-
-            if (rowsSelect) {
-                // Set the selected value based on current appState, default to 12 if not available
-                const availableOptions = ['5', '12', '20'];
-                const currentValue = appState.payoutRowsPerPage.toString();
-                rowsSelect.value = availableOptions.includes(currentValue) ? currentValue : '12';
-            }
-        },
-
-        calculateMonthlyPayoutStats(selectedYear = null, selectedRegion = 'all') {
-            // Load payout data from payouts.json if not already loaded
-            if (!window.PAYOUT_DATA) {
-                this.loadPayoutData();
-            }
-            
-            if (!window.PAYOUT_DATA || !window.PAYOUT_DATA.belPayoutHistory) {
-                return [];
-            }
-
-            const monthlyMap = new Map();
-            
-            // Process all BEL payout records
-            window.PAYOUT_DATA.belPayoutHistory.forEach(bel => {
-                // Filter by selected region if specified
-                if (selectedRegion && selectedRegion !== 'all' && bel.belRegion !== selectedRegion) {
-                    return;
-                }
-                
-                bel.payoutHistory.forEach(payout => {
-                    // Filter by selected year if specified (skip if 'all' is selected)
-                    if (selectedYear && selectedYear !== 'all' && payout.year !== parseInt(selectedYear)) {
-                        return;
-                    }
-                    
-                    const key = `${payout.year}-${String(payout.month).padStart(2, '0')}`;
-                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                                     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                    const monthYear = `${monthNames[payout.month - 1]} ${payout.year}`;
-                    
-                    if (!monthlyMap.has(key)) {
-                        monthlyMap.set(key, {
-                            key: key,
-                            monthYear: monthYear,
-                            year: payout.year,
-                            month: payout.month,
-                            totalAmount: 0,
-                            belCount: 0,
-                            payouts: []
-                        });
-                    }
-                    
-                    const monthData = monthlyMap.get(key);
-                    monthData.totalAmount += payout.netPayout || 0;
-                    monthData.belCount++;
-                    monthData.payouts.push({
-                        ...payout,
-                        belId: bel.belId,
-                        belName: bel.belName,
-                        belRegion: bel.belRegion
-                    });
-                });
-            });
-            
-            // Convert to array and sort by year/month descending
-            return Array.from(monthlyMap.values())
-                .sort((a, b) => {
-                    if (a.year !== b.year) return b.year - a.year;
-                    return b.month - a.month;
-                });
-        },
-
-        async loadPayoutData() {
-            try {
-                const response = await fetch('/data/payouts.json');
-                if (response.ok) {
-                    const payoutData = await response.json();
-                    window.PAYOUT_DATA = payoutData;
-                    APP_DATA.payouts = payoutData; // Also set in APP_DATA
-                } else {
-                    console.error('Failed to load payouts.json');
-                    const fallbackData = { belPayoutHistory: [] };
-                    window.PAYOUT_DATA = fallbackData;
-                    APP_DATA.payouts = fallbackData;
-                }
-            } catch (error) {
-                console.error('Error loading payouts.json:', error);
-                const fallbackData = { belPayoutHistory: [] };
-                window.PAYOUT_DATA = fallbackData;
-                APP_DATA.payouts = fallbackData;
-            }
-        },
-
-        initializePayoutYearSelector() {
-            const yearSelect = document.getElementById('payout-year-select');
-            if (!yearSelect || yearSelect.children.length > 0) return; // Already initialized
-            
-            if (!window.PAYOUT_DATA || !window.PAYOUT_DATA.belPayoutHistory) return;
-            
-            // Get all unique years from payout data
-            const years = new Set();
-            window.PAYOUT_DATA.belPayoutHistory.forEach(bel => {
-                bel.payoutHistory.forEach(payout => {
-                    years.add(payout.year);
-                });
-            });
-            
-            // Sort years in descending order
-            const sortedYears = Array.from(years).sort((a, b) => b - a);
-            
-            // Add "All Years" option first
-            const allOption = document.createElement('option');
-            allOption.value = '';
-            allOption.textContent = 'All Years';
-            yearSelect.appendChild(allOption);
-            
-            // Add year options
-            sortedYears.forEach(year => {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                yearSelect.appendChild(option);
-            });
-            
-            // Set default to current year if available, otherwise "All Years"
-            const currentYear = new Date().getFullYear();
-            if (sortedYears.includes(currentYear)) {
-                yearSelect.value = currentYear;
-            } else {
-                yearSelect.value = '';
-            }
-            
-            // Add event listener for year selection changes
-            yearSelect.addEventListener('change', () => {
-                this.renderPayoutHistory(yearSelect.value);
-            });
-        },
-
-        renderOrdersInPayout(selectedYear = null, selectedRegion = 'all') {
+        renderOrdersInPayout() {
             const tableBody = document.querySelector('#order-tracking-table-payout tbody');
             if (!tableBody) return;
             
-            let orders = APP_DATA.orders.history;
-            
-            // Apply year and region filters
-            if (selectedYear || (selectedRegion && selectedRegion !== 'all')) {
-                orders = orders.filter(order => {
-                    // Filter by year if specified (skip if 'all' is selected)
-                    if (selectedYear && selectedYear !== 'all') {
-                        const orderYear = new Date(order.orderDate).getFullYear();
-                        if (orderYear !== parseInt(selectedYear)) {
-                            return false;
-                        }
-                    }
-                    
-                    // Filter by region if specified
-                    if (selectedRegion && selectedRegion !== 'all') {
-                        // Get the BEL profile for this referral ID to find the region
-                        const bel = window.APP_DATA?.belProfiles?.leaderboard?.find(profile => profile.id === order.referralId);
-                        if (bel && bel.countryCode) {
-                            // Convert country code to country name
-                            const getCountryName = (countryCode) => {
-                                const countryNames = {
-                                    'TW': 'Taiwan', 'US': 'United States', 'DE': 'Germany', 'FR': 'France', 'JP': 'Japan',
-                                    'AU': 'Australia', 'KR': 'South Korea', 'IT': 'Italy', 'MX': 'Mexico', 'CN': 'China',
-                                    'CA': 'Canada', 'IN': 'India', 'NO': 'Norway', 'NL': 'Netherlands', 'BR': 'Brazil',
-                                    'SE': 'Sweden', 'CH': 'Switzerland', 'DK': 'Denmark', 'PL': 'Poland', 'BE': 'Belgium',
-                                    'SG': 'Singapore', 'TH': 'Thailand', 'MY': 'Malaysia', 'ZA': 'South Africa'
-                                };
-                                return countryNames[countryCode] || 'Others';
-                            };
-                            
-                            // Convert country name to region using utils function
-                            const countryName = getCountryName(bel.countryCode);
-                            const belRegion = utils.getRegionFromCountry(countryName);
-                            
-                            if (belRegion !== selectedRegion) {
-                                return false;
-                            }
-                        } else {
-                            // If no BEL found or no country code, exclude from filtered results
-                            return false;
-                        }
-                    }
-                    
-                    return true;
-                });
-            }
-            
-            // Apply order-specific filters
-            orders = this.applyOrderFilters(orders);
-            
+            const orders = APP_DATA.orders.history;
             const totalOrders = orders.length;
             const startIndex = (appState.orderPagePayout - 1) * appState.orderRowsPerPagePayout;
             const endIndex = Math.min(startIndex + appState.orderRowsPerPagePayout, totalOrders);
@@ -6423,17 +4216,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (order.status === 'Canceled') statusClass = 'danger';
                 else if (order.status === 'Processing') statusClass = 'processing';
                 
-                // Display original amount directly from orders.json
-                const formattedAmount = utils.formatMoney(order.amount, 2);
-                
                 return `
                     <tr>
                         <td>${order.orderDate}</td>
                         <td>${order.orderNumber}</td>
-                        <td>${order.referralId}</td>
+                        <td><a href="#" class="referral-id-link" data-referral-id="${order.referralId}">${order.referralId}</a></td>
                         <td>${order.belName}</td>
-                        <td>${formattedAmount}</td>
-                        <td>${order.currency || 'USD'}</td>
+                        <td>${utils.formatCurrency(order.amount, order.currency)}</td>
                         <td><span class="bel-badge ${statusClass}">${order.status}</span></td>
                     </tr>
                 `;
@@ -6447,54 +4236,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (orderTable) {
                 TableUtils.makeTableSortable(orderTable);
             }
-        },
-
-        applyOrderFilters(orders) {
-            const filters = appState.orderFilters;
-            
-            return orders.filter(order => {
-                // Date range filter
-                if (filters.dateFrom) {
-                    const orderDate = new Date(order.orderDate);
-                    const fromDate = new Date(filters.dateFrom);
-                    if (orderDate < fromDate) return false;
-                }
-                
-                if (filters.dateTo) {
-                    const orderDate = new Date(order.orderDate);
-                    const toDate = new Date(filters.dateTo);
-                    // Set toDate to end of day for inclusive filtering
-                    toDate.setHours(23, 59, 59, 999);
-                    if (orderDate > toDate) return false;
-                }
-                
-                // Search filter (Order Number, Referral ID or BEL Name)
-                if (filters.search) {
-                    const searchTerm = filters.search.toLowerCase();
-                    const orderNumberMatch = order.orderNumber.toLowerCase().includes(searchTerm);
-                    const referralIdMatch = order.referralId.toLowerCase().includes(searchTerm);
-                    const belNameMatch = order.belName.toLowerCase().includes(searchTerm);
-                    if (!orderNumberMatch && !referralIdMatch && !belNameMatch) return false;
-                }
-                
-                // Amount range filter 
-                if (filters.amountMin) {
-                    const minAmount = parseFloat(filters.amountMin);
-                    if (order.amount < minAmount) return false;
-                }
-                
-                if (filters.amountMax) {
-                    const maxAmount = parseFloat(filters.amountMax);
-                    if (order.amount > maxAmount) return false;
-                }
-                
-                // Status filter
-                if (filters.status && filters.status !== '') {
-                    if (order.status !== filters.status) return false;
-                }
-                
-                return true;
-            });
         },
 
         updateOrdersPaginationUIForPayout(totalOrders, startIndex, endIndex) {
@@ -6525,51 +4266,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        setupPayoutPagination() {
-            const prevBtn = document.getElementById('payout-prev-page');
-            const nextBtn = document.getElementById('payout-next-page');
-            const rowsSelect = document.getElementById('payout-rows-per-page');
-
-            if (prevBtn) {
-                prevBtn.addEventListener('click', () => {
-                    if (appState.payoutPage > 1) {
-                        appState.payoutPage--;
-                        // Get current filter values
-                        const selectedYear = document.getElementById('header-year-filter') ? 
-                            document.getElementById('header-year-filter').value : null;
-                        const selectedRegion = document.getElementById('header-region-filter') ? 
-                            document.getElementById('header-region-filter').value : 'all';
-                        this.renderPayoutHistory(selectedYear, selectedRegion);
-                    }
-                });
-            }
-
-            if (nextBtn) {
-                nextBtn.addEventListener('click', () => {
-                    appState.payoutPage++;
-                    // Get current filter values
-                    const selectedYear = document.getElementById('header-year-filter') ? 
-                        document.getElementById('header-year-filter').value : null;
-                    const selectedRegion = document.getElementById('header-region-filter') ? 
-                        document.getElementById('header-region-filter').value : 'all';
-                    this.renderPayoutHistory(selectedYear, selectedRegion);
-                });
-            }
-
-            if (rowsSelect) {
-                rowsSelect.addEventListener('change', (e) => {
-                    appState.payoutRowsPerPage = parseInt(e.target.value, 10);
-                    appState.payoutPage = 1; // Reset to first page
-                    // Get current filter values
-                    const selectedYear = document.getElementById('header-year-filter') ? 
-                        document.getElementById('header-year-filter').value : null;
-                    const selectedRegion = document.getElementById('header-region-filter') ? 
-                        document.getElementById('header-region-filter').value : 'all';
-                    this.renderPayoutHistory(selectedYear, selectedRegion);
-                });
-            }
-        },
-
         setupOrdersPaginationForPayout() {
             const prevBtn = document.getElementById('order-prev-page-payout');
             const nextBtn = document.getElementById('order-next-page-payout');
@@ -6579,12 +4275,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 prevBtn.addEventListener('click', () => {
                     if (appState.orderPagePayout > 1) {
                         appState.orderPagePayout--;
-                        // Get current filter values
-                        const selectedYear = document.getElementById('header-year-filter') ? 
-                            document.getElementById('header-year-filter').value : null;
-                        const selectedRegion = document.getElementById('header-region-filter') ? 
-                            document.getElementById('header-region-filter').value : 'all';
-                        this.renderOrdersInPayout(selectedYear, selectedRegion);
+                        this.renderOrdersInPayout();
                     }
                 });
             }
@@ -6595,12 +4286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const maxPage = Math.ceil(totalOrders / appState.orderRowsPerPagePayout);
                     if (appState.orderPagePayout < maxPage) {
                         appState.orderPagePayout++;
-                        // Get current filter values
-                        const selectedYear = document.getElementById('header-year-filter') ? 
-                            document.getElementById('header-year-filter').value : null;
-                        const selectedRegion = document.getElementById('header-region-filter') ? 
-                            document.getElementById('header-region-filter').value : 'all';
-                        this.renderOrdersInPayout(selectedYear, selectedRegion);
+                        this.renderOrdersInPayout();
                     }
                 });
             }
@@ -6609,372 +4295,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 rowsSelect.addEventListener('change', (e) => {
                     appState.orderRowsPerPagePayout = parseInt(e.target.value, 10);
                     appState.orderPagePayout = 1; // Reset to first page
-                    // Get current filter values
-                    const selectedYear = document.getElementById('header-year-filter') ? 
-                        document.getElementById('header-year-filter').value : null;
-                    const selectedRegion = document.getElementById('header-region-filter') ? 
-                        document.getElementById('header-region-filter').value : 'all';
-                    this.renderOrdersInPayout(selectedYear, selectedRegion);
+                    this.renderOrdersInPayout();
                 });
-            }
-        },
-
-        setupOrderFilters() {
-            console.log('🔧 Setting up order filters...');
-            
-            const filterBtn = document.getElementById('order-filter-btn');
-            const filterPanel = document.getElementById('order-filter-panel');
-            const searchInput = document.getElementById('order-search');
-            const suggestionsContainer = document.getElementById('order-search-suggestions');
-            const dateRangeInput = document.getElementById('order-date-range');
-            
-            console.log('📍 Order filter elements found:', {
-                filterBtn: !!filterBtn,
-                filterPanel: !!filterPanel,
-                searchInput: !!searchInput,
-                suggestionsContainer: !!suggestionsContainer
-            });
-
-            // Toggle filter panel
-            if (filterBtn) {
-                filterBtn.addEventListener('click', () => {
-                    const isVisible = filterPanel.style.display !== 'none';
-                    filterPanel.style.display = isVisible ? 'none' : 'block';
-                    filterBtn.innerHTML = isVisible 
-                        ? '<i class="fas fa-filter"></i> Filter'
-                        : '<i class="fas fa-filter"></i> Hide Filters';
-                });
-            }
-
-            // Initialize date range picker (one input for start/end)
-            let fpInstance = null;
-            if (dateRangeInput && window.flatpickr) {
-                try {
-                    fpInstance = window.flatpickr(dateRangeInput, {
-                        mode: 'range',
-                        dateFormat: 'Y-m-d',
-                        allowInput: true,
-                        onChange: (selectedDates) => {
-                            // When two dates selected, auto-apply
-                            if (selectedDates.length === 2) {
-                                applyFilters();
-                            }
-                        },
-                        onClose: () => applyFilters()
-                    });
-                } catch (e) {
-                    console.warn('flatpickr init failed, fallback to manual parsing.', e);
-                }
-            }
-
-            // Clear button removed per request; users can erase inputs to clear filters
-
-            // Auto-apply filters function
-            const parseRangeValue = () => {
-                // Returns { from, to } in 'YYYY-MM-DD' or empty strings
-                let from = '', to = '';
-                if (fpInstance && fpInstance.selectedDates && fpInstance.selectedDates.length) {
-                    const dates = fpInstance.selectedDates;
-                    if (dates[0]) from = dates[0].toISOString().slice(0,10);
-                    if (dates[1]) to = dates[1].toISOString().slice(0,10);
-                } else if (dateRangeInput && dateRangeInput.value) {
-                    // Fallback: try to split by ' to ' or ' - '
-                    const raw = dateRangeInput.value.trim();
-                    let parts = raw.split(' to ');
-                    if (parts.length < 2) parts = raw.split(' - ');
-                    if (parts.length === 2) {
-                        from = parts[0].trim();
-                        to = parts[1].trim();
-                    } else if (parts.length === 1) {
-                        from = raw; // single date
-                    }
-                }
-                return { from, to };
-            };
-
-            const parseAmount = () => {
-                // Reads from #order-amount and returns {min,max} as numbers or ''
-                const input = document.getElementById('order-amount');
-                if (!input) return { min: '', max: '' };
-                const raw = (input.value || '').trim();
-                if (!raw) return { min: '', max: '' };
-
-                // Formats supported: "a-b", ">=a", "<=b", ">a", "<b", single number
-                const between = raw.match(/^\s*(\d+(?:\.\d+)?)\s*(?:-|~|–|—|to)\s*(\d+(?:\.\d+)?)\s*$/i);
-                if (between) {
-                    const a = parseFloat(between[1]);
-                    const b = parseFloat(between[2]);
-                    if (!isNaN(a) && !isNaN(b)) return { min: Math.min(a,b), max: Math.max(a,b) };
-                }
-
-                const gte = raw.match(/^\s*>?=\s*(\d+(?:\.\d+)?)\s*$/);
-                if (gte) {
-                    const a = parseFloat(gte[1]);
-                    if (!isNaN(a)) return { min: a, max: '' };
-                }
-
-                const lte = raw.match(/^\s*<=\s*(\d+(?:\.\d+)?)\s*$/);
-                if (lte) {
-                    const b = parseFloat(lte[1]);
-                    if (!isNaN(b)) return { min: '', max: b };
-                }
-
-                const gt = raw.match(/^\s*>\s*(\d+(?:\.\d+)?)\s*$/);
-                if (gt) {
-                    const a = parseFloat(gt[1]);
-                    if (!isNaN(a)) return { min: a + Number.EPSILON, max: '' };
-                }
-
-                const lt = raw.match(/^\s*<\s*(\d+(?:\.\d+)?)\s*$/);
-                if (lt) {
-                    const b = parseFloat(lt[1]);
-                    if (!isNaN(b)) return { min: '', max: b - Number.EPSILON };
-                }
-
-                // single number -> min only
-                const single = parseFloat(raw);
-                if (!isNaN(single)) return { min: single, max: '' };
-
-                return { min: '', max: '' };
-            };
-
-            const applyFilters = () => {
-                // Update filter state
-                const range = parseRangeValue();
-                appState.orderFilters.dateFrom = range.from;
-                appState.orderFilters.dateTo = range.to;
-                appState.orderFilters.search = document.getElementById('order-search').value;
-                const amt = parseAmount();
-                appState.orderFilters.amountMin = amt.min === '' ? '' : String(amt.min);
-                appState.orderFilters.amountMax = amt.max === '' ? '' : String(amt.max);
-                appState.orderFilters.status = document.getElementById('order-status-filter').value;
-
-                // Reset to first page and re-render
-                appState.orderPagePayout = 1;
-                
-                // Get current year and region filters
-                const selectedYear = document.getElementById('header-year-filter') ? 
-                    document.getElementById('header-year-filter').value : null;
-                const selectedRegion = document.getElementById('header-region-filter') ? 
-                    document.getElementById('header-region-filter').value : 'all';
-                
-                this.renderOrdersInPayout(selectedYear, selectedRegion);
-            };
-
-            // Add auto-apply event listeners to all filter inputs
-            const filterInputs = [
-                'order-date-range', 
-                'order-search',
-                'order-amount',
-                'order-status-filter'
-            ];
-
-            filterInputs.forEach(inputId => {
-                const input = document.getElementById(inputId);
-                if (input) {
-                    if (input.id === 'order-date-range') {
-                        // flatpickr handles change; also listen to manual input
-                        input.addEventListener('change', applyFilters);
-                        input.addEventListener('blur', utils.debounce(() => applyFilters(), 300));
-                    } else if (input.type === 'text' || input.type === 'number') {
-                        // Use debounced input for text and number inputs to avoid too many calls
-                        input.addEventListener('input', utils.debounce(() => applyFilters(), 500));
-                    } else {
-                        // For date and select inputs, apply immediately
-                        input.addEventListener('change', applyFilters);
-                    }
-                }
-            });
-
-            // Setup search suggestions for the search input
-            this.setupOrderSearchSuggestions();
-        },
-
-        // Highlight helper for Order suggestions (ContentManager scope)
-        highlightMatch(text, query) {
-            if (!query) return text;
-            const safe = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const regex = new RegExp(`(${safe})`, 'gi');
-            return String(text).replace(regex, '<mark style="background-color: var(--ds-color-primary-light-30); font-weight: var(--fw-semibold);">$1</mark>');
-        },
-
-        // Order search suggestions (ContentManager scope)
-        setupOrderSearchSuggestions() {
-            const searchInput = document.getElementById('order-search');
-            const suggestionsContainer = document.getElementById('order-search-suggestions');
-
-            if (!searchInput || !suggestionsContainer) return;
-
-            let selectedIndex = -1;
-            let suggestions = [];
-
-            // Input event for showing suggestions
-            searchInput.addEventListener('input', utils.debounce((e) => {
-                const query = e.target.value.trim().toLowerCase();
-                selectedIndex = -1;
-
-                if (query.length === 0) {
-                    this.hideOrderSuggestions(suggestionsContainer);
-                    return;
-                }
-
-                // Validate data
-                const data = (window.APP_DATA || APP_DATA);
-                if (!data?.orders?.history) {
-                    this.hideOrderSuggestions(suggestionsContainer);
-                    return;
-                }
-
-                suggestions = [];
-
-                // Build suggestions: orderNumber, referralId, belName
-                data.orders.history.forEach(order => {
-                    const orderNumber = (order.orderNumber || '').toLowerCase();
-                    const referralId = (order.referralId || '').toLowerCase();
-                    const belName = (order.belName || '').toLowerCase();
-
-                    if (orderNumber.includes(query)) {
-                        suggestions.push({
-                            orderNumber: order.orderNumber,
-                            referralId: order.referralId,
-                            belName: order.belName,
-                            displayText: order.orderNumber,
-                            subText: `${order.belName} ・ ${order.referralId}`,
-                            searchField: 'orderNumber',
-                            matchValue: order.orderNumber
-                        });
-                    } else if (referralId.includes(query)) {
-                        suggestions.push({
-                            orderNumber: order.orderNumber,
-                            referralId: order.referralId,
-                            belName: order.belName,
-                            displayText: `${order.referralId}`,
-                            subText: `${order.belName} ・ Order:${order.orderNumber}`,
-                            searchField: 'referralId',
-                            matchValue: order.referralId
-                        });
-                    } else if (belName.includes(query)) {
-                        suggestions.push({
-                            orderNumber: order.orderNumber,
-                            referralId: order.referralId,
-                            belName: order.belName,
-                            displayText: `${order.belName} `,
-                            subText: `${order.referralId} ・ Order:${order.orderNumber}`,
-                            searchField: 'belName',
-                            matchValue: order.belName
-                        });
-                    }
-                });
-
-                // De-duplicate and limit
-                const uniqueSuggestions = [];
-                const seen = new Set();
-                for (const s of suggestions) {
-                    const key = `${s.searchField}-${s.matchValue}`;
-                    if (!seen.has(key)) {
-                        seen.add(key);
-                        uniqueSuggestions.push(s);
-                        if (uniqueSuggestions.length >= 8) break;
-                    }
-                }
-
-                if (uniqueSuggestions.length > 0) {
-                    this.showOrderSuggestions(uniqueSuggestions, query, suggestionsContainer, searchInput);
-                } else {
-                    this.hideOrderSuggestions(suggestionsContainer);
-                }
-            }, 150));
-
-            // Keyboard navigation
-            searchInput.addEventListener('keydown', (e) => {
-                const items = suggestionsContainer.querySelectorAll('.search-suggestion-item');
-                switch (e.key) {
-                    case 'ArrowDown':
-                        e.preventDefault();
-                        selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
-                        this.highlightOrderSuggestion(items, selectedIndex);
-                        break;
-                    case 'ArrowUp':
-                        e.preventDefault();
-                        selectedIndex = Math.max(selectedIndex - 1, -1);
-                        this.highlightOrderSuggestion(items, selectedIndex);
-                        break;
-                    case 'Enter':
-                        e.preventDefault();
-                        if (selectedIndex >= 0 && items[selectedIndex]) {
-                            this.selectOrderSuggestion(suggestions[selectedIndex], searchInput);
-                        }
-                        break;
-                    case 'Escape':
-                        this.hideOrderSuggestions(suggestionsContainer);
-                        searchInput.blur();
-                        break;
-                }
-            });
-
-            // Click outside to hide
-            document.addEventListener('click', (e) => {
-                if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
-                    this.hideOrderSuggestions(suggestionsContainer);
-                }
-            });
-
-            // Focus to re-show suggestions
-            searchInput.addEventListener('focus', () => {
-                if (searchInput.value.trim().length > 0) {
-                    searchInput.dispatchEvent(new Event('input'));
-                }
-            });
-        },
-
-        showOrderSuggestions(suggestions, query, suggestionsContainer, searchInput) {
-            if (!suggestionsContainer) return;
-            const html = suggestions.map((s, index) => {
-                const highlighted = this.highlightMatch(s.displayText, query);
-                const sub = s.subText ?? '';
-                return `
-                    <div class="search-suggestion-item" data-index="${index}">
-                        <div class="suggestion-name">${highlighted}</div>
-                        <div class="suggestion-id">${sub}</div>
-                    </div>
-                `;
-            }).join('');
-
-            suggestionsContainer.innerHTML = html;
-            suggestionsContainer.classList.add('show');
-
-            suggestionsContainer.querySelectorAll('.search-suggestion-item').forEach((item, index) => {
-                item.addEventListener('click', () => {
-                    this.selectOrderSuggestion(suggestions[index], searchInput);
-                });
-            });
-        },
-
-        hideOrderSuggestions(suggestionsContainer) {
-            if (suggestionsContainer) {
-                suggestionsContainer.classList.remove('show');
-                suggestionsContainer.innerHTML = '';
-            }
-        },
-
-        highlightOrderSuggestion(items, index) {
-            items.forEach((item, i) => item.classList.toggle('highlighted', i === index));
-        },
-
-        selectOrderSuggestion(suggestion, searchInput) {
-            if (!searchInput || !suggestion) return;
-            searchInput.value = suggestion.displayText || '';
-            const suggestionsContainer = document.getElementById('order-search-suggestions');
-            this.hideOrderSuggestions(suggestionsContainer);
-
-            // Auto-apply filters after selection
-            appState.orderFilters.search = searchInput.value;
-            appState.orderPagePayout = 1;
-
-            const selectedYear = document.getElementById('header-year-filter')?.value ?? null;
-            const selectedRegion = document.getElementById('header-region-filter')?.value ?? 'all';
-            if (typeof this.renderOrdersInPayout === 'function') {
-                this.renderOrdersInPayout(selectedYear, selectedRegion);
             }
         },
 
@@ -7070,7 +4392,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="pagination-bar" style="margin-top: 16px;">
                                 <div class="rows-select">
                                     <label for="history-modal-rows-per-page">Rows per page</label>
-                                    <select id="history-modal-rows-per-page" class="bel-form-control bel-form-select">
+                                    <select id="history-modal-rows-per-page" class="bel-select" style="width: 70px;">
                                         <option>5</option>
                                         <option selected>10</option>
                                         <option>20</option>
@@ -7209,16 +4531,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         getCategoryBadgeClass(category) {
             switch(category) {
-                case 'All':
-                    return 'admin';
-                case 'Builder':
-                    return 'builder';
-                case 'Enabler':
-                    return 'enabler';
-                case 'Exploder':
-                    return 'exploder';
-                case 'Leader':
-                    return 'leader';
+                case 'System':
+                    return 'system-badge';
+                case 'Policy Update':
+                    return 'policy-update-badge';
+                case 'Payout Reminder':
+                    return 'payout-reminder-badge';
+                case 'Campaign Launch':
+                    return 'campaign-launch-badge';
+                case 'Important':
+                    return 'important-badge';
                 default:
                     return 'secondary-color';
             }
@@ -7226,16 +4548,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         getNotificationTagClass(category) {
             switch(category) {
-                case 'All':
-                    return 'admin';
-                case 'Builder':
-                    return 'builder';
-                case 'Enabler':
-                    return 'enabler';
-                case 'Exploder':
-                    return 'exploder';
-                case 'Leader':
-                    return 'leader';
+                case 'System':
+                    return 'system';
+                case 'Policy Update':
+                    return 'policy';
+                case 'Payout Reminder':
+                    return 'payout';
+                case 'Campaign Launch':
+                    return 'campaign';
+                case 'Important':
+                    return 'important';
                 default:
                     return '';
             }
@@ -7320,113 +4642,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return this.payoutModalEl;
         },
 
-        async openBelPayoutModal(payoutMonth) {
-            // Load payout data if not already loaded
-            await this.loadPayoutData();
-            
-            // Get current filter values
-            const selectedYear = document.getElementById('header-year-filter') ? 
-                document.getElementById('header-year-filter').value : null;
-            const selectedRegion = document.getElementById('header-region-filter') ? 
-                document.getElementById('header-region-filter').value : 'all';
-            
-            const monthlyStats = this.calculateMonthlyPayoutStats(selectedYear, selectedRegion);
-            const monthData = monthlyStats.find(m => m.key === payoutMonth);
-            
-            if (!monthData) {
-                console.error('Month data not found for:', payoutMonth);
-                return;
-            }
-
-            const modal = this.ensureBelPayoutModal();
-            
-            // Update modal header
-            modal.querySelector('#bel-payout-modal-date').textContent = `Payout Month: ${monthData.monthYear}`;
-            modal.querySelector('#bel-payout-modal-total').textContent = `Total Amount: ${utils.formatMoney(monthData.totalAmount, 2)}`;
-            modal.querySelector('#bel-payout-modal-count').textContent = `BEL Count: ${monthData.belCount}`;
-
-            // Fill the table with BEL payout records
-            const tbody = modal.querySelector('#bel-payout-detail-table tbody');
-            tbody.innerHTML = monthData.payouts.map(payout => `
-                <tr data-payout-id="${payout.payoutId}">
-                    <td>${payout.payoutId}</td>
-                    <td>${payout.belId}</td>
-                    <td>${payout.belName}</td>
-                    <td>${payout.belRegion}</td>
-                    <td>${payout.date}</td>
-                    <td>${utils.formatMoney(payout.grossPayout, 2)}</td>
-                    <td>${utils.formatMoney(payout.wht, 2)}</td>
-                    <td><strong>${utils.formatMoney(payout.netPayout, 2)}</strong></td>
-                    <td>
-                        <span class="bel-badge ${payout.status === 'Completed' ? 'completed' : 'danger'}">${payout.status}</span>
-                    </td>
-                </tr>
-            `).join('');
-
-            // Make table sortable
-            const table = modal.querySelector('#bel-payout-detail-table');
-            if (table) {
-                TableUtils.makeTableSortable(table);
-            }
-
-            modal.style.zIndex = this.getNextModalZIndex();
-            modal.classList.add('show');
-        },
-
-        ensureBelPayoutModal() {
-            if (this.belPayoutModalEl) return this.belPayoutModalEl;
-            
-            const wrap = document.createElement('div');
-            wrap.className = 'modal-overlay';
-            wrap.id = 'bel-payout-modal';
-            wrap.innerHTML = `
-                <div class="modal-content" style="max-width: 1200px;">
-                    <div class="modal-header">
-                        <div style="flex: 1;">
-                            <h3 style="margin:0;">BEL Payout Details</h3>
-                            <div style="display: flex; gap: 20px; margin-top: 8px; font-size: 0.9rem; color: #666;">
-                                <span id="bel-payout-modal-date"></span>
-                                <span id="bel-payout-modal-total"></span>
-                                <span id="bel-payout-modal-count"></span>
-                            </div>
-                        </div>
-                        <button class="close-button" aria-label="Close">&times;</button>
-                    </div>
-                    
-                    <div class="modal-body" style="padding: 20px;">
-                        <div class="scrollable-table-container" style="max-height: 500px;">
-                            <table class="bel-table" id="bel-payout-detail-table">
-                                <thead>
-                                    <tr>
-                                        <th data-sortable data-type="string">Payout ID</th>
-                                        <th data-sortable data-type="string">BEL ID</th>
-                                        <th data-sortable data-type="string">BEL Name</th>
-                                        <th data-sortable data-type="string">Region</th>
-                                        <th data-sortable data-type="string">Date</th>
-                                        <th data-sortable data-type="number">Gross Payout</th>
-                                        <th data-sortable data-type="number">WHT</th>
-                                        <th data-sortable data-type="number">Net Payout</th>
-                                        <th data-sortable data-type="string">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(wrap);
-            this.belPayoutModalEl = wrap;
-
-            const close = () => this.belPayoutModalEl.classList.remove('show');
-            this.belPayoutModalEl.querySelector('.close-button')?.addEventListener('click', close);
-            this.belPayoutModalEl.addEventListener('click', (e) => { 
-                if (e.target === this.belPayoutModalEl) close(); 
-            });
-
-            return this.belPayoutModalEl;
-        },
-
         openPayoutModal(payoutDate) {
             const payout = APP_DATA.payouts.history.find(p => p.date === payoutDate);
             if (!payout) return;
@@ -7475,7 +4690,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <h3 id="sup-modal-title" style="margin:0; font-size: 1.4rem; font-weight: 600;">Support Ticket</h3>
                                 <span id="sup-modal-status"></span>
                             </div>
-                            <div id="sup-modal-ticket-num" style="color: var(--ds-color-gray-70); font-size: 0.9rem; margin-top: 4px;">Ticket #</div>
+                            <div id="sup-modal-ticket-num" style="color: #666; font-size: 0.9rem; margin-top: 4px;">Ticket #</div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <button class="close-button" aria-label="Close">&times;</button>
@@ -7512,7 +4727,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <i class="fas fa-reply" style="color: #6b7280;"></i>
                                     <span class="support-reply-form-title">Your Reply</span>
                                 </div>
-                                <textarea id="sup-reply-input" placeholder="Type your reply..." class="bel-form-control bel-form-textarea"></textarea>
+                                <textarea id="sup-reply-input" placeholder="Type your reply..." class="support-reply-textarea"></textarea>
                                 <div class="support-reply-actions">
                                     <button class="bel-btn primary" id="sup-send-btn" style="flex: 1;"><i class="fas fa-reply"></i> Send Reply</button>
                                 </div>
@@ -7653,32 +4868,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="modal-body-grid" style="grid-template-columns: 1fr;">
                         <div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
-                                <label>Level</label>
-                                <select id="ann-category" class="bel-form-control bel-form-select">
-                                    <option>All</option>
-                                    <option>Builder</option>
-                                    <option>Enabler</option>
-                                    <option>Exploder</option>
-                                    <option>Leader</option>
+                                <label>Category</label>
+                                <select id="ann-category" class="bel-select">
+                                    <option>System</option>
+                                    <option>Policy Update</option>
+                                    <option>Payout Reminder</option>
+                                    <option>Campaign Launch</option>
+                                    <option>Important</option>
                                 </select>
                             </div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
                                 <label>Title</label>
-                                <div class="input-with-counter">
-                                    <input type="text" id="ann-title" class="bel-form-control bel-form-input" maxlength="20" required placeholder="Enter announcement title" />
-                                    <small class="char-counter"><span id="title-count">0</span>/20</small>
-                                </div>
+                                <input type="text" id="ann-title" class="bel-input" maxlength="20" required placeholder="Enter announcement title" />
+                                <small style="color: #666; font-size: 12px;">Character limit: <span id="title-count">0</span>/20</small>
                             </div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
                                 <label>Body</label>
-                                <div class="input-with-counter">
-                                    <input type="text" id="ann-body" class="bel-form-control bel-form-input" maxlength="40" required placeholder="Enter announcement content" />
-                                    <small class="char-counter"><span id="body-count">0</span>/40</small>
-                                </div>
+                                <input type="text" id="ann-body" class="bel-input" maxlength="40" required placeholder="Enter announcement content" />
+                                <small style="color: #666; font-size: 12px;">Character limit: <span id="body-count">0</span>/40</small>
                             </div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
                                 <label>Link (optional)</label>
-                                <input type="url" id="ann-link" class="bel-form-control bel-form-input" placeholder="https://example.com/link"/>
+                                <input type="url" id="ann-link" class="bel-input" placeholder="https://example.com/link"/>
                             </div>
                             <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:8px;">
                                 <button class="bel-btn primary" id="ann-send"><i class="fas fa-paper-plane"></i> Send</button>
@@ -7764,7 +4975,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         li.className = 'bel-notification-item';
                         const tagClass = this.getNotificationTagClass(cat);
                         li.innerHTML = `
-                            <div class="title"><span class="bel-badge ${tagClass}">${cat}</span>${title}</div>
+                            <div class="title"><span class="tag ${tagClass}">${cat}</span>${title}</div>
                             <div class="date">${new Date().toISOString().slice(0,10)}</div>
                         `;
                         list.prepend(li);
@@ -7790,17 +5001,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setupEventListeners() {
             // Event delegation for payout view buttons
-            document.addEventListener('click', async (e) => {
+            document.addEventListener('click', (e) => {
                 const payoutBtn = e.target.closest('.payout-view-btn');
                 if (payoutBtn) {
-                    const payoutMonth = payoutBtn.getAttribute('data-payout-month');
-                    if (payoutMonth) {
-                        await this.openBelPayoutModal(payoutMonth);
-                    } else {
-                        // Fallback for old data-payout-date format
-                        const payoutDate = payoutBtn.getAttribute('data-payout-date');
-                        this.openPayoutModal(payoutDate);
-                    }
+                    const payoutDate = payoutBtn.getAttribute('data-payout-date');
+                    this.openPayoutModal(payoutDate);
                     return;
                 }
 
@@ -7917,71 +5122,69 @@ document.addEventListener('DOMContentLoaded', () => {
             wrap.className = 'modal-overlay';
             wrap.id = 'asset-form-modal';
             wrap.innerHTML = `
-                <div class="modal-content" style="max-width:800px;">
+                <div class="modal-content" style="max-width:560px;">
                     <div class="modal-header">
                         <h3 style="margin:0;" id="asset-form-title">Add Asset</h3>
                         <button class="close-button" aria-label="Close">&times;</button>
                     </div>
-                    <div class="modal-body-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start;">
-                        <!-- Left Column: Data Fields -->
-                        <div class="form-data-column">
-                            <form id="asset-form">
-                                <div class="bel-form-group" style="margin-bottom:4px;">
-                                    <label>Category</label>
-                                    <select id="asset-category" class="bel-form-control bel-form-select" required>
-                                        <option value="">Select a category</option>
-                                        <option value="IoTMart Campaign">IoTMart Campaign</option>
-                                        <option value="Advantech Resource Website">Advantech Resource Website</option>
-                                    </select>
-                                </div>
-                                <div class="bel-form-group" style="margin-bottom:4px;">
-                                    <label>Title</label>
-                                    <input type="text" id="asset-title" class="bel-form-control bel-form-input" maxlength="25" required />
-                                </div>
-                                <div class="bel-form-group" style="margin-bottom:4px;">
-                                    <label>Subtitle</label>
-                                    <input type="text" id="asset-subtitle" class="bel-form-control bel-form-input" maxlength="60" required />
-                                </div>
-                                <div class="bel-form-group" style="margin-bottom:4px;">
-                                    <label>Page Link URL</label>
-                                    <input type="url" id="asset-url" class="bel-form-control bel-form-input" placeholder="https://example.com/..." required />
-                                </div>
-                            </form>
-                        </div>
-                        
-                        <!-- Right Column: Picture Upload -->
-                        <div class="form-picture-column">
-                            <div class="bel-form-group">
-                                <label>Picture <span style="color: var(--ds-color-gray-60); font-size: 0.9em;">(Recommended: 1200 × 740 pixels)</span></label>
-                                <div class="picture-upload-area" style="border: 2px dashed var(--bel-border-color); border-radius: 4px; padding: 32px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease; min-height: 200px; display: flex; flex-direction: column; justify-content: center;" onclick="document.getElementById('asset-picture').click();">
-                                    <div class="upload-icon" style="font-size: 48px; color: #ccc; margin-bottom: 12px;">
+                    <div class="modal-body-grid" style="grid-template-columns: 1fr;">
+                        <form id="asset-form">
+                            <div class="bel-form-group" style="margin-bottom:12px;">
+                                <label>Category</label>
+                                <select id="asset-category" class="bel-select" required>
+                                    <option value="">Select a category</option>
+                                    <option value="IoTMart Campaign">IoTMart Campaign</option>
+                                    <option value="Advantech Resource Website">Advantech Resource Website</option>
+                                </select>
+                            </div>
+                            <div class="bel-form-group" style="margin-bottom:12px;">
+                                <label>Title</label>
+                                <input type="text" id="asset-title" class="bel-input" maxlength="25" required />
+                            </div>
+                            <div class="bel-form-group" style="margin-bottom:12px;">
+                                <label>Subtitle</label>
+                                <input type="text" id="asset-subtitle" class="bel-input" maxlength="60" required />
+                            </div>
+                            <div class="bel-form-group" style="margin-bottom:12px;">
+                                <label>Page Link URL</label>
+                                <input type="url" id="asset-url" class="bel-input" placeholder="https://example.com/..." required />
+                            </div>
+                            <div class="bel-form-group" style="margin-bottom:12px;">
+                                <label>Picture <span style="color: #666; font-size: 0.9em;">(Recommended: 1200 × 740 pixels)</span></label>
+                                <div class="picture-upload-area" style="border: 2px dashed var(--bel-border-color); border-radius: 4px; padding: 20px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease;" onclick="document.getElementById('asset-picture').click();">
+                                    <div class="upload-icon" style="font-size: 48px; color: #ccc; margin-bottom: 10px;">
                                         <i class="fas fa-cloud-upload-alt"></i>
                                     </div>
-                                    <div class="upload-text" style="color: var(--ds-color-gray-70); margin-bottom: 8px; font-weight: 600;">
-                                        Click to upload picture
+                                    <div class="upload-text" style="color: #666; margin-bottom: 8px;">
+                                        <strong>Click to upload picture</strong> or drag and drop
                                     </div>
-                                    <div class="upload-text-secondary" style="color: var(--ds-color-gray-60); margin-bottom: 8px; font-size: 0.9em;">
-                                        or drag and drop
-                                    </div>
-                                    <div class="upload-dimensions" style="color: var(--ds-color-gray-70); font-size: 0.85em;">
-                                        Recommended: 1200 × 740 pixels
+                                    <div class="upload-dimensions" style="color: #999; font-size: 0.9em;">
+                                        Recommended dimensions: 1200 × 740 pixels
                                     </div>
                                     <input type="file" id="asset-picture" accept="image/*" style="display: none;" />
                                 </div>
-                                <div id="picture-preview" style=" display: none;">
-                                    <div class="preview-image-container" style="position: relative; cursor: pointer; border-radius: 4px; overflow: hidden;" onclick="document.getElementById('asset-picture').click();">
-                                        <img id="preview-image" style="width: 100%; height: auto; display: block; border: 1px solid var(--bel-border-color);" />
-                                        <div class="image-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); color: white; display: none; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;">
+                                <div id="picture-preview" style="margin-top: 10px; display: none;">
+                                    <div class="preview-image-container" style="position: relative; cursor: pointer;" onclick="document.getElementById('asset-picture').click();">
+                                        <img id="preview-image" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--bel-border-color);" />
+                                        <div class="image-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); color: white; display: none; flex-direction: column; justify-content: center; align-items: center; border-radius: 4px; opacity: 0; transition: opacity 0.3s ease;">
                                             <i class="fas fa-camera" style="font-size: 24px; margin-bottom: 8px;"></i>
                                             <div>Click to change picture</div>
                                         </div>
                                     </div>
-                                    <div id="picture-info" style="color: var(--ds-color-gray-40); font-size:12px; text-align: right;"></div>
+                                    <div id="picture-info" style="margin-top: 8px; color: #666; font-size: 0.9em;"></div>
+                                    <div class="picture-actions" style="margin-top: 8px; display: flex; gap: 8px;">
+                                        <button type="button" class="bel-btn secondary" style="padding: 4px 8px; font-size: 0.8em;" onclick="document.getElementById('asset-picture').click()">
+                                            <i class="fas fa-upload"></i> Change Picture
+                                        </button>
+                                        <button type="button" class="bel-btn secondary" style="padding: 4px 8px; font-size: 0.8em;" onclick="removePicture()">
+                                            <i class="fas fa-trash"></i> Remove Picture
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="modal-actions" style="grid-column: 1 / -1; display:flex; justify-content:flex-end; gap:8px;">
-                            <button class="bel-btn primary" id="asset-save-btn">Save Asset</button>
+                        </form>
+                        <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:8px;">
+                            <button class="bel-btn primary" id="asset-save-btn">Save</button>
                             <button class="bel-btn secondary" id="asset-cancel-btn">Cancel</button>
                         </div>
                     </div>

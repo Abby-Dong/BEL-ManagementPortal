@@ -288,6 +288,24 @@ body::-webkit-scrollbar-track,
     background-color: var(--ds-color-white);
 }
 
+/* Placeholder color for unified form controls */
+.bel-form-control::placeholder {
+    color: var(--ds-color-gray-60);
+    opacity: 1; /* Ensure consistent visibility across browsers */
+}
+.bel-form-control::-webkit-input-placeholder { /* Safari/Chrome */
+    color: var(--ds-color-gray-60);
+}
+.bel-form-control::-moz-placeholder { /* Firefox */
+    color: var(--ds-color-gray-60);
+}
+.bel-form-control:-ms-input-placeholder { /* IE 10+ (legacy) */
+    color: var(--ds-color-gray-60);
+}
+.bel-form-control::-ms-input-placeholder { /* Edge (legacy) */
+    color: var(--ds-color-gray-60);
+}
+
 /* Disabled states for all form elements */
 .bel-form-control:disabled {
     background-color: var(--ds-color-gray-40);
@@ -2720,3 +2738,93 @@ body::-webkit-scrollbar-track,
     color: var(--ds-color-brand);
     font-weight: 500;
 }
+
+/* ==========================================================================
+   ORDER FILTER PANEL STYLES
+   ========================================================================== */
+.filter-panel {
+    background: var(--ds-color-gray-30);
+    border: 1px solid var(--ds-color-gray-40);
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 16px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 300px;
+        padding-top: 16px;
+        padding-bottom: 16px;
+    }
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 0;
+}
+
+.filter-row:last-of-type {
+    margin-bottom: 0;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 220px;
+    flex: 1 1 260px; /* grow/shrink with a base width so row can pack left-to-right */
+}
+
+.filter-group label {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--ds-color-gray-80);
+}
+
+.date-range-inputs,
+.amount-range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.date-separator,
+.amount-separator {
+    font-size: var(--fs-sm);
+    color: var(--ds-color-gray-70);
+    font-weight: var(--fw-medium);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 8px;
+    border-top: 1px solid var(--ds-color-gray-40);
+}
+
+/* Responsive design for filter panel */
+@media (max-width: 768px) {
+    .filter-row {
+        gap: 12px;
+    }
+    
+    .filter-actions {
+        justify-content: stretch;
+    }
+    
+    .filter-actions .bel-btn {
+        flex: 1;
+    }
+}
+
