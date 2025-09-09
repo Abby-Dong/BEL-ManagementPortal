@@ -6294,7 +6294,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         async loadPayoutData() {
             try {
-                const response = await fetch('/data/payouts.json');
+                const response = await fetch('data/payouts.json');
                 if (response.ok) {
                     const payoutData = await response.json();
                     window.PAYOUT_DATA = payoutData;
