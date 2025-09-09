@@ -24,11 +24,11 @@
             <div class="bel-header-right">
                 <!-- Header Filters -->
                 <div class="bel-header-filters">
-                    <select id="header-year-filter" class="bel-header-filter-select">
+                    <select id="header-year-filter" class="bel-form-control bel-form-select bel-select--compact">
                         <option value="all">All Years</option>
                         <!-- Years will be populated by JavaScript -->
                     </select>
-                    <select id="header-region-filter" class="bel-header-filter-select">
+                    <select id="header-region-filter" class="bel-form-control bel-form-select bel-select--compact">
                         <option value="all">All Regions</option>
                         <option value="AAU / NZ">AAU / NZ</option>
                         <option value="ASEAN">ASEAN</option>
@@ -211,20 +211,20 @@
                         <div class="bel-form-group">
                             <label for="f-referral-id">Referral ID</label>
                             <div class="search-input-container">
-                                <input id="f-referral-id" class="bel-input" type="search" placeholder="Search Referral ID" autocomplete="off" />
+                                <input id="f-referral-id" class="bel-form-control bel-form-input" type="search" placeholder="Search Referral ID" autocomplete="off" />
                                 <div id="search-suggestions-id" class="search-suggestions"></div>
                             </div>
                         </div>
                         <div class="bel-form-group">
                             <label for="f-name">Name</label>
                             <div class="search-input-container">
-                                <input id="f-name" class="bel-input" type="search" placeholder="Search Name" autocomplete="off" />
+                                <input id="f-name" class="bel-form-control bel-form-input" type="search" placeholder="Search Name" autocomplete="off" />
                                 <div id="search-suggestions-name" class="search-suggestions"></div>
                             </div>
                         </div>
                         <div class="bel-form-group">
                             <label for="f-level">Level</label>
-                            <select id="f-level" class="bel-select">
+                            <select id="f-level" class="bel-form-control bel-form-select">
                                 <option value="">All Levels</option>
                                 <option value="Builder">Builder</option>
                                 <option value="Enabler">Enabler</option>
@@ -234,7 +234,7 @@
                         </div>
                         <div class="bel-form-group">
                             <label for="f-region">Region</label>
-                            <select id="f-region" class="bel-select">
+                            <select id="f-region" class="bel-form-control bel-form-select">
                                 <option value="">All Regions</option>
                                 <option value="AAU / NZ">AAU / NZ</option>
                                 <option value="ASEAN">ASEAN</option>
@@ -253,14 +253,14 @@
                         </div>
                         <div class="bel-form-group">
                             <label for="f-country">Country</label>
-                            <select id="f-country" class="bel-select">
+                            <select id="f-country" class="bel-form-control bel-form-select">
                                 <option value="">All Countries</option>
                                 <!-- Countries will be populated by JavaScript -->
                             </select>
                         </div>
                         <div class="bel-form-group">
                             <label for="f-activity">Activity</label>
-                            <select id="f-activity" class="bel-select">
+                            <select id="f-activity" class="bel-form-control bel-form-select">
                                 <option value="">Any activity</option>
                                 <option value="clicks">Has clicks only</option>
                                 <option value="orders">Has orders</option>
@@ -310,7 +310,7 @@
                     <div class="pagination-bar">
                         <div class="rows-select">
                             <label for="rows-per-page">Rows per page</label>
-                            <select id="rows-per-page" class="bel-select" style="width: 70px;">
+                            <select id="rows-per-page" class="bel-form-control bel-form-select" style="width: 70px;">
                                 <option>10</option>
                                 <option selected>20</option>
                                 <option>50</option>
@@ -351,20 +351,20 @@
                         <div class="bel-form-group">
                             <label for="account-f-referral-id">Referral ID</label>
                             <div class="search-input-container">
-                                <input id="account-f-referral-id" class="bel-input" type="search" placeholder="Search Referral ID" autocomplete="off" />
+                                <input id="account-f-referral-id" class="bel-form-control bel-form-input" type="search" placeholder="Search Referral ID" autocomplete="off" />
                                 <div id="account-search-suggestions-id" class="search-suggestions"></div>
                             </div>
                         </div>
                         <div class="bel-form-group">
                             <label for="account-f-name">Name</label>
                             <div class="search-input-container">
-                                <input id="account-f-name" class="bel-input" type="search" placeholder="Search Name" autocomplete="off" />
+                                <input id="account-f-name" class="bel-form-control bel-form-input" type="search" placeholder="Search Name" autocomplete="off" />
                                 <div id="account-search-suggestions-name" class="search-suggestions"></div>
                             </div>
                         </div>
                         <div class="bel-form-group">
                             <label for="account-f-level">Level</label>
-                            <select id="account-f-level" class="bel-select">
+                            <select id="account-f-level" class="bel-form-control bel-form-select">
                                 <option value="">All Levels</option>
                                 <option value="Builder">Builder</option>
                                 <option value="Enabler">Enabler</option>
@@ -374,7 +374,7 @@
                         </div>
                         <div class="bel-form-group">
                             <label for="account-f-region">Region</label>
-                            <select id="account-f-region" class="bel-select">
+                            <select id="account-f-region" class="bel-form-control bel-form-select">
                                 <option value="">All Regions</option>
                                 <option value="AAU / NZ">AAU / NZ</option>
                                 <option value="ASEAN">ASEAN</option>
@@ -393,7 +393,7 @@
                         </div>
                         <div class="bel-form-group">
                             <label for="account-f-sort">Sort By</label>
-                            <select id="account-f-sort" class="bel-select">
+                            <select id="account-f-sort" class="bel-form-control bel-form-select">
                                 <option value="name">By Name</option>
                                 <option value="id">By ID</option>
                                 <option value="level">By Level</option>
@@ -414,7 +414,7 @@
                     <div class="pagination-bar" style="margin-top: 20px;">
                         <div class="rows-select">
                             <label for="account-grid-rows-per-page">Cards per page</label>
-                            <select id="account-grid-rows-per-page" class="bel-select" style="width: 70px;">
+                            <select id="account-grid-rows-per-page" class="bel-form-control bel-form-select" style="width: 70px;">
                                 <option>6</option>
                                 <option selected>12</option>
                                 <option>24</option>
@@ -461,7 +461,7 @@
                     <div class="pagination-bar" style="margin-top: 16px;">
                         <div class="rows-select">
                             <label for="account-list-rows-per-page">Rows per page</label>
-                            <select id="account-list-rows-per-page" class="bel-select" style="width: 70px;">
+                            <select id="account-list-rows-per-page" class="bel-form-control bel-form-select" style="width: 70px;">
                                 <option>5</option>
                                 <option selected>10</option>
                                 <option>20</option>
@@ -534,7 +534,7 @@
                     <div class="tab-content active" id="overview">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                             <h4 style="margin: 0;">Annual Performance Metrics</h4>
-                            <select id="year-selector" class="bel-select" style="width: auto; min-width: 100px;">
+                            <select id="year-selector" class="bel-form-control bel-form-select bel-select--inline">
                                 <option value="2024">2024</option>
                                 <option value="2025" selected>2025</option>
                             </select>
@@ -568,27 +568,27 @@
                             <div class="bel-form-group">
                                 <label>Bank Name</label>
                                 <div class="banking-display" id="bank-name-display">-</div>
-                                <input type="text" id="bank-name-edit" class="bel-input banking-edit" style="display: none;" value="">
+                                <input type="text" id="bank-name-edit" class="bel-form-control bel-form-input banking-edit" style="display: none;" value="">
                             </div>
                             <div class="bel-form-group">
                                 <label>SWIFT Code</label>
                                 <div class="banking-display" id="swift-code-display">-</div>
-                                <input type="text" id="swift-code-edit" class="bel-input banking-edit" style="display: none;" value="">
+                                <input type="text" id="swift-code-edit" class="bel-form-control bel-form-input banking-edit" style="display: none;" value="">
                             </div>
                             <div class="bel-form-group">
                                 <label>Account Holder Name (Passport Name)</label>
                                 <div class="banking-display" id="account-holder-display">-</div>
-                                <input type="text" id="account-holder-edit" class="bel-input banking-edit" style="display: none;" value="">
+                                <input type="text" id="account-holder-edit" class="bel-form-control bel-form-input banking-edit" style="display: none;" value="">
                             </div>
                             <div class="bel-form-group">
                                 <label>Phone Number</label>
                                 <div class="banking-display" id="phone-display">-</div>
-                                <input type="tel" id="phone-edit" class="bel-input banking-edit" style="display: none;" value="">
+                                <input type="tel" id="phone-edit" class="bel-form-control bel-form-input banking-edit" style="display: none;" value="">
                             </div>
                             <div class="bel-form-group" style="grid-column: 1 / -1;">
                                 <label>Address</label>
                                 <div class="banking-display" id="address-display">-</div>
-                                <textarea id="address-edit" class="bel-input banking-edit" style="display: none; min-height: 80px;"></textarea>
+                                <textarea id="address-edit" class="bel-form-control bel-form-textarea banking-edit" style="display: none; min-height: 80px;"></textarea>
                             </div>
                         </div>
                         
@@ -667,7 +667,7 @@
                     <h4>Management</h4>
                     <div class="bel-form-group">
                         <label for="level-adjustment">Adjust Level</label>
-                        <select id="level-adjustment" class="bel-select">
+                        <select id="level-adjustment" class="bel-form-control bel-form-select">
                             <option value="Builder">Builder</option>
                             <option value="Enabler">Enabler</option>
                             <option value="Exploder" selected>Exploder</option>
@@ -694,7 +694,7 @@
                         </div>
                     </div>
                     <div class="add-note-form">
-                        <textarea id="add-note-textarea" placeholder="Add a new note..."></textarea>
+                        <textarea id="add-note-textarea" class="bel-form-control bel-form-textarea" placeholder="Add a new note..."></textarea>
                         <button id="add-note-btn" class="bel-btn secondary" style="width: 100%;">Add Note</button>
                     </div>
                 </div>

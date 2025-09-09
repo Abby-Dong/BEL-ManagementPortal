@@ -230,47 +230,132 @@ body::-webkit-scrollbar-track,
     margin-left: auto; 
 }
 
-/* --- Header Filters --- */
+/* ==========================================================================
+   UNIFIED FORM ELEMENTS STYLES
+   ========================================================================== */
+
+/* Base unified form control styles - applies to all input, select, and textarea elements */
+.bel-form-control {
+    width: 100%; 
+    border: 1px solid var(--ds-color-gray-50); 
+    border-radius: 4px; 
+    font-size: var(--fs-sm); 
+    background-color: var(--ds-color-white); 
+    color: var(--ds-color-gray-80);
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: inherit;
+    padding: 8px 12px; /* Unified padding */
+}
+
+/* Input-specific styles (text inputs) */
+.bel-form-input {
+    cursor: text;
+}
+
+/* Select-specific styles (dropdowns) */
+.bel-form-select {
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23434447' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center; /* 1rem = 16px from right */
+    background-size: 12px;
+    padding-right: 4px; /* Make space for the arrow */
+}
+
+/* Textarea-specific styles */
+.bel-form-textarea {
+    cursor: text;
+    resize: vertical;
+    min-height: 80px;
+    line-height: var(--lh-base);
+}
+
+/* Hover states for all form elements */
+.bel-form-control:hover {
+    border-color: var(--ds-color-brand-light-50);
+    background-color: var(--ds-color-gray-30);
+}
+
+/* Focus states for all form elements */
+.bel-form-control:focus {
+    outline: none;
+    border-color: var(--ds-color-brand);
+    box-shadow: 0 0 0 2px var(--ds-color-brand-light-30);
+    background-color: var(--ds-color-white);
+}
+
+/* Disabled states for all form elements */
+.bel-form-control:disabled {
+    background-color: var(--ds-color-gray-40);
+    color: var(--ds-color-gray-60);
+    cursor: not-allowed;
+    border-color: var(--ds-color-gray-40);
+}
+
+/* --- Select Size Variants --- */
+/* Compact size for headers and tight spaces */
+.bel-select--compact {
+    padding: 6px 12px;
+    min-width: 120px;
+    width: auto;
+}
+
+/* Inline size for use with other elements */
+.bel-select--inline {
+    width: auto;
+    min-width: 100px;
+}
+
+/* Small size for pagination controls */
+.bel-select--small {
+    width: 70px;
+    min-width: 70px;
+}
+
+/* Wide size for section titles */
+.bel-select--wide {
+    font-weight: var(--fw-semibold);
+    width: auto;
+    min-width: 150px;
+}
+
+/* --- Header Filters Container --- */
 .bel-header-filters {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.bel-header-filter-select {
-    padding: 6px 12px;
-    border: 1px solid var(--ds-color-gray-50);
-    border-radius: 4px;
-    font-size: var(--fs-sm);
-    font-weight: var(--fw-medium);
-    background-color: var(--ds-color-white);
-    color: var(--ds-color-gray-80);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 120px;
+.date-filter input { 
+    font-weight: var(--fw-medium); 
+    width: 250px; 
+    padding: 8px 15px 8px 40px; 
 }
 
-.bel-header-filter-select:hover {
-    border-color: var(--ds-color-brand-light-50);
-    background-color: var(--ds-color-gray-30);
+.add-note-form textarea {
+    margin-bottom: 8px; 
 }
 
-.bel-header-filter-select:focus {
-    outline: none;
-    border-color: var(--ds-color-brand);
-    box-shadow: 0 0 0 2px var(--ds-color-brand-light-30);
-}
-
-/* Mobile responsive for header filters */
+/* Mobile responsive for all dropdowns */
 @media (max-width: 768px) {
     .bel-header-filters {
         gap: 8px;
     }
     
-    .bel-header-filter-select {
+    .bel-select--compact {
         min-width: 100px;
         font-size: var(--fs-xs);
         padding: 4px 8px;
+    }
+    
+    .bel-select,
+    .bel-input {
+        font-size: var(--fs-xs);
+        padding: 6px 10px;
     }
 }
 
@@ -283,10 +368,16 @@ body::-webkit-scrollbar-track,
         gap: 6px;
     }
     
-    .bel-header-filter-select {
+    .bel-select--compact {
         min-width: 80px;
         font-size: var(--fs-xs);
         padding: 4px 6px;
+    }
+    
+    .bel-select,
+    .bel-input {
+        font-size: var(--fs-xs);
+        padding: 4px 8px;
     }
 }
 
@@ -626,43 +717,46 @@ body::-webkit-scrollbar-track,
     overflow-x: hidden; 
 }
 
-.bel-h1 { 
-    font-size: var(--fs-h1); 
-    font-weight: var(--fw-extrabold); 
-    line-height: var(--lh-snug); 
-    margin-top: 0; 
-    text-align: start; 
-    color: var(--ds-color-gray-90); 
-    margin-bottom: 24px; 
+/* ==========================================================================
+   UNIFIED HEADING STYLES
+   ========================================================================== */
+
+/* Base heading styles */
+.bel-h1,
+.bel-h3,
+.dashboard-welcome,
+.section-title {
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-snug);
+    text-align: start;
+    color: var(--ds-color-gray-90);
+    margin-top: 0;
 }
 
-.bel-h3 { 
-    font-size: var(--fs-h3); 
-    font-weight: var(--fw-bold); 
-    line-height: var(--lh-snug); 
-    text-align: start; 
-    margin-top: 2rem; 
-    margin-bottom: 0.8rem; 
-    color: var(--ds-color-gray-90); 
+.bel-h1 {
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-extrabold);
+    margin-bottom: 24px;
 }
 
-.dashboard-welcome { 
-    font-size: var(--fs-h2); 
-    font-weight: var(--fw-bold); 
-    margin-bottom: 24px; 
-    color: var(--ds-color-gray-90); 
+.bel-h3 {
+    font-size: var(--fs-h3);
+    margin-top: 2rem;
+    margin-bottom: 0.8rem;
 }
 
-.section-title { 
-    font-size: var(--fs-h4); 
-    font-weight: var(--fw-bold); 
-    line-height: var(--lh-snug); 
-    color: var(--ds-color-gray-90); 
-    margin-top: 2.5rem; 
-    margin-bottom: 1rem; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
+.dashboard-welcome {
+    font-size: var(--fs-h2);
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: var(--fs-h4);
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .content-section { 
@@ -673,17 +767,102 @@ body::-webkit-scrollbar-track,
     display: block; 
 }
 
-.bel-grid-container { 
-    display: grid; 
-    gap: 24px; 
+/* ==========================================================================
+   UNIFIED GRID LAYOUT STYLES
+   ========================================================================== */
+
+/* Base grid container styles */
+.bel-grid-container,
+.bel-stats-cards,
+.metric-cards-grid,
+.performance-charts-grid,
+.product-analysis-grid {
+    display: grid;
+    gap: 24px;
 }
 
-.bel-stats-cards { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
-    gap: 24px; 
-    margin-top: 24px; 
-    margin-bottom: 24px; 
+.bel-stats-cards {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.metric-cards-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+.performance-charts-grid,
+.product-analysis-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Modal specific metric cards grid - 5 cards optimization */
+.modal-content .metric-cards-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+/* Responsive grid breakpoints */
+@media (max-width: 1024px) {
+    .performance-charts-grid,
+    .product-analysis-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 992px) {
+    .grid-cols-2,
+    .grid-cols-3,
+    .grid-cols-6,
+    .performance-grid,
+    .product-sales-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .performance-grid {
+        flex-direction: column;
+    }
+    
+    .performance-grid > div:first-child,
+    .performance-grid > div:last-child {
+        flex: none;
+        width: 100%;
+    }
+    
+    .product-sales-grid {
+        flex-direction: column;
+    }
+    
+    .product-sales-grid > div:first-child,
+    .product-sales-grid > div:last-child {
+        flex: none;
+        width: 100%;
+    }
+    
+    .pie-chart-container {
+        max-height: 200px;
+        margin-bottom: 20px;
+    }
+    
+    .flex-center {
+        height: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .modal-content .metric-cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content .metric-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
 }
 
 /* --- Cards & Panels --- */
@@ -886,23 +1065,26 @@ body::-webkit-scrollbar-track,
     margin-bottom: 2px; 
     font-weight: var(--fw-semibold); 
     font-size: var(--fs-sm); 
-    color: var(--ds-color-gray-70); 
+    color: var(--ds-color-gray-80); 
 }
 
-.bel-input, 
-.bel-select, 
-.add-note-form textarea, 
-.bel-form-group input, 
-.bel-form-group select, 
-.section-title select, 
-.date-filter input { 
-    width: 100%; 
-    padding: 8px 12px; 
-    border: 1px solid var(--ot-color-gray-45); 
-    border-radius: 4px; 
-    font-size: var(--fs-sm); 
-    background-color: var(--ds-color-white); 
-    transition: all 0.2s ease; 
+/* Input with character counter */
+.input-with-counter {
+    position: relative;
+}
+
+.input-with-counter .bel-form-input {
+    /* Make space for the counter */
+    padding-right: 60px;
+}
+
+.input-with-counter .char-counter {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: var(--fs-xs);
+    color: var(--ds-color-gray-60);
+    pointer-events: none;
 }
 
 /* Search Input Container and Suggestions */
@@ -983,161 +1165,120 @@ body::-webkit-scrollbar-track,
     padding: 8px 15px 8px 40px; 
 }
 
-.bel-btn { 
-    display: inline-flex; 
-    align-items: center; 
-    justify-content: center;
-    gap: 8px; 
-    padding: 8px 16px; 
-    border: none; 
-    border-radius: 4px; 
-    cursor: pointer; 
-    font-weight: var(--fw-semibold); 
-    transition: background-color 0.2s ease, transform 0.1s ease; 
-    font-size: var(--fs-base); 
-    text-decoration: none !important; 
-}
+/* ==========================================================================
+   UNIFIED BUTTON STYLES
+   ========================================================================== */
 
-.bel-btn.primary { 
-    background-color: var(--ds-color-link); 
-    color: var(--ds-color-white); 
-}
-
-.bel-btn.primary:hover { 
-    background-color: var(--ds-color-brand); 
-}
-
-.bel-btn.secondary { 
-    background-color: var(--ds-color-gray-40); 
-    color: var(--ds-color-gray-80); 
-}
-
-.bel-btn.secondary:hover { 
-    background-color: var(--ds-color-gray-50); 
-}
-
-.bel-btn.brand { 
-    background-color: var(--ds-color-primary); 
-    color: var(--ds-color-white); 
-    font-size: var(--fs-xs); 
-}
-
-.bel-btn.brand:hover { 
-    background-color: var(--ds-color-primary-dark); 
-}
-
-.bel-btn.danger { 
-    background-color: var(--ds-color-error); 
-    color: var(--ds-color-white); 
-}
-
-.bel-btn.danger:hover { 
-    background-color: var(--ds-color-error-dark); 
-}
-
-.bel-btn:not(.secondary) { 
-    color: var(--ds-color-white) !important; 
-}
-
-.bel-btn.active { 
-    background-color: var(--ds-color-link) !important; 
-    color: var(--ds-color-white) !important; 
-}
-
-.bel-btn.secondary.active { 
-    background-color: var(--ds-color-link) !important; 
-    color: var(--ds-color-white) !important; 
-}
-
-/* --- Small Button Styles --- */
-.bel-btn-s { 
-    display: inline-flex; 
-    align-items: center; 
-    justify-content: center;
-    gap: 8px; 
-    padding: 8px 16px; 
-    border: none; 
-    border-radius: 4px; 
-    cursor: pointer; 
-    font-weight: var(--fw-semibold); 
-    transition: background-color 0.2s ease, transform 0.1s ease; 
-    font-size: var(--fs-sm); 
-    text-decoration: none !important; 
-}
-
-.bel-btn-s.primary { 
-    background-color: var(--ds-color-link); 
-    color: var(--ds-color-white); 
-}
-
-.bel-btn-s.primary:hover { 
-    background-color: var(--ds-color-brand); 
-}
-
-.bel-btn-s.secondary { 
-    background-color: var(--ds-color-gray-40); 
-    color: var(--ds-color-gray-80); 
-}
-
-.bel-btn-s.secondary:hover { 
-    background-color: var(--ds-color-gray-50); 
-}
-
-.bel-btn-s.brand { 
-    background-color: var(--ds-color-primary); 
-    color: var(--ds-color-white); 
-    font-size: var(--fs-xs); 
-}
-
-.bel-btn-s.brand:hover { 
-    background-color: var(--ds-color-primary-dark); 
-}
-
-.bel-btn-s.danger { 
-    background-color: var(--ds-color-error); 
-    color: var(--ds-color-white); 
-}
-
-.bel-btn-s.danger:hover { 
-    background-color: var(--ds-color-error-dark); 
-}
-
-.bel-btn-s:not(.secondary) { 
-    color: var(--ds-color-white) !important; 
-}
-
-.bel-btn-s.active { 
-    background-color: var(--ds-color-link) !important; 
-    color: var(--ds-color-white) !important; 
-}
-
-.bel-btn-s.secondary.active { 
-    background-color: var(--ds-color-link) !important; 
-    color: var(--ds-color-white) !important; 
-}
-
-.filter-btn { 
-    background-color: var(--ds-color-gray-30); 
-    border: 1px solid var(--ot-color-gray-45); 
-    padding: 8px 16px; 
-    border-radius: 50px; 
-    cursor: pointer; 
-    font-weight: var(--fw-semibold); 
-    transition: all 0.2s ease; 
+/* Base button styles - applies to all button types */
+.bel-btn, 
+.bel-btn-s, 
+.filter-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: var(--fw-semibold);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    text-decoration: none !important;
 }
 
-.filter-btn:hover { 
-    background-color: var(--ot-color-gray-45); 
+/* Button size variants */
+.bel-btn {
+    padding: 8px 16px;
+    font-size: var(--fs-base);
 }
 
-.filter-btn.active { 
-    background-color: var(--ds-color-link); 
-    color: var(--ds-color-white); 
-    border-color: var(--ds-color-link); 
+.bel-btn-s {
+    padding: 8px 16px;
+    font-size: var(--fs-sm);
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    background-color: var(--ds-color-gray-30);
+    border: 1px solid var(--ot-color-gray-45);
+    border-radius: 50px;
+}
+
+/* Button color variants - Primary */
+.bel-btn.primary, 
+.bel-btn-s.primary {
+    background-color: var(--ds-color-link);
+    color: var(--ds-color-white);
+}
+
+.bel-btn.primary:hover, 
+.bel-btn-s.primary:hover {
+    background-color: var(--ds-color-brand);
+}
+
+/* Button color variants - Secondary */
+.bel-btn.secondary, 
+.bel-btn-s.secondary {
+    background-color: var(--ds-color-gray-40);
+    color: var(--ds-color-gray-80);
+}
+
+.bel-btn.secondary:hover, 
+.bel-btn-s.secondary:hover {
+    background-color: var(--ds-color-gray-50);
+}
+
+/* Button color variants - Brand */
+.bel-btn.brand, 
+.bel-btn-s.brand {
+    background-color: var(--ds-color-primary);
+    color: var(--ds-color-white);
+    font-size: var(--fs-xs);
+}
+
+.bel-btn.brand:hover, 
+.bel-btn-s.brand:hover {
+    background-color: var(--ds-color-primary-dark);
+}
+
+/* Button color variants - Danger */
+.bel-btn.danger, 
+.bel-btn-s.danger {
+    background-color: var(--ds-color-error);
+    color: var(--ds-color-white);
+}
+
+.bel-btn.danger:hover, 
+.bel-btn-s.danger:hover {
+    background-color: var(--ds-color-error-dark);
+}
+
+/* Button state variants */
+.bel-btn:not(.secondary), 
+.bel-btn-s:not(.secondary) {
+    color: var(--ds-color-white) !important;
+}
+
+.bel-btn.active, 
+.bel-btn-s.active {
+    background-color: var(--ds-color-link) !important;
+    color: var(--ds-color-white) !important;
+}
+
+.bel-btn.secondary.active, 
+.bel-btn-s.secondary.active {
+    background-color: var(--ds-color-link) !important;
+    color: var(--ds-color-white) !important;
+}
+
+/* Filter button specific styles */
+.filter-btn:hover {
+    background-color: var(--ot-color-gray-45);
+}
+
+.filter-btn.active {
+    background-color: var(--ds-color-link);
+    color: var(--ds-color-white);
+    border-color: var(--ds-color-link);
 }
 
 /* --- View Switcher --- */
@@ -1300,98 +1441,108 @@ body::-webkit-scrollbar-track,
     opacity: 1; 
 }
 
-/* --- Badges & Tags --- */
-.bel-badge { 
-    display: inline-block; 
-    padding: 4px 12px; 
-    border-radius: 4px; 
-    font-size: var(--fs-xs); 
-    font-weight: var(--fw-semibold); 
-    white-space: nowrap; 
+/* ==========================================================================
+   UNIFIED BADGE STYLES
+   ========================================================================== */
+
+/* Base badge styles - applies to all badge types */
+.bel-badge,
+.level-badge,
+.bel-acct-mgmt-level-exploder,
+.bel-acct-mgmt-level-builder,
+.bel-acct-mgmt-level-enabler,
+.bel-acct-mgmt-level-leader {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    white-space: nowrap;
 }
 
-.bel-badge.primary-color, 
-.bel-badge.pending, 
-.bel-badge.exploder { 
-    background-color: var(--ds-color-primary-light-10); 
-    color: var(--ds-color-primary); 
+/* Special level badge styling */
+.level-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 15px;
+    border-radius: 50px;
+    font-size: var(--fs-sm);
 }
 
-.bel-badge.secondary-color { 
-    background-color: var(--ds-color-gray-40); 
-    color: var(--ds-color-gray-80); 
+.level-badge i {
+    font-size: var(--fs-base);
 }
 
-.bel-badge.completed, 
-.bel-badge.enabler { 
-    background-color: var(--ds-color-success-light); 
-    color: var(--ds-color-success); 
+/* Account management level badges specific padding */
+.bel-acct-mgmt-level-exploder,
+.bel-acct-mgmt-level-builder,
+.bel-acct-mgmt-level-enabler,
+.bel-acct-mgmt-level-leader {
+    padding: 4px 8px;
 }
 
-.bel-badge.processing, 
-.bel-badge.builder { 
-    background-color: var(--ds-color-brand-light-30); 
-    color: var(--ds-color-link); 
+/* Badge color variants - Primary/Orange theme */
+.bel-badge.primary-color,
+.bel-badge.pending,
+.bel-badge.exploder,
+.bel-badge.iotmart,
+.bel-badge.campaign-launch-badge,
+.bel-acct-mgmt-level-exploder,
+.level-badge {
+    background-color: var(--ds-color-primary-light-10);
+    color: var(--ds-color-primary);
 }
 
-.bel-badge.canceled, 
+/* Badge color variants - Success/Green theme */
+.bel-badge.completed,
+.bel-badge.enabler,
+.bel-badge.payout-reminder-badge,
+.bel-acct-mgmt-level-enabler {
+    background-color: var(--ds-color-success-light);
+    color: var(--ds-color-success);
+}
+
+/* Badge color variants - Brand/Blue theme */
+.bel-badge.processing,
+.bel-badge.builder,
+.bel-badge.approved,
+.bel-badge.advantech,
+.bel-badge.system-badge,
+.bel-badge.policy-update-badge,
+.bel-acct-mgmt-level-builder {
+    background-color: var(--ds-color-brand-light-30);
+    color: var(--ds-color-link);
+}
+
+/* Special policy update badge */
+.bel-badge.policy-update-badge {
+    background-color: var(--ds-color-brand);
+    color: var(--ds-color-white);
+}
+
+/* Badge color variants - Error/Red theme */
+.bel-badge.canceled,
 .bel-badge.rejected,
-.bel-badge.danger { 
-    background-color: var(--ds-color-error-light); 
-    color: var(--ds-color-error-dark); 
+.bel-badge.danger,
+.bel-badge.leader,
+.bel-badge.important-badge,
+.bel-acct-mgmt-level-leader {
+    background-color: var(--ds-color-error-light);
+    color: var(--ds-color-error);
 }
 
-.bel-badge.approved { 
-    background-color: var(--ds-color-brand-light-30); 
-    color: var(--ds-color-brand); 
+/* Badge color variants - Secondary/Gray theme */
+.bel-badge.secondary-color {
+    background-color: var(--ds-color-gray-40);
+    color: var(--ds-color-gray-80);
 }
 
-.bel-badge.leader { 
-    background-color: var(--ds-color-error-light); 
-    color: var(--ds-color-error); 
-}
-
-.bel-badge.admin { 
-    background-color: var(--ds-color-link); 
-    color: var(--ds-color-white); 
+/* Special admin badge */
+.bel-badge.admin {
+    background-color: var(--ds-color-link);
+    color: var(--ds-color-white);
     font-weight: var(--fw-bold);
-}
-
-/* --- Category Badge Styles --- */
-.bel-badge.iotmart { 
-    background-color: var(--ds-color-primary-light-10); 
-    color: var(--ds-color-primary-dark); 
-}
-
-.bel-badge.advantech { 
-    background-color: var(--ds-color-brand-light-30); 
-    color: var(--ds-color-brand-dark); 
-}
-
-/* --- Announcement Category Badges --- */
-.bel-badge.system-badge { 
-    background-color: var(--ds-color-brand-light-30); 
-    color: var(--ds-color-brand-dark); 
-}
-
-.bel-badge.policy-update-badge { 
-    background-color: var(--ds-color-brand); 
-    color: var(--ds-color-white); 
-}
-
-.bel-badge.payout-reminder-badge { 
-    background-color: var(--ds-color-success-light); 
-    color: var(--ds-color-success-dark); 
-}
-
-.bel-badge.campaign-launch-badge { 
-    background-color: var(--ds-color-primary-light-10); 
-    color: var(--ds-color-primary-dark); 
-}
-
-.bel-badge.important-badge { 
-    background-color: var(--ds-color-error-light); 
-    color: var(--ds-color-error-dark); 
 }
 
 /* --- Grid & Layout Helpers --- */
@@ -1459,50 +1610,130 @@ body::-webkit-scrollbar-track,
     height: 100%; 
 }
 
-/* --- Modal Styles --- */
-.modal-overlay { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background-color: rgba(0,0,0,0.5); 
-    display: none; 
-    align-items: flex-start; 
-    justify-content: center; 
-    z-index: 2000; 
-    overflow-y: auto; 
-    padding: 20px 0; 
-}
+/* ==========================================================================
+   UNIFIED MODAL STYLES
+   ========================================================================== */
 
-/* Custom modal overlays for specialized modals */
+/* Base modal overlay styles */
+.modal-overlay,
 .custom-modal-overlay {
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background-color: rgba(0,0,0,0.5); 
-    display: none; 
-    align-items: center; 
-    justify-content: center; 
-    z-index: 2000; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: none;
+    z-index: 2000;
 }
 
-.modal-overlay.show { 
-    display: flex; 
+.modal-overlay {
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 20px 0;
 }
 
-.modal-content { 
-    background-color: var(--ds-color-white); 
-    padding: 24px; 
-    border-radius: 4px; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-    width: 100%; 
-    max-height: calc(100vh - 40px); 
-    overflow-y: auto; 
-    margin: auto; 
-    scroll-behavior: smooth; 
+.custom-modal-overlay {
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+/* Base modal content styles */
+.modal-content,
+.custom-modal-content {
+    background-color: var(--ds-color-white);
+    padding: 24px;
+    border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    width: 100%;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.modal-content {
+    margin: auto;
+    scroll-behavior: smooth;
+}
+
+.custom-modal-content {
+    max-width: 400px;
+    width: 90%;
+}
+
+/* Custom modal dialog specific styles */
+.custom-modal-content h3 {
+    margin: 0 0 15px 0;
+    color: var(--ds-color-gray-90);
+    font-size: var(--fs-xl);
+}
+
+.custom-modal-content textarea {
+    min-height: 80px;
+    resize: vertical;
+    margin-bottom: 15px;
+}
+
+.custom-modal-content .checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.custom-modal-content .checkbox-container input[type="checkbox"] {
+    margin-top: 2px;
+}
+
+.custom-modal-content .checkbox-container label {
+    color: var(--ds-color-gray-70);
+    font-size: var(--fs-sm);
+    line-height: 1.4;
+}
+
+.custom-modal-content .button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.custom-modal-content .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: var(--fs-sm);
+}
+
+.custom-modal-content .btn-secondary {
+    background: var(--ds-color-gray-60);
+    color: var(--ds-color-white);
+}
+
+.custom-modal-content .btn-secondary:hover {
+    background: var(--ds-color-gray-70);
+}
+
+.custom-modal-content .btn-primary {
+    background: var(--ds-color-link);
+    color: var(--ds-color-white);
+}
+
+.custom-modal-content .btn-primary:hover {
+    background: var(--ds-color-brand);
+}
+
+.custom-modal-content .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.modal-content.modal-lg {
+    max-width: 1100px;
 }
 
 /* Custom scrollbar for modal */
@@ -1522,21 +1753,6 @@ body::-webkit-scrollbar-track,
 
 .modal-content::-webkit-scrollbar-thumb:hover {
     background: var(--ds-color-gray-70);
-}
-
-.modal-content.modal-lg { 
-    max-width: 1100px; 
-}
-
-/* Custom modal content styles */
-.custom-modal-content {
-    background-color: var(--ds-color-white);
-    padding: 24px;
-    border-radius: 4px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    width: 100%;
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
 }
 
 .custom-modal-header {
@@ -1613,7 +1829,6 @@ body::-webkit-scrollbar-track,
     display: grid; 
     grid-template-columns: 2fr 1fr; 
     gap: 30px; 
-    padding-top: 15px; 
     align-items: start;
 }
 
@@ -1677,25 +1892,6 @@ body::-webkit-scrollbar-track,
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
     gap: 15px; 
 }
-
-/* Modal specific metric cards grid - 5 cards optimization */
-.modal-content .metric-cards-grid {
-    grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
-}
-
-@media (max-width: 768px) {
-    .modal-content .metric-cards-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .modal-content .metric-cards-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
     
     /* Additional modal optimizations for small screens */
     .modal-overlay {
@@ -1757,7 +1953,6 @@ body::-webkit-scrollbar-track,
         font-size: 14px;
         padding: 6px 10px;
     }
-}
 
 .metric-card { 
     background-color: var(--ds-color-gray-30); 
@@ -1787,12 +1982,6 @@ body::-webkit-scrollbar-track,
     border-radius: 4px;
     padding: 16px;
     margin-bottom: 1rem;
-}
-
-.modal-content .tab-content h4 {
-    color: var(--ds-color-gray-90);
-    border-bottom: 1px solid var(--ds-color-gray-40);
-    padding-bottom: 0.5rem;
 }
 
 /* Banking Information Styles */
@@ -1921,42 +2110,7 @@ body::-webkit-scrollbar-track,
     transform: translateY(-4px);
 }
 
-/* Level pill styles */
-.bel-acct-mgmt-level-exploder { 
-    background-color: var(--ds-color-primary-light-10); 
-    color: var(--ds-color-primary); 
-    font-weight: var(--fw-semibold); 
-    font-size: var(--fs-xs); 
-    padding: 4px 8px; 
-    border-radius: 4px; 
-}
-
-.bel-acct-mgmt-level-builder { 
-    background-color: var(--ds-color-brand-light-30); 
-    color: var(--ds-color-link); 
-    font-weight: var(--fw-semibold); 
-    font-size: var(--fs-xs); 
-    padding: 4px 8px; 
-    border-radius: 4px; 
-}
-
-.bel-acct-mgmt-level-enabler { 
-    background-color: var(--ds-color-success-light); 
-    color: var(--ds-color-success); 
-    font-weight: var(--fw-semibold); 
-    font-size: var(--fs-xs); 
-    padding: 4px 8px; 
-    border-radius: 4px; 
-}
-
-.bel-acct-mgmt-level-leader { 
-    background-color: var(--ds-color-error-light); 
-    color: var(--ds-color-error); 
-    font-weight: var(--fw-semibold); 
-    font-size: var(--fs-xs); 
-    padding: 4px 8px; 
-    border-radius: 4px; 
-}
+/* Level pill styles are now unified in the badge styles section above */
 
 /* Text styles */
 .bel-acct-mgmt-text-xl-var { 
@@ -2234,51 +2388,6 @@ body::-webkit-scrollbar-track,
     } 
 }
 
-@media (max-width: 1024px) { 
-    .product-analysis-grid { 
-        grid-template-columns: 1fr; 
-    } 
-}
-
-@media (max-width: 992px) { 
-    .grid-cols-2, 
-    .grid-cols-3, 
-    .grid-cols-6, 
-    .performance-grid,
-    .product-sales-grid { 
-        grid-template-columns: 1fr; 
-    } 
-    
-    .performance-grid { 
-        flex-direction: column; 
-    }
-    
-    .performance-grid > div:first-child,
-    .performance-grid > div:last-child {
-        flex: none;
-        width: 100%;
-    }
-    
-    .product-sales-grid { 
-        flex-direction: column; 
-    }
-    
-    .product-sales-grid > div:first-child,
-    .product-sales-grid > div:last-child {
-        flex: none;
-        width: 100%;
-    }
-    
-    .pie-chart-container {
-        max-height: 200px;
-        margin-bottom: 20px;
-    }
-    
-    .flex-center { 
-        height: auto; 
-    } 
-}
-
 @media (max-width: 768px) {
     .bel-sidebar-logo img { 
         width: 160px; 
@@ -2552,99 +2661,9 @@ body::-webkit-scrollbar-track,
     gap: 12px;
 }
 
-/* Custom Modal Dialogs */
-.custom-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 10001;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+/* Custom Modal Dialogs specific styling is now unified in the modal styles section above */
 
-.custom-modal-content {
-    background: white;
-    border-radius: 4px;
-    padding: 20px;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
 
-.custom-modal-content h3 {
-    margin: 0 0 15px 0;
-    color: #333;
-    font-size: 1.2rem;
-}
-
-.custom-modal-content textarea {
-    width: 100%;
-    min-height: 80px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    resize: vertical;
-    font-family: inherit;
-    margin-bottom: 15px;
-}
-
-.custom-modal-content .checkbox-container {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 20px;
-    gap: 10px;
-}
-
-.custom-modal-content .checkbox-container input[type="checkbox"] {
-    margin-top: 2px;
-}
-
-.custom-modal-content .checkbox-container label {
-    color: #666;
-    font-size: 0.9rem;
-    line-height: 1.4;
-}
-
-.custom-modal-content .button-group {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-}
-
-.custom-modal-content .btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.custom-modal-content .btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.custom-modal-content .btn-secondary:hover {
-    background: #5a6268;
-}
-
-.custom-modal-content .btn-primary {
-    background: #007bff;
-    color: white;
-}
-
-.custom-modal-content .btn-primary:hover {
-    background: #0056b3;
-}
-
-.custom-modal-content .btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
 
 /* Sales Performance Insights Styles */
 .sales-summary {

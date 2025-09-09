@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userProfile: document.querySelector('.bel-user-profile'),
         userProfilePanel: document.getElementById('user-profile-panel'),
         
-        // Account Management
+        // Account Management (legacy filters)
         regionSel: document.getElementById('f-region'),
         countrySel: document.getElementById('f-country'),
         rowsPerPage: document.getElementById('rows-per-page'),
@@ -133,7 +133,16 @@ document.addEventListener('DOMContentLoaded', () => {
         page: 1, 
         rowsPerPage: 10, 
         selected: new Set(),
-        filters: { keyword: '', referralId: '', level: '', region: '', country: '', start: '', end: '', activity: '' },
+        filters: { 
+            keyword: '', 
+            referralId: '', 
+            level: '', 
+            region: '', 
+            country: '', 
+            startDate: '', 
+            endDate: '', 
+            activity: '' 
+        },
         sortDir: 'desc', 
         currentReferralId: null, 
         notes: {},
@@ -4667,7 +4676,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="pagination-bar">
                         <div class="rows-select">
                             <label for="order-rows-per-page-payout">Rows per page</label>
-                            <select id="order-rows-per-page-payout" class="bel-select" style="width: 70px;">
+                            <select id="order-rows-per-page-payout" class="bel-select bel-select--small">>
                                 <option>5</option>
                                 <option selected>10</option>
                                 <option>20</option>
@@ -5009,7 +5018,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="pagination-bar" style="margin-top: 16px;">
                                 <div class="rows-select">
                                     <label for="history-modal-rows-per-page">Rows per page</label>
-                                    <select id="history-modal-rows-per-page" class="bel-select" style="width: 70px;">
+                                    <select id="history-modal-rows-per-page" class="bel-select bel-select--small">>
                                         <option>5</option>
                                         <option selected>10</option>
                                         <option>20</option>
@@ -5307,7 +5316,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <h3 id="sup-modal-title" style="margin:0; font-size: 1.4rem; font-weight: 600;">Support Ticket</h3>
                                 <span id="sup-modal-status"></span>
                             </div>
-                            <div id="sup-modal-ticket-num" style="color: #666; font-size: 0.9rem; margin-top: 4px;">Ticket #</div>
+                            <div id="sup-modal-ticket-num" style="color: var(--ds-color-gray-70); font-size: 0.9rem; margin-top: 4px;">Ticket #</div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <button class="close-button" aria-label="Close">&times;</button>
@@ -5344,7 +5353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <i class="fas fa-reply" style="color: #6b7280;"></i>
                                     <span class="support-reply-form-title">Your Reply</span>
                                 </div>
-                                <textarea id="sup-reply-input" placeholder="Type your reply..." class="support-reply-textarea"></textarea>
+                                <textarea id="sup-reply-input" placeholder="Type your reply..." class="bel-form-control bel-form-textarea"></textarea>
                                 <div class="support-reply-actions">
                                     <button class="bel-btn primary" id="sup-send-btn" style="flex: 1;"><i class="fas fa-reply"></i> Send Reply</button>
                                 </div>
@@ -5486,7 +5495,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
                                 <label>Category</label>
-                                <select id="ann-category" class="bel-select">
+                                <select id="ann-category" class="bel-form-control bel-form-select">
                                     <option>System</option>
                                     <option>Policy Update</option>
                                     <option>Payout Reminder</option>
@@ -5496,17 +5505,21 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
                                 <label>Title</label>
-                                <input type="text" id="ann-title" class="bel-input" maxlength="20" required placeholder="Enter announcement title" />
-                                <small style="color: #666; font-size: 12px;">Character limit: <span id="title-count">0</span>/20</small>
+                                <div class="input-with-counter">
+                                    <input type="text" id="ann-title" class="bel-form-control bel-form-input" maxlength="20" required placeholder="Enter announcement title" />
+                                    <small class="char-counter"><span id="title-count">0</span>/20</small>
+                                </div>
                             </div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
                                 <label>Body</label>
-                                <input type="text" id="ann-body" class="bel-input" maxlength="40" required placeholder="Enter announcement content" />
-                                <small style="color: #666; font-size: 12px;">Character limit: <span id="body-count">0</span>/40</small>
+                                <div class="input-with-counter">
+                                    <input type="text" id="ann-body" class="bel-form-control bel-form-input" maxlength="40" required placeholder="Enter announcement content" />
+                                    <small class="char-counter"><span id="body-count">0</span>/40</small>
+                                </div>
                             </div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
                                 <label>Link (optional)</label>
-                                <input type="url" id="ann-link" class="bel-input" placeholder="https://example.com/link"/>
+                                <input type="url" id="ann-link" class="bel-form-control bel-form-input" placeholder="https://example.com/link"/>
                             </div>
                             <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:8px;">
                                 <button class="bel-btn primary" id="ann-send"><i class="fas fa-paper-plane"></i> Send</button>
@@ -5748,7 +5761,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <form id="asset-form">
                             <div class="bel-form-group" style="margin-bottom:12px;">
                                 <label>Category</label>
-                                <select id="asset-category" class="bel-select" required>
+                                <select id="asset-category" class="bel-form-control bel-form-select" required>
                                     <option value="">Select a category</option>
                                     <option value="IoTMart Campaign">IoTMart Campaign</option>
                                     <option value="Advantech Resource Website">Advantech Resource Website</option>
@@ -5756,23 +5769,23 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
                                 <label>Title</label>
-                                <input type="text" id="asset-title" class="bel-input" maxlength="25" required />
+                                <input type="text" id="asset-title" class="bel-form-control bel-form-input" maxlength="25" required />
                             </div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
                                 <label>Subtitle</label>
-                                <input type="text" id="asset-subtitle" class="bel-input" maxlength="60" required />
+                                <input type="text" id="asset-subtitle" class="bel-form-control bel-form-input" maxlength="60" required />
                             </div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
                                 <label>Page Link URL</label>
-                                <input type="url" id="asset-url" class="bel-input" placeholder="https://example.com/..." required />
+                                <input type="url" id="asset-url" class="bel-form-control bel-form-input" placeholder="https://example.com/..." required />
                             </div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
-                                <label>Picture <span style="color: #666; font-size: 0.9em;">(Recommended: 1200 × 740 pixels)</span></label>
+                                <label>Picture <span style="color: var(--ds-color-gray-70); font-size: 0.9em;">(Recommended: 1200 × 740 pixels)</span></label>
                                 <div class="picture-upload-area" style="border: 2px dashed var(--bel-border-color); border-radius: 4px; padding: 20px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease;" onclick="document.getElementById('asset-picture').click();">
                                     <div class="upload-icon" style="font-size: 48px; color: #ccc; margin-bottom: 10px;">
                                         <i class="fas fa-cloud-upload-alt"></i>
                                     </div>
-                                    <div class="upload-text" style="color: #666; margin-bottom: 8px;">
+                                    <div class="upload-text" style="color: var(--ds-color-gray-70); margin-bottom: 8px;">
                                         <strong>Click to upload picture</strong> or drag and drop
                                     </div>
                                     <div class="upload-dimensions" style="color: #999; font-size: 0.9em;">
@@ -5788,7 +5801,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                             <div>Click to change picture</div>
                                         </div>
                                     </div>
-                                    <div id="picture-info" style="margin-top: 8px; color: #666; font-size: 0.9em;"></div>
+                                    <div id="picture-info" style="margin-top: 8px; color: var(--ds-color-gray-70); font-size: 0.9em;"></div>
                                     <div class="picture-actions" style="margin-top: 8px; display: flex; gap: 8px;">
                                         <button type="button" class="bel-btn secondary" style="padding: 4px 8px; font-size: 0.8em;" onclick="document.getElementById('asset-picture').click()">
                                             <i class="fas fa-upload"></i> Change Picture
