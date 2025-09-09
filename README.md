@@ -235,7 +235,7 @@ const APP_DATA = {
     },
     orders: {
       history: [
-        { orderDate: "2025-08-20", orderNumber: "IMTW000234", referralId: "KTWADVANT", amount: 1250.00, status: "Completed" }
+        { orderDate: "2025-08-20", orderNumber: "IMTW000234", referralId: "ATWADVANT", amount: 1250.00, status: "Completed" }
         // ...訂單追蹤記錄
       ]
     }
@@ -252,7 +252,7 @@ const APP_DATA = {
   supportAndComm: {
     // 客戶支援與溝通資料
     tickets: [
-      { ticketNumber: "TICK-2025-001", belName: "Maxwell Walker", referralId: "KTWADVANT", subject: "Payment inquiry", status: "Open" }
+      { ticketNumber: "TICK-2025-001", belName: "Maxwell Walker", referralId: "ATWADVANT", subject: "Payment inquiry", status: "Open" }
       // ...支援客服單列表
     ],
     announcements: [

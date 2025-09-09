@@ -1,7 +1,7 @@
 {
   "leaderboard": [
     {
-      "id": "KTWADVANT",
+      "id": "ATWADVANT",
       "name": "Maxwell Walker",
       "email": "maxwell.walker@wellwolf.com",
       "level": "Exploder",
@@ -1691,6 +1691,1557 @@
       },
       "region": "Korea",
       "countryCode": "KR"
+    },
+    {
+      "id": "AUSTOLIVM",
+      "name": "Oliver Martin",
+      "email": "oliver.martin@techsolutions.au",
+      "level": "Builder",
+      "monthlyData": {
+        "2024": {
+          "January": {
+            "clicks": 287,
+            "orders": 6,
+            "revenue": 4621
+          },
+          "February": {
+            "clicks": 294,
+            "orders": 5,
+            "revenue": 4183
+          },
+          "March": {
+            "clicks": 312,
+            "orders": 6,
+            "revenue": 5142
+          },
+          "April": {
+            "clicks": 295,
+            "orders": 6,
+            "revenue": 4856
+          },
+          "May": {
+            "clicks": 308,
+            "orders": 7,
+            "revenue": 5394
+          },
+          "June": {
+            "clicks": 321,
+            "orders": 7,
+            "revenue": 5683
+          },
+          "July": {
+            "clicks": 334,
+            "orders": 7,
+            "revenue": 5921
+          },
+          "August": {
+            "clicks": 346,
+            "orders": 8,
+            "revenue": 6247
+          },
+          "September": {
+            "clicks": 329,
+            "orders": 7,
+            "revenue": 5834
+          },
+          "October": {
+            "clicks": 341,
+            "orders": 8,
+            "revenue": 6192
+          },
+          "November": {
+            "clicks": 355,
+            "orders": 8,
+            "revenue": 6458
+          },
+          "December": {
+            "clicks": 368,
+            "orders": 9,
+            "revenue": 6897
+          }
+        },
+        "2025": {
+          "January": {
+            "clicks": 372,
+            "orders": 9,
+            "revenue": 7123
+          },
+          "February": {
+            "clicks": 385,
+            "orders": 9,
+            "revenue": 7485
+          },
+          "March": {
+            "clicks": 398,
+            "orders": 10,
+            "revenue": 7892
+          },
+          "April": {
+            "clicks": 412,
+            "orders": 10,
+            "revenue": 8234
+          },
+          "May": {
+            "clicks": 426,
+            "orders": 11,
+            "revenue": 8576
+          },
+          "June": {
+            "clicks": 439,
+            "orders": 11,
+            "revenue": 8913
+          },
+          "July": {
+            "clicks": 453,
+            "orders": 12,
+            "revenue": 9254
+          },
+          "August": {
+            "clicks": 467,
+            "orders": 12,
+            "revenue": 9598
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        }
+      },
+      "bankingInfo": {
+        "bankName": "Commonwealth Bank",
+        "swiftCode": "CTBAAU2S",
+        "accountHolder": "Oliver Martin",
+        "phone": "+61-2-9555-0142",
+        "address": "123 Collins Street, Melbourne, VIC 3000, Australia"
+      },
+      "region": "North America",
+      "countryCode": "US"
+    },
+    {
+      "id": "ACAFLORET",
+      "name": "Sophie Laurent",
+      "email": "sophie.laurent@tech-innovations.ca",
+      "level": "Enabler",
+      "monthlyData": {
+        "2024": {
+          "January": {
+            "clicks": 425,
+            "orders": 12,
+            "revenue": 9840
+          },
+          "February": {
+            "clicks": 458,
+            "orders": 13,
+            "revenue": 10692
+          },
+          "March": {
+            "clicks": 442,
+            "orders": 11,
+            "revenue": 9238
+          },
+          "April": {
+            "clicks": 467,
+            "orders": 14,
+            "revenue": 11456
+          },
+          "May": {
+            "clicks": 435,
+            "orders": 12,
+            "revenue": 9875
+          },
+          "June": {
+            "clicks": 489,
+            "orders": 15,
+            "revenue": 12340
+          },
+          "July": {
+            "clicks": 512,
+            "orders": 16,
+            "revenue": 13125
+          },
+          "August": {
+            "clicks": 495,
+            "orders": 14,
+            "revenue": 11789
+          },
+          "September": {
+            "clicks": 478,
+            "orders": 13,
+            "revenue": 10567
+          },
+          "October": {
+            "clicks": 521,
+            "orders": 17,
+            "revenue": 14235
+          },
+          "November": {
+            "clicks": 534,
+            "orders": 15,
+            "revenue": 12890
+          },
+          "December": {
+            "clicks": 548,
+            "orders": 16,
+            "revenue": 13678
+          }
+        },
+        "2025": {
+          "January": {
+            "clicks": 567,
+            "orders": 18,
+            "revenue": 15234
+          },
+          "February": {
+            "clicks": 582,
+            "orders": 17,
+            "revenue": 14567
+          },
+          "March": {
+            "clicks": 595,
+            "orders": 19,
+            "revenue": 16123
+          },
+          "April": {
+            "clicks": 612,
+            "orders": 20,
+            "revenue": 17345
+          },
+          "May": {
+            "clicks": 628,
+            "orders": 18,
+            "revenue": 15890
+          },
+          "June": {
+            "clicks": 641,
+            "orders": 21,
+            "revenue": 18467
+          },
+          "July": {
+            "clicks": 657,
+            "orders": 19,
+            "revenue": 16789
+          },
+          "August": {
+            "clicks": 673,
+            "orders": 22,
+            "revenue": 19234
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        }
+      },
+      "bankingInfo": {
+        "bankName": "Royal Bank of Canada",
+        "swiftCode": "ROYCCAT2",
+        "accountHolder": "Sophie Laurent",
+        "phone": "+1-416-555-7891",
+        "address": "789 Bay Street, Toronto, ON M5G 2N5, Canada"
+      },
+      "region": "North America",
+      "countryCode": "CA"
+    },
+    {
+      "id": "ASGRACHEL",
+      "name": "Rachel Chen",
+      "email": "rachel.chen@singapore-tech.sg",
+      "level": "Enabler",
+      "monthlyData": {
+        "2024": {
+          "January": {
+            "clicks": 396,
+            "orders": 10,
+            "revenue": 8234
+          },
+          "February": {
+            "clicks": 412,
+            "orders": 11,
+            "revenue": 9145
+          },
+          "March": {
+            "clicks": 435,
+            "orders": 12,
+            "revenue": 9876
+          },
+          "April": {
+            "clicks": 387,
+            "orders": 9,
+            "revenue": 7654
+          },
+          "May": {
+            "clicks": 441,
+            "orders": 13,
+            "revenue": 10567
+          },
+          "June": {
+            "clicks": 458,
+            "orders": 12,
+            "revenue": 9890
+          },
+          "July": {
+            "clicks": 472,
+            "orders": 14,
+            "revenue": 11234
+          },
+          "August": {
+            "clicks": 489,
+            "orders": 15,
+            "revenue": 12345
+          },
+          "September": {
+            "clicks": 456,
+            "orders": 13,
+            "revenue": 10789
+          },
+          "October": {
+            "clicks": 493,
+            "orders": 16,
+            "revenue": 13456
+          },
+          "November": {
+            "clicks": 517,
+            "orders": 17,
+            "revenue": 14123
+          },
+          "December": {
+            "clicks": 534,
+            "orders": 18,
+            "revenue": 15234
+          }
+        },
+        "2025": {
+          "January": {
+            "clicks": 548,
+            "orders": 19,
+            "revenue": 16345
+          },
+          "February": {
+            "clicks": 562,
+            "orders": 20,
+            "revenue": 17456
+          },
+          "March": {
+            "clicks": 576,
+            "orders": 21,
+            "revenue": 18567
+          },
+          "April": {
+            "clicks": 591,
+            "orders": 22,
+            "revenue": 19678
+          },
+          "May": {
+            "clicks": 605,
+            "orders": 23,
+            "revenue": 20789
+          },
+          "June": {
+            "clicks": 619,
+            "orders": 24,
+            "revenue": 21890
+          },
+          "July": {
+            "clicks": 633,
+            "orders": 25,
+            "revenue": 22901
+          },
+          "August": {
+            "clicks": 647,
+            "orders": 26,
+            "revenue": 24012
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        }
+      },
+      "bankingInfo": {
+        "bankName": "DBS Bank",
+        "swiftCode": "DBSSSGSG",
+        "accountHolder": "Rachel Chen",
+        "phone": "+65-6555-4789",
+        "address": "12 Marina Boulevard, Singapore 018982"
+      },
+      "region": "ASEAN",
+      "countryCode": "SG"
+    },
+    {
+      "id": "AJPKARATO",
+      "name": "Hiroshi Karato",
+      "email": "hiroshi.karato@innovation-jp.com",
+      "level": "Enabler",
+      "monthlyData": {
+        "2024": {
+          "January": {
+            "clicks": 415,
+            "orders": 11,
+            "revenue": 8965
+          },
+          "February": {
+            "clicks": 387,
+            "orders": 10,
+            "revenue": 8124
+          },
+          "March": {
+            "clicks": 432,
+            "orders": 12,
+            "revenue": 9876
+          },
+          "April": {
+            "clicks": 408,
+            "orders": 10,
+            "revenue": 8453
+          },
+          "May": {
+            "clicks": 456,
+            "orders": 13,
+            "revenue": 10234
+          },
+          "June": {
+            "clicks": 471,
+            "orders": 12,
+            "revenue": 9567
+          },
+          "July": {
+            "clicks": 438,
+            "orders": 11,
+            "revenue": 8890
+          },
+          "August": {
+            "clicks": 495,
+            "orders": 14,
+            "revenue": 11345
+          },
+          "September": {
+            "clicks": 463,
+            "orders": 12,
+            "revenue": 9786
+          },
+          "October": {
+            "clicks": 489,
+            "orders": 13,
+            "revenue": 10567
+          },
+          "November": {
+            "clicks": 512,
+            "orders": 15,
+            "revenue": 12134
+          },
+          "December": {
+            "clicks": 528,
+            "orders": 16,
+            "revenue": 13245
+          }
+        },
+        "2025": {
+          "January": {
+            "clicks": 545,
+            "orders": 17,
+            "revenue": 14356
+          },
+          "February": {
+            "clicks": 562,
+            "orders": 18,
+            "revenue": 15467
+          },
+          "March": {
+            "clicks": 578,
+            "orders": 19,
+            "revenue": 16578
+          },
+          "April": {
+            "clicks": 595,
+            "orders": 20,
+            "revenue": 17689
+          },
+          "May": {
+            "clicks": 612,
+            "orders": 21,
+            "revenue": 18790
+          },
+          "June": {
+            "clicks": 628,
+            "orders": 22,
+            "revenue": 19801
+          },
+          "July": {
+            "clicks": 645,
+            "orders": 23,
+            "revenue": 20912
+          },
+          "August": {
+            "clicks": 661,
+            "orders": 24,
+            "revenue": 22023
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        }
+      },
+      "bankingInfo": {
+        "bankName": "Mizuho Bank",
+        "swiftCode": "MHCBJPJT",
+        "accountHolder": "Hiroshi Karato",
+        "phone": "+81-3-5555-2847",
+        "address": "2-1-1 Marunouchi, Chiyoda-ku, Tokyo 100-8176, Japan"
+      },
+      "region": "Japan",
+      "countryCode": "JP"
+    },
+    {
+      "id": "ATHMALICE",
+      "name": "Alice Thompson",
+      "email": "alice.thompson@thai-innovations.th",
+      "level": "Builder",
+      "monthlyData": {
+        "2024": {
+          "January": {
+            "clicks": 295,
+            "orders": 6,
+            "revenue": 4825
+          },
+          "February": {
+            "clicks": 312,
+            "orders": 7,
+            "revenue": 5342
+          },
+          "March": {
+            "clicks": 287,
+            "orders": 6,
+            "revenue": 4976
+          },
+          "April": {
+            "clicks": 301,
+            "orders": 7,
+            "revenue": 5198
+          },
+          "May": {
+            "clicks": 318,
+            "orders": 8,
+            "revenue": 5679
+          },
+          "June": {
+            "clicks": 334,
+            "orders": 8,
+            "revenue": 6024
+          },
+          "July": {
+            "clicks": 342,
+            "orders": 9,
+            "revenue": 6387
+          },
+          "August": {
+            "clicks": 356,
+            "orders": 9,
+            "revenue": 6752
+          },
+          "September": {
+            "clicks": 328,
+            "orders": 8,
+            "revenue": 5945
+          },
+          "October": {
+            "clicks": 371,
+            "orders": 10,
+            "revenue": 7234
+          },
+          "November": {
+            "clicks": 389,
+            "orders": 11,
+            "revenue": 7896
+          },
+          "December": {
+            "clicks": 405,
+            "orders": 12,
+            "revenue": 8453
+          }
+        },
+        "2025": {
+          "January": {
+            "clicks": 421,
+            "orders": 12,
+            "revenue": 8967
+          },
+          "February": {
+            "clicks": 438,
+            "orders": 13,
+            "revenue": 9324
+          },
+          "March": {
+            "clicks": 455,
+            "orders": 14,
+            "revenue": 9876
+          },
+          "April": {
+            "clicks": 472,
+            "orders": 15,
+            "revenue": 10543
+          },
+          "May": {
+            "clicks": 489,
+            "orders": 15,
+            "revenue": 11098
+          },
+          "June": {
+            "clicks": 506,
+            "orders": 16,
+            "revenue": 11634
+          },
+          "July": {
+            "clicks": 523,
+            "orders": 17,
+            "revenue": 12289
+          },
+          "August": {
+            "clicks": 540,
+            "orders": 18,
+            "revenue": 12945
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        }
+      },
+      "bankingInfo": {
+        "bankName": "Bangkok Bank",
+        "swiftCode": "BKKBTHBK",
+        "accountHolder": "Alice Thompson",
+        "phone": "+66-2-555-8934",
+        "address": "456 Sukhumvit Road, Bangkok 10110, Thailand"
+      },
+      "region": "ASEAN",
+      "countryCode": "TH"
+    },
+    {
+      "id": "AINMARTIN",
+      "name": "Martin Anderson",
+      "email": "martin.anderson@tech-innovations.in",
+      "level": "Enabler",
+      "monthlyData": {
+        "2024": {
+          "January": {
+            "clicks": 398,
+            "orders": 10,
+            "revenue": 8245
+          },
+          "February": {
+            "clicks": 425,
+            "orders": 11,
+            "revenue": 9156
+          },
+          "March": {
+            "clicks": 441,
+            "orders": 12,
+            "revenue": 9987
+          },
+          "April": {
+            "clicks": 389,
+            "orders": 9,
+            "revenue": 7765
+          },
+          "May": {
+            "clicks": 456,
+            "orders": 13,
+            "revenue": 10678
+          },
+          "June": {
+            "clicks": 472,
+            "orders": 12,
+            "revenue": 9991
+          },
+          "July": {
+            "clicks": 485,
+            "orders": 14,
+            "revenue": 11345
+          },
+          "August": {
+            "clicks": 503,
+            "orders": 15,
+            "revenue": 12456
+          },
+          "September": {
+            "clicks": 468,
+            "orders": 13,
+            "revenue": 10890
+          },
+          "October": {
+            "clicks": 517,
+            "orders": 16,
+            "revenue": 13567
+          },
+          "November": {
+            "clicks": 534,
+            "orders": 17,
+            "revenue": 14234
+          },
+          "December": {
+            "clicks": 548,
+            "orders": 18,
+            "revenue": 15345
+          }
+        },
+        "2025": {
+          "January": {
+            "clicks": 562,
+            "orders": 19,
+            "revenue": 16456
+          },
+          "February": {
+            "clicks": 578,
+            "orders": 20,
+            "revenue": 17567
+          },
+          "March": {
+            "clicks": 594,
+            "orders": 21,
+            "revenue": 18678
+          },
+          "April": {
+            "clicks": 610,
+            "orders": 22,
+            "revenue": 19789
+          },
+          "May": {
+            "clicks": 626,
+            "orders": 23,
+            "revenue": 20890
+          },
+          "June": {
+            "clicks": 642,
+            "orders": 24,
+            "revenue": 21991
+          },
+          "July": {
+            "clicks": 658,
+            "orders": 25,
+            "revenue": 23012
+          },
+          "August": {
+            "clicks": 674,
+            "orders": 26,
+            "revenue": 24123
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        }
+      },
+      "bankingInfo": {
+        "bankName": "State Bank of India",
+        "swiftCode": "SBININBB",
+        "accountHolder": "Martin Anderson",
+        "phone": "+91-11-5555-3456",
+        "address": "45 MG Road, Mumbai, Maharashtra 400001, India"
+      },
+      "region": "India",
+      "countryCode": "IN"
+    },
+    {
+      "id": "AVNROBERT",
+      "name": "Robert Nguyen",
+      "email": "robert.nguyen@vietnam-tech.vn",
+      "level": "Builder",
+      "monthlyData": {
+        "2024": {
+          "January": {
+            "clicks": 312,
+            "orders": 7,
+            "revenue": 5674
+          },
+          "February": {
+            "clicks": 328,
+            "orders": 8,
+            "revenue": 6145
+          },
+          "March": {
+            "clicks": 345,
+            "orders": 8,
+            "revenue": 6523
+          },
+          "April": {
+            "clicks": 332,
+            "orders": 7,
+            "revenue": 5892
+          },
+          "May": {
+            "clicks": 359,
+            "orders": 9,
+            "revenue": 7234
+          },
+          "June": {
+            "clicks": 367,
+            "orders": 9,
+            "revenue": 7458
+          },
+          "July": {
+            "clicks": 374,
+            "orders": 8,
+            "revenue": 6987
+          },
+          "August": {
+            "clicks": 391,
+            "orders": 10,
+            "revenue": 8123
+          },
+          "September": {
+            "clicks": 385,
+            "orders": 9,
+            "revenue": 7654
+          },
+          "October": {
+            "clicks": 402,
+            "orders": 11,
+            "revenue": 8789
+          },
+          "November": {
+            "clicks": 418,
+            "orders": 12,
+            "revenue": 9345
+          },
+          "December": {
+            "clicks": 435,
+            "orders": 13,
+            "revenue": 10234
+          }
+        },
+        "2025": {
+          "January": {
+            "clicks": 452,
+            "orders": 14,
+            "revenue": 11123
+          },
+          "February": {
+            "clicks": 469,
+            "orders": 15,
+            "revenue": 12045
+          },
+          "March": {
+            "clicks": 486,
+            "orders": 16,
+            "revenue": 12987
+          },
+          "April": {
+            "clicks": 503,
+            "orders": 17,
+            "revenue": 13834
+          },
+          "May": {
+            "clicks": 520,
+            "orders": 18,
+            "revenue": 14723
+          },
+          "June": {
+            "clicks": 537,
+            "orders": 19,
+            "revenue": 15612
+          },
+          "July": {
+            "clicks": 554,
+            "orders": 20,
+            "revenue": 16501
+          },
+          "August": {
+            "clicks": 571,
+            "orders": 21,
+            "revenue": 17390
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        }
+      },
+      "bankingInfo": {
+        "bankName": "Vietcombank",
+        "swiftCode": "BFTVVNVX",
+        "accountHolder": "Robert Nguyen",
+        "phone": "+84-28-5555-6789",
+        "address": "266 Nguyen Trai Street, District 1, Ho Chi Minh City, Vietnam"
+      },
+      "region": "ASEAN",
+      "countryCode": "VN"
+    },
+    {
+      "id": "ABRMATEUS",
+      "name": "Mateus Silva",
+      "email": "mateus.silva@tech-innovate.br",
+      "level": "Builder",
+      "monthlyData": {
+        "2024": {
+          "January": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "February": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "March": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "April": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "May": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "June": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "July": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "August": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        },
+        "2025": {
+          "January": {
+            "clicks": 215,
+            "orders": 4,
+            "revenue": 3245
+          },
+          "February": {
+            "clicks": 234,
+            "orders": 5,
+            "revenue": 3890
+          },
+          "March": {
+            "clicks": 267,
+            "orders": 6,
+            "revenue": 4567
+          },
+          "April": {
+            "clicks": 289,
+            "orders": 6,
+            "revenue": 4923
+          },
+          "May": {
+            "clicks": 312,
+            "orders": 7,
+            "revenue": 5634
+          },
+          "June": {
+            "clicks": 334,
+            "orders": 8,
+            "revenue": 6123
+          },
+          "July": {
+            "clicks": 356,
+            "orders": 8,
+            "revenue": 6789
+          },
+          "August": {
+            "clicks": 378,
+            "orders": 9,
+            "revenue": 7234
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        }
+      },
+      "bankingInfo": {
+        "bankName": "Banco do Brasil",
+        "swiftCode": "BRASBRRJ",
+        "accountHolder": "Mateus Silva",
+        "phone": "+55-11-5555-4567",
+        "address": "Av. Paulista 1000, São Paulo, SP 01310-100, Brazil"
+      },
+      "region": "LATAM",
+      "countryCode": "BR"
+    },
+    {
+      "id": "AITDAVIES",
+      "name": "David Davies",
+      "email": "david.davies@uk-automation.co.uk",
+      "level": "Enabler",
+      "monthlyData": {
+        "2024": {
+          "January": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "February": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "March": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "April": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "May": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "June": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "July": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "August": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        },
+        "2025": {
+          "January": {
+            "clicks": 412,
+            "orders": 9,
+            "revenue": 7834
+          },
+          "February": {
+            "clicks": 445,
+            "orders": 11,
+            "revenue": 9123
+          },
+          "March": {
+            "clicks": 478,
+            "orders": 12,
+            "revenue": 10456
+          },
+          "April": {
+            "clicks": 503,
+            "orders": 13,
+            "revenue": 11789
+          },
+          "May": {
+            "clicks": 534,
+            "orders": 14,
+            "revenue": 12345
+          },
+          "June": {
+            "clicks": 567,
+            "orders": 15,
+            "revenue": 13678
+          },
+          "July": {
+            "clicks": 589,
+            "orders": 16,
+            "revenue": 14234
+          },
+          "August": {
+            "clicks": 612,
+            "orders": 17,
+            "revenue": 15567
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        }
+      },
+      "bankingInfo": {
+        "bankName": "Barclays Bank",
+        "swiftCode": "BARCIT22",
+        "accountHolder": "David Davies",
+        "phone": "+44-20-7555-8901",
+        "address": "25 The Strand, London WC2N 5HR, United Kingdom"
+      },
+      "region": "Europe",
+      "countryCode": "IT"
+    },
+    {
+      "id": "AFRAJAMES",
+      "name": "James Dubois",
+      "email": "james.dubois@tech-paris.fr",
+      "level": "Builder",
+      "monthlyData": {
+        "2024": {
+          "January": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "February": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "March": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "April": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "May": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "June": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "July": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "August": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        },
+        "2025": {
+          "January": {
+            "clicks": 180,
+            "orders": 3,
+            "revenue": 2567
+          },
+          "February": {
+            "clicks": 198,
+            "orders": 4,
+            "revenue": 3124
+          },
+          "March": {
+            "clicks": 225,
+            "orders": 4,
+            "revenue": 3456
+          },
+          "April": {
+            "clicks": 267,
+            "orders": 5,
+            "revenue": 4123
+          },
+          "May": {
+            "clicks": 289,
+            "orders": 6,
+            "revenue": 4567
+          },
+          "June": {
+            "clicks": 312,
+            "orders": 6,
+            "revenue": 4891
+          },
+          "July": {
+            "clicks": 334,
+            "orders": 7,
+            "revenue": 5234
+          },
+          "August": {
+            "clicks": 356,
+            "orders": 7,
+            "revenue": 5678
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        }
+      },
+      "bankingInfo": {
+        "bankName": "BNP Paribas",
+        "swiftCode": "BNPAFRPP",
+        "accountHolder": "James Dubois",
+        "phone": "+33-1-5555-4321",
+        "address": "45 Avenue des Champs-Élysées, Paris 75008, France"
+      },
+      "region": "Europe",
+      "countryCode": "FR"
+    },
+    {
+      "id": "AUSLISAON",
+      "name": "Lisa Thompson",
+      "email": "lisa.thompson@aussie-innovations.au",
+      "level": "Builder",
+      "monthlyData": {
+        "2024": {
+          "January": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "February": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "March": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "April": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "May": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "June": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "July": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "August": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        },
+        "2025": {
+          "January": {
+            "clicks": 167,
+            "orders": 3,
+            "revenue": 2234
+          },
+          "February": {
+            "clicks": 189,
+            "orders": 4,
+            "revenue": 2890
+          },
+          "March": {
+            "clicks": 212,
+            "orders": 4,
+            "revenue": 3234
+          },
+          "April": {
+            "clicks": 234,
+            "orders": 5,
+            "revenue": 3789
+          },
+          "May": {
+            "clicks": 256,
+            "orders": 5,
+            "revenue": 4123
+          },
+          "June": {
+            "clicks": 278,
+            "orders": 6,
+            "revenue": 4567
+          },
+          "July": {
+            "clicks": 301,
+            "orders": 6,
+            "revenue": 4891
+          },
+          "August": {
+            "clicks": 323,
+            "orders": 7,
+            "revenue": 5234
+          },
+          "September": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "October": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "November": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          },
+          "December": {
+            "clicks": 0,
+            "orders": 0,
+            "revenue": 0
+          }
+        }
+      },
+      "bankingInfo": {
+        "bankName": "Westpac Banking",
+        "swiftCode": "WPACAU2S",
+        "accountHolder": "Lisa Thompson",
+        "phone": "+61-2-9555-7890",
+        "address": "234 George Street, Sydney, NSW 2000, Australia"
+      },
+      "region": "North America",
+      "countryCode": "US"
     }
   ]
 }

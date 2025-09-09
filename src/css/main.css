@@ -2828,3 +2828,136 @@ body::-webkit-scrollbar-track,
     }
 }
 
+/* ==========================================================================
+   Support Attachment Styles
+   ========================================================================== */
+.support-attachment-section {
+    border-top: 1px solid var(--ds-color-gray-40);
+    padding-top: 12px;
+}
+
+.attachment-upload-area:hover {
+    border-color: var(--ds-color-gray-60);
+    background-color: var(--ds-color-gray-30);
+}
+
+.attached-files-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.attached-file-item:hover {
+    background-color: var(--ds-color-gray-40);
+}
+
+.attached-file-item .remove-attachment-btn:hover {
+    background-color: var(--ds-color-error-light);
+    color: var(--ds-color-error);
+}
+
+.reply-attachments .attachment-item:hover {
+    background-color: var(--ds-color-gray-40);
+}
+
+.reply-attachments .download-attachment:hover {
+    background-color: var(--ds-color-gray-30);
+    color: var(--ds-color-link);
+}
+
+/* ==========================================================================
+   TOP PERFORMERS CARDS STYLES
+   ========================================================================== */
+.top-performers-container {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.top-performer-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    background-color: var(--ds-color-gray-30);
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.top-performer-item:hover {
+    background-color: var(--ds-color-gray-40);
+}
+
+.top-performer-avatar,
+.top-performer-item .real-photo-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--ds-color-link);
+    flex-shrink: 0;
+}
+
+.top-performer-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.top-performer-name {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    color: var(--ds-color-gray-90);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.top-performer-value {
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-medium);
+    color: var(--ds-color-gray-70);
+}
+
+/* Generated avatar styles for top performers */
+.top-performer-avatar.generated-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--fw-bold);
+    font-size: var(--fs-sm);
+    color: var(--ds-color-white);
+}
+
+/* Responsive adjustments for top performers cards */
+@media (max-width: 992px) {
+    .top-performers-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .top-performer-item {
+        padding: 6px;
+        gap: 8px;
+        flex: none;
+    }
+    
+    .top-performer-avatar,
+    .top-performer-item .real-photo-avatar {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .top-performer-name {
+        font-size: var(--fs-xs);
+    }
+    
+    .top-performer-value {
+        font-size: 0.6rem;
+    }
+}
+

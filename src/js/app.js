@@ -657,10 +657,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Set current content type for filter handling
                 ContentManager.currentContentType = targetId;
                 
+                // Manage header filters visibility based on page
+                this.manageHeaderFiltersVisibility(targetId);
+                
                 // 如果切換到Account Management頁面，渲染帳戶卡片和設置過濾器
                 if (targetId === 'Account-Management') {
                     ContentManager.renderAccountCards();
                     ContentManager.setupAccountFilters();
+                }
+            }
+        },
+
+        manageHeaderFiltersVisibility(targetId) {
+            const headerFilters = document.querySelector('.bel-header-filters');
+            if (headerFilters) {
+                // Hide filters on "Respond to Leader" and "Publish Resources" pages
+                if (targetId === 'contact-support' || targetId === 'content') {
+                    headerFilters.style.display = 'none';
+                } else {
+                    headerFilters.style.display = 'flex';
                 }
             }
         },
@@ -2209,6 +2224,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.updateBelDataForHeaderFilters(selectedYear, selectedRegion);
             this.setupEventListeners();
             this.populateFilters();
+            this.renderTopPerformersCards();
             this.renderTable();
         },
 
@@ -2474,6 +2490,96 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             return filtered;
+        },
+
+        /**
+         * Render the Top Performers Cards
+         */
+        renderTopPerformersCards() {
+            const selectedYear = window.selectedDashboardYear || '2025';
+            
+            // Get processed data
+            const allData = this.belData.map(record => {
+                const yearlyData = this.calculateYearlyData(record, selectedYear);
+                return {
+                    ...record,
+                    clicks: yearlyData.clicks,
+                    orders: yearlyData.orders,
+                    revenue: yearlyData.revenue,
+                    cvr: yearlyData.clicks > 0 ? (yearlyData.orders / yearlyData.clicks) * 100 : 0
+                };
+            });
+
+            // Filter out records with no activity for meaningful rankings
+            const activeData = allData.filter(record => 
+                record.clicks > 0 || record.orders > 0 || record.revenue > 0
+            );
+
+            // Sort by revenue (descending) and take top 3
+            const topRevenue = [...activeData]
+                .sort((a, b) => b.revenue - a.revenue)
+                .slice(0, 3);
+
+            // Sort by CVR (descending) and take top 3
+            const topCVR = [...activeData]
+                .filter(record => record.clicks > 0) // Must have clicks to have meaningful CVR
+                .sort((a, b) => b.cvr - a.cvr)
+                .slice(0, 3);
+
+            // Render each card (only 2 cards now)
+            this.renderPerformerCard('top-revenue-performers', topRevenue, 'revenue');
+            this.renderPerformerCard('top-cvr-performers', topCVR, 'cvr');
+        },
+
+        /**
+         * Render individual performer card
+         */
+        renderPerformerCard(containerId, performers, metricType) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            if (performers.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #666; font-style: italic; padding: 20px;">No data available</div>';
+                return;
+            }
+
+            const html = performers.map(performer => {
+                let valueDisplay = '';
+                
+                switch (metricType) {
+                    case 'revenue':
+                        valueDisplay = utils.formatMoney(performer.revenue);
+                        break;
+                    case 'cvr':
+                        valueDisplay = utils.formatPercent(performer.cvr / 100);
+                        break;
+                }
+
+                // Use the same avatar generation as bel-acct-mgmt-card
+                const avatarHtml = utils.generateAvatarHTMLPlaceholder(performer.id, 40);
+
+                return `
+                    <div class="top-performer-item" data-id="${performer.id}">
+                        ${avatarHtml}
+                        <div class="top-performer-info">
+                            <div class="top-performer-name">${performer.name}</div>
+                            <div class="top-performer-value">${valueDisplay}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = html;
+
+            // Add click event listeners to open BEL modal
+            container.querySelectorAll('.top-performer-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const id = item.dataset.id;
+                    if (id && window.BELModal) {
+                        window.BELModal.showModal(id);
+                    }
+                });
+            });
         },
 
         renderTable() {
@@ -3202,6 +3308,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Update region filters with disabled options after data change
             this.updateRegionFilterWithDisabledOptions();
+            
+            // Update top performers cards with new data
+            this.renderTopPerformersCards();
         }
     };
 
@@ -5605,7 +5714,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <thead>
                                 <tr>
                                     <th data-sortable data-type="string">Payout Month</th>
-                                    <th data-sortable data-type="number">Total Amount</th>
+                                    <th data-sortable data-type="number">Total Net Payouts</th>
                                     <th data-sortable data-type="number">BEL Count</th>
                                     <th>View Detail</th>
                                 </tr>
@@ -6006,7 +6115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Define the three cards as requested
             const cardsData = [
                 {
-                    title: 'Payout Amount ($)',
+                    title: 'Net Payout Amount ($)',
                     value: payoutAmountFormatted,
                     icon: 'fas fa-dollar-sign',
                     trend: trends.payoutAmountTrend.value,
@@ -7509,11 +7618,33 @@ document.addEventListener('DOMContentLoaded', () => {
                             <!-- Reply Section (only for Open tickets) -->
                             <div id="sup-reply-section" class="support-reply-section">
                                 <div class="support-reply-form-header">
-                                    <i class="fas fa-reply" style="color: #6b7280;"></i>
+                                    <i class="fas fa-reply" style="color: var(--ds-color-gray-70);"></i>
                                     <span class="support-reply-form-title">Your Reply</span>
                                 </div>
                                 <textarea id="sup-reply-input" placeholder="Type your reply..." class="bel-form-control bel-form-textarea"></textarea>
-                                <div class="support-reply-actions">
+                                
+                                <!-- Attachment Section -->
+                                <div class="support-attachment-section" style="margin-top: 12px;">
+                                    <div class="attachment-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                        <i class="fas fa-paperclip" style="color: var(--ds-color-gray-70); font-size: 0.9rem;"></i>
+                                        <span style="font-size: 0.9rem; color: var(--ds-color-gray-70); font-weight: 500;">Attachments (Optional)</span>
+                                    </div>
+                                    
+                                    <!-- File Upload Area -->
+                                    <div class="attachment-upload-area" style="border: 2px dashed var(--ds-color-gray-50); border-radius: 6px; padding: 16px; text-align: center; background-color: var(--ds-color-gray-30); cursor: pointer; transition: all 0.3s ease;" onclick="document.getElementById('sup-attachment-input').click();">
+                                        <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                                            <i class="fas fa-cloud-upload-alt" style="font-size: 20px; color: var(--ds-color-gray-60);"></i>
+                                            <span style="font-size: 0.85rem; color: var(--ds-color-gray-70);">Click to attach files or drag and drop</span>
+                                            <span style="font-size: 0.75rem; color: var(--ds-color-gray-60);">Max 5 files, 10MB each</span>
+                                        </div>
+                                        <input type="file" id="sup-attachment-input" multiple accept="image/*,.pdf,.doc,.docx,.txt,.xlsx,.xls" style="display: none;" />
+                                    </div>
+                                    
+                                    <!-- Attached Files List -->
+                                    <div id="sup-attached-files" class="attached-files-list" style="margin-top: 8px;"></div>
+                                </div>
+                                
+                                <div class="support-reply-actions" style="margin-top: 16px;">
                                     <button class="bel-btn primary" id="sup-send-btn" style="flex: 1;"><i class="fas fa-reply"></i> Send Reply</button>
                                 </div>
                             </div>
@@ -7530,6 +7661,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (e.target === this.supportModalEl) close(); 
             });
 
+            // Setup attachment functionality
+            this.setupSupportAttachments();
+
             // send reply functionality
             this.supportModalEl.querySelector('#sup-send-btn')?.addEventListener('click', () => {
                 const ticketId = this.supportModalEl.dataset.ticketId;
@@ -7543,20 +7677,181 @@ document.addEventListener('DOMContentLoaded', () => {
                     return; 
                 }
                 
+                // Get attached files
+                const attachedFiles = this.getSupportAttachedFiles();
+                
                 ticket.replies = ticket.replies || [];
                 ticket.replies.push({ 
                     time: new Date().toISOString().slice(0, 16).replace('T', ' '), 
-                    text: txt 
+                    text: txt,
+                    attachments: attachedFiles
                 });
                 
                 // 回覆後直接關閉ticket
                 ticket.status = 'Closed';
                 textarea.value = '';
+                this.clearSupportAttachments();
                 this.fillSupportModal(ticket);
                 this.renderContactSupportTickets();
             });
 
             return this.supportModalEl;
+        },
+
+        setupSupportAttachments() {
+            const fileInput = this.supportModalEl.querySelector('#sup-attachment-input');
+            const uploadArea = this.supportModalEl.querySelector('.attachment-upload-area');
+            
+            if (!fileInput || !uploadArea) return;
+
+            // File input change event
+            fileInput.addEventListener('change', (e) => {
+                this.handleSupportAttachmentFiles(Array.from(e.target.files));
+            });
+
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'var(--ds-color-gray-60)';
+                uploadArea.style.backgroundColor = 'var(--ds-color-gray-30)';
+            });
+
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'var(--ds-color-gray-50)';
+                uploadArea.style.backgroundColor = 'var(--ds-color-gray-30)';
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = 'var(--ds-color-gray-50)';
+                uploadArea.style.backgroundColor = 'var(--ds-color-gray-30)';
+                
+                const files = Array.from(e.dataTransfer.files);
+                this.handleSupportAttachmentFiles(files);
+            });
+        },
+
+        handleSupportAttachmentFiles(files) {
+            const attachedFilesList = this.supportModalEl.querySelector('#sup-attached-files');
+            if (!attachedFilesList) return;
+
+            // Validate files
+            const validFiles = files.filter(file => {
+                // Max file size: 10MB
+                if (file.size > 10 * 1024 * 1024) {
+                    alert(`File "${file.name}" is too large. Maximum size is 10MB.`);
+                    return false;
+                }
+                return true;
+            });
+
+            // Check total file count (max 5)
+            const currentFiles = attachedFilesList.querySelectorAll('.attached-file-item');
+            if (currentFiles.length + validFiles.length > 5) {
+                alert('Maximum 5 files can be attached.');
+                return;
+            }
+
+            // Add files to the list
+            validFiles.forEach(file => {
+                this.addSupportAttachmentItem(file);
+            });
+        },
+
+        addSupportAttachmentItem(file) {
+            const attachedFilesList = this.supportModalEl.querySelector('#sup-attached-files');
+            if (!attachedFilesList) return;
+
+            const fileItem = document.createElement('div');
+            fileItem.className = 'attached-file-item';
+            fileItem.style.cssText = `
+                display: flex; 
+                align-items: center; 
+                justify-content: space-between; 
+                padding: 8px 12px; 
+                background: var(--ds-color-gray-30); 
+                border: 1px solid var(--ds-color-gray-40); 
+                border-radius: 6px; 
+                margin-bottom: 6px;
+            `;
+
+            const fileIcon = this.getFileIcon(file.type);
+            const fileSize = this.formatFileSize(file.size);
+
+            fileItem.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
+                    <i class="${fileIcon}" style="color: var(--ds-color-gray-70); font-size: 0.9rem;"></i>
+                    <div style="min-width: 0; flex: 1;">
+                        <div style="font-size: 0.85rem; font-weight: 500; color: var(--ds-color-gray-80); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${file.name}">${file.name}</div>
+                        <div style="font-size: 0.75rem; color: var(--ds-color-gray-70);">${fileSize}</div>
+                    </div>
+                </div>
+                <button class="remove-attachment-btn" style="background: none; border: none; color: var(--ds-color-error); cursor: pointer; padding: 4px; border-radius: 4px; display: flex; align-items: center; justify-content: center;" title="Remove file">
+                    <i class="fas fa-times" style="font-size: 0.8rem;"></i>
+                </button>
+            `;
+
+            // Store file data
+            fileItem.dataset.fileName = file.name;
+            fileItem.dataset.fileSize = file.size;
+            fileItem.dataset.fileType = file.type;
+            
+            // Convert file to base64 for storage
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                fileItem.dataset.fileData = e.target.result;
+            };
+            reader.readAsDataURL(file);
+
+            // Remove button event
+            fileItem.querySelector('.remove-attachment-btn').addEventListener('click', () => {
+                fileItem.remove();
+            });
+
+            attachedFilesList.appendChild(fileItem);
+        },
+
+        getFileIcon(fileType) {
+            if (fileType.startsWith('image/')) return 'fas fa-image';
+            if (fileType === 'application/pdf') return 'fas fa-file-pdf';
+            if (fileType.includes('word') || fileType.includes('document')) return 'fas fa-file-word';
+            if (fileType.includes('sheet') || fileType.includes('excel')) return 'fas fa-file-excel';
+            if (fileType.includes('text')) return 'fas fa-file-alt';
+            return 'fas fa-file';
+        },
+
+        formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        },
+
+        getSupportAttachedFiles() {
+            const attachedFilesList = this.supportModalEl.querySelector('#sup-attached-files');
+            if (!attachedFilesList) return [];
+
+            const fileItems = attachedFilesList.querySelectorAll('.attached-file-item');
+            return Array.from(fileItems).map(item => ({
+                name: item.dataset.fileName,
+                size: parseInt(item.dataset.fileSize),
+                type: item.dataset.fileType,
+                data: item.dataset.fileData
+            }));
+        },
+
+        clearSupportAttachments() {
+            const attachedFilesList = this.supportModalEl.querySelector('#sup-attached-files');
+            const fileInput = this.supportModalEl.querySelector('#sup-attachment-input');
+            
+            if (attachedFilesList) {
+                attachedFilesList.innerHTML = '';
+            }
+            if (fileInput) {
+                fileInput.value = '';
+            }
         },
 
         fillSupportModal(ticket) {
@@ -7597,18 +7892,47 @@ document.addEventListener('DOMContentLoaded', () => {
             if (ticket.status === 'Closed' && ticket.replies && ticket.replies.length) {
                 // Closed tickets show conversation history
                 if (conversationTitle) conversationTitle.style.display = 'block';
-                repliesContainer.innerHTML = ticket.replies.map(reply => `
-                    <div class="support-reply-item">
-                        <div class="support-reply-header">
-                            <i class="fas fa-user-circle" style="color: #6b7280;"></i>
-                            <span style="font-weight: 600; color: #374151;">Admin Reply</span>
+                repliesContainer.innerHTML = ticket.replies.map(reply => {
+                    let attachmentsHtml = '';
+                    if (reply.attachments && reply.attachments.length > 0) {
+                        attachmentsHtml = `
+                            <div class="reply-attachments" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--ds-color-gray-40);">
+                                <div style="font-size: 0.85rem; color: var(--ds-color-gray-70); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-paperclip"></i>
+                                    <span>Attachments (${reply.attachments.length})</span>
+                                </div>
+                                <div class="attachment-list" style="display: flex; flex-direction: column; gap: 6px;">
+                                    ${reply.attachments.map(attachment => `
+                                        <div class="attachment-item" style="display: flex; align-items: center; gap: 8px; padding: 8px; background: var(--ds-color-gray-30); border: 1px solid var(--ds-color-gray-40); border-radius: 6px;">
+                                            <i class="${this.getFileIcon(attachment.type)}" style="color: var(--ds-color-gray-70); font-size: 0.9rem;"></i>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <div style="font-size: 0.85rem; font-weight: 500; color: var(--ds-color-gray-80); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${attachment.name}">${attachment.name}</div>
+                                                <div style="font-size: 0.75rem; color: var(--ds-color-gray-70);">${this.formatFileSize(attachment.size)}</div>
+                                            </div>
+                                            <a href="${attachment.data}" download="${attachment.name}" class="download-attachment" style="color: var(--ds-color-link); text-decoration: none; padding: 4px; border-radius: 4px; display: flex; align-items: center;" title="Download">
+                                                <i class="fas fa-download" style="font-size: 0.8rem;"></i>
+                                            </a>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    return `
+                        <div class="support-reply-item">
+                            <div class="support-reply-header">
+                                <i class="fas fa-user-circle" style="color: var(--ds-color-gray-70);"></i>
+                                <span style="font-weight: 600; color: var(--ds-color-gray-80);">Admin Reply</span>
+                            </div>
+                            <div class="support-reply-content">${reply.text}</div>
+                            ${attachmentsHtml}
+                            <div class="support-reply-meta">
+                                ${reply.time} • admin@advantech.com
+                            </div>
                         </div>
-                        <div class="support-reply-content">${reply.text}</div>
-                        <div class="support-reply-meta">
-                            ${reply.time} • admin@advantech.com
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             } else {
                 // Open tickets and other statuses don't show conversation history
                 if (conversationTitle) conversationTitle.style.display = 'none';
@@ -7619,6 +7943,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const replySection = modal.querySelector('#sup-reply-section');
             if (ticket.status === 'Open') {
                 replySection.style.display = 'block';
+                // Clear any previous attachments when opening a new ticket
+                this.clearSupportAttachments();
             } else {
                 replySection.style.display = 'none';
             }

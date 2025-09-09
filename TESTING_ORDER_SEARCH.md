@@ -22,7 +22,7 @@
 - 輸入: `000234` (應該顯示特定訂單號)
 
 #### 測試 Referral ID 搜索：
-- 輸入: `KTWADVANT` (Maxwell Walker - Taiwan)
+- 輸入: `ATWADVANT` (Maxwell Walker - Taiwan)
 - 輸入: `KUSOLVACE` (Olivia Chen - US)
 - 輸入: `KDEIMULER` (Liam Müller - Germany)
 - 輸入: `KJPTANAKA` (Kenji Tanaka - Japan)

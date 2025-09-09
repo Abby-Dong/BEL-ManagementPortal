@@ -335,7 +335,28 @@
             <!-- Account Management Section -->
             <div id="Account-Management" class="content-section">
                 <h1 class="bel-h1">Account Management</h1>
-                
+                <!-- Top Performers Cards -->
+                <div class="bel-stats-cards grid-cols-2" style="margin-bottom: 24px; display: none;">
+                    <!-- Top Revenue Contribution Card -->
+                    <div class="bel-card">
+                        <div class="bel-card-content">
+                            <div class="bel-card-title">Top Revenue Contribution</div>
+                            <div id="top-revenue-performers" class="top-performers-container">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Top CVR (Clicks to Orders) Card -->
+                    <div class="bel-card">
+                        <div class="bel-card-content">
+                            <div class="bel-card-title">Top CVR (Clicks to Orders)</div>
+                            <div id="top-cvr-performers" class="top-performers-container">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- View Switcher -->
                 <div class="view-switcher" id="account-view-switcher" style="margin-bottom: 16px;">
                     <button class="view-btn active" data-view="grid">
@@ -510,7 +531,7 @@
                             <h3 id="modal-bel-name">Maxwell Walker</h3>
                             <span id="modal-bel-level-badge" class="bel-badge exploder">Exploder</span>
                         </div>
-                        <p style="margin-top:4px" id="modal-bel-info">Referral ID: KTWADVANT | Email: maxwell.walker@advantech.com</p>
+                        <p style="margin-top:4px" id="modal-bel-info">Referral ID: ATWADVANT | Email: maxwell.walker@advantech.com</p>
                     </div>
                 </div>
                 <button class="close-button">&times;</button>
