@@ -401,22 +401,6 @@ body::-webkit-scrollbar-track,
     font-size: var(--fs-sm); 
 }
 
-.level-badge { 
-    display: inline-flex; 
-    align-items: center; 
-    gap: 8px; 
-    padding: 5px 15px; 
-    background-color: var(--ds-color-primary-light-10); 
-    color: var(--ds-color-primary); 
-    border-radius: 50px; 
-    font-weight: var(--fw-semibold); 
-    font-size: var(--fs-sm); 
-}
-
-.level-badge i { 
-    font-size: var(--fs-base); 
-}
-
 .bel-notification-bell { 
     font-size: var(--fs-xl); 
     color: var(--ds-color-gray-80); 
@@ -484,41 +468,27 @@ body::-webkit-scrollbar-track,
     margin-bottom: 4px; 
 }
 
-.bel-notification-item .tag { 
+.bel-notification-item .bel-badge { 
     font-size: var(--fs-xs); 
     padding: 2px 6px; 
     border-radius: 4px; 
     margin-right: 8px; 
 }
 
-.bel-notification-item .tag.important { 
-    background-color: var(--ds-color-error-light); 
-    color: var(--ds-color-error); 
-}
 
-.bel-notification-item .tag.new-product { 
-    background-color: var(--ds-color-brand-light-30); 
-    color: var(--ds-color-link); 
-}
-
-.bel-notification-item .tag.admin-alert { 
+.bel-notification-item .bel-badge.admin-alert { 
     background-color: var(--ds-color-error); 
     color: var(--ds-color-white); 
     font-weight: var(--fw-bold);
 }
 
-.bel-notification-item .tag.admin-system { 
+.bel-notification-item .bel-badge.admin-system { 
     background-color: var(--ds-color-gray-80); 
     color: var(--ds-color-white); 
 }
 
-.bel-notification-item .tag.admin-user { 
+.bel-notification-item .bel-badge.admin-user { 
     background-color: var(--ds-color-link); 
-    color: var(--ds-color-white); 
-}
-
-.bel-notification-item .tag.admin-revenue { 
-    background-color: var(--ds-color-success); 
     color: var(--ds-color-white); 
 }
 
@@ -596,7 +566,7 @@ body::-webkit-scrollbar-track,
     margin-bottom: 15px; 
 }
 
-.user-profile-panel .level-badge { 
+.user-profile-panel { 
     border-radius: 4px; 
 }
 
@@ -875,13 +845,10 @@ body::-webkit-scrollbar-track,
     position: relative; 
 }
 
-.bel-card.blue-bg { 
-    background-color: var(--ds-color-brand-light-30); 
+.bel-card.gray-bg { 
+    background-color: var(--ds-color-gray-30); 
 }
 
-.bel-card.red-bg { 
-    background-color: var(--ds-color-error-light); 
-}
 
 .bel-card-content { 
     flex-grow: 1; 
@@ -1446,12 +1413,7 @@ body::-webkit-scrollbar-track,
    ========================================================================== */
 
 /* Base badge styles - applies to all badge types */
-.bel-badge,
-.level-badge,
-.bel-acct-mgmt-level-exploder,
-.bel-acct-mgmt-level-builder,
-.bel-acct-mgmt-level-enabler,
-.bel-acct-mgmt-level-leader {
+.bel-badge {
     display: inline-block;
     padding: 4px 12px;
     border-radius: 4px;
@@ -1460,36 +1422,12 @@ body::-webkit-scrollbar-track,
     white-space: nowrap;
 }
 
-/* Special level badge styling */
-.level-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 15px;
-    border-radius: 50px;
-    font-size: var(--fs-sm);
-}
-
-.level-badge i {
-    font-size: var(--fs-base);
-}
-
-/* Account management level badges specific padding */
-.bel-acct-mgmt-level-exploder,
-.bel-acct-mgmt-level-builder,
-.bel-acct-mgmt-level-enabler,
-.bel-acct-mgmt-level-leader {
-    padding: 4px 8px;
-}
-
 /* Badge color variants - Primary/Orange theme */
 .bel-badge.primary-color,
 .bel-badge.pending,
 .bel-badge.exploder,
 .bel-badge.iotmart,
-.bel-badge.campaign-launch-badge,
-.bel-acct-mgmt-level-exploder,
-.level-badge {
+.bel-badge.campaign-launch-badge {
     background-color: var(--ds-color-primary-light-10);
     color: var(--ds-color-primary);
 }
@@ -1497,8 +1435,7 @@ body::-webkit-scrollbar-track,
 /* Badge color variants - Success/Green theme */
 .bel-badge.completed,
 .bel-badge.enabler,
-.bel-badge.payout-reminder-badge,
-.bel-acct-mgmt-level-enabler {
+.bel-badge.payout-reminder-badge {
     background-color: var(--ds-color-success-light);
     color: var(--ds-color-success);
 }
@@ -1509,8 +1446,7 @@ body::-webkit-scrollbar-track,
 .bel-badge.approved,
 .bel-badge.advantech,
 .bel-badge.system-badge,
-.bel-badge.policy-update-badge,
-.bel-acct-mgmt-level-builder {
+.bel-badge.policy-update-badge {
     background-color: var(--ds-color-brand-light-30);
     color: var(--ds-color-link);
 }
@@ -1526,8 +1462,7 @@ body::-webkit-scrollbar-track,
 .bel-badge.rejected,
 .bel-badge.danger,
 .bel-badge.leader,
-.bel-badge.important-badge,
-.bel-acct-mgmt-level-leader {
+.bel-badge.important-badge {
     background-color: var(--ds-color-error-light);
     color: var(--ds-color-error);
 }
@@ -1640,6 +1575,11 @@ body::-webkit-scrollbar-track,
 }
 
 .modal-overlay.show {
+    display: flex;
+}
+
+/* Ensure custom modals become visible when toggled */
+.custom-modal-overlay.show {
     display: flex;
 }
 
@@ -1921,10 +1861,6 @@ body::-webkit-scrollbar-track,
         font-size: var(--fs-lg);
     }
     
-    .chart-container {
-        height: 200px !important;
-        padding: 10px;
-    }
     
     /* Sticky modal header for very small screens */
     .modal-header {
@@ -1943,9 +1879,11 @@ body::-webkit-scrollbar-track,
     }
     
     /* Banking info grid mobile optimization */
-    .banking-info-grid {
-        grid-template-columns: 1fr !important;
-        gap: 10px;
+    @media (max-width: 768px) {
+        .banking-info-grid {
+            grid-template-columns: 1fr !important;
+            gap: 10px;
+        }
     }
     
     .banking-display,
@@ -2077,7 +2015,9 @@ body::-webkit-scrollbar-track,
     margin-bottom: 20px; 
 }
 
-.tag {
+/* Legacy tag styling - for compatibility */
+.tag,
+.bel-badge.default {
     display: inline-block;
     padding: 0.25rem 0.75rem;
     font-size: 0.8rem;
@@ -2367,6 +2307,9 @@ body::-webkit-scrollbar-track,
     justify-content: space-between; 
     padding: 16px 0; 
     font-size: var(--fs-sm); 
+    flex-wrap: nowrap;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .pagination-controls { 
@@ -2379,6 +2322,22 @@ body::-webkit-scrollbar-track,
     display: inline-flex; 
     align-items: center; 
     gap: 8px; 
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.rows-select label {
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: var(--fs-sm);
+    color: var(--ds-color-gray-70);
+}
+
+.rows-select select {
+    white-space: nowrap;
+    flex-shrink: 0;
+    width: 70px;
 }
 
 /* --- Responsive Breakpoints --- */
@@ -2705,7 +2664,7 @@ body::-webkit-scrollbar-track,
     color: var(--ds-color-gray-90);
 }
 
-.tag.hot-selling {
+.bel-badge.hot-selling {
     background: var(--ds-color-brand-light-30);
     color: var(--ds-color-brand);
     border: none;
@@ -2760,57 +2719,4 @@ body::-webkit-scrollbar-track,
 .revenue {
     color: var(--ds-color-brand);
     font-weight: 500;
-}
-
-/* ==========================================================================
-   DASHBOARD YEAR SELECTOR
-   ========================================================================== */
-
-.dashboard-year-selector {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding: 16px 20px;
-    background: var(--ds-color-white);
-    border: 1px solid var(--ot-color-gray-45);
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.dashboard-year-selector label {
-    font-weight: 600;
-    color: var(--ds-color-gray-80);
-    margin: 0;
-    white-space: nowrap;
-}
-
-.dashboard-year-selector select {
-    min-width: 120px;
-    font-weight: 500;
-    border-color: var(--ds-color-brand-light-50);
-}
-
-.dashboard-year-selector select:focus {
-    border-color: var(--ds-color-brand);
-    box-shadow: 0 0 0 2px var(--ds-color-brand-light-30);
-}
-
-.dashboard-year-selector span {
-    font-size: 0.85em;
-    color: var(--ds-color-gray-60);
-    margin-left: 8px;
-}
-
-@media (max-width: 768px) {
-    .dashboard-year-selector {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-    }
-    
-    .dashboard-year-selector select {
-        width: 100%;
-        min-width: auto;
-    }
 }

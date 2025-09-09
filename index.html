@@ -186,7 +186,7 @@
                                             <th data-sortable data-type="number" style="width:24px;">Rank</th>
                                             <th data-sortable data-type="string" style="width:160px;">Product</th>
                                             <th data-sortable data-type="number">Price</th>
-                                            <th data-sortable data-type="number">Units</th>
+                                            <th data-sortable data-type="number">Qty</th>
                                             <th data-sortable data-type="number">Total</th>
                                         </tr>
                                     </thead>
@@ -202,7 +202,7 @@
 
                 <!-- Filters Panel -->
                 <div class="section-title">
-                    <h3>Top 10 BEL Performance Leaderboard</h3>
+                    <h3>Top 10 Performance Leaderboard</h3>
                 </div>
                <!-- Filters Panel -->
                 <div class="bel-panel">
@@ -548,8 +548,8 @@
                         </div>
                         
                         <!-- Performance Trend Chart -->
-                        <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Performance Trend</h4>
-                        <div class="chart-container" style="height: 250px; margin-bottom: 2rem;">
+                        <h4 style="margin-top: 24px; margin-bottom: 4px;">Performance Trend</h4>
+                        <div class="chart-container" style="height: 280px; margin-bottom: 2rem;">
                             <canvas id="bel-performance-trend-chart"></canvas>
                         </div>
                     </div>
@@ -602,57 +602,52 @@
                     </div>
 
                     <div class="tab-content" id="payout">
-                         <div class="bel-grid-container grid-cols-2" style="margin-bottom: 24px;">
-                            <div class="bel-card blue-bg">
-                                <div class="bel-card-title">Total Payouts</div>
-                                <div class="bel-card-value" style="font-size: 1.5rem;">$7,500</div>
-                            </div>
-                            <div class="bel-card red-bg">
-                                <div class="bel-card-title">To Be Payout</div>
-                                <div class="bel-card-value" style="font-size: 1.5rem;">$1,250</div>
-                            </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4 style="margin: 0;">Annual Payouts History</h4>
+                            <select id="payout-year-selector" class="bel-form-control bel-form-select bel-select--inline">
+                                <!-- Years will be dynamically populated by JavaScript -->
+                            </select>
                         </div>
                         
-                        <h4>Recent Payout History</h4>
-                        <div class="scrollable-table-container">
+                         <div class="bel-grid-container grid-cols-3" style="margin-bottom: 12px; gap:12px;">
+                            <div class="bel-card gray-bg">
+                                <div class="bel-card-title">Total Gross Amount</div>
+                                <div class="bel-card-value" style="font-size: 1.5rem;" id="total-gross-amount">$0.00</div>
+                            </div>
+                            <div class="bel-card gray-bg">
+                                <div class="bel-card-title">WHT</div>
+                                <div class="bel-card-value" style=" font-size: 1.5rem;" id="total-wht-amount">$0.00</div>
+                            </div>
+                            <div class="bel-card gray-bg">
+                                <div class="bel-card-title">Total Net Amount</div>
+                                <div class="bel-card-value" style="color:var(--ds-color-success); font-size: 1.5rem;" id="total-net-amount">$0.00</div>
+                            </div>
+                        </div>
+                        <div class="scrollable-table-container" style="margin-bottom:12px ;">
                              <table class="bel-table">
                                  <thead>
                                      <tr>
                                          <th data-sortable data-type="date">Date</th>
-                                         <th data-sortable data-type="number">Amount</th>
+                                         <th data-sortable data-type="number">Gross Amount</th>
+                                         <th data-sortable data-type="number">WHT</th>
+                                         <th data-sortable data-type="number">Net Amount</th>
                                          <th data-sortable data-type="string">Status</th>
                                      </tr>
                                  </thead>
-                                 <tbody>
-                                     <tr>
-                                         <td>2025-08-05</td>
-                                         <td>$1,520.00</td>
-                                         <td><span class="bel-badge completed">Completed</span></td>
-                                     </tr>
-                                     <tr>
-                                         <td>2025-07-05</td>
-                                         <td>$1,330.00</td>
-                                         <td><span class="bel-badge completed">Completed</span></td>
-                                     </tr>
-                                     <tr>
-                                         <td>2025-06-05</td>
-                                         <td>$800.00</td>
-                                         <td><span class="bel-badge completed">Completed</span></td>
-                                     </tr>
+                                 <tbody id="payout-history-tbody">
+                                     <!-- Payout history will be populated by JavaScript -->
                                  </tbody>
                             </table>
                         </div>
                     </div>
 
                     <div class="tab-content" id="insights">
-                        <h4>Top Purchased Categories</h4>
+                        <h4>Top Purchased Categories & Products</h4>
                         <div class="tags-container">
                             <span class="insight-tag">Smart Home</span>
                             <span class="insight-tag">Sensors</span>
                             <span class="insight-tag">Industrial PC</span>
                         </div>
-
-                        <h4>Top 10 Products Purchased by Referrals</h4>
                         <ol class="product-list">
                             <li>Smart Lock Pro</li>
                             <li>Environment Sensor Gen 2</li>
@@ -682,7 +677,7 @@
                     
                     <hr class="divider">
 
-                    <h4>Internal Notes (Audit Trail)</h4>
+                    <h4>Internal Notes</h4>
                     <div class="notes-history">
                         <div class="note-item">
                             <p>Contacted to confirm partnership interest, samples will be sent.</p>

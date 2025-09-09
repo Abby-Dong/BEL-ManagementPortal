@@ -129,68 +129,6 @@
             "orders": 0,
             "revenue": 0
           }
-        },
-        "2026": {
-          "January": {
-            "clicks": 750,
-            "orders": 25,
-            "revenue": 19500
-          },
-          "February": {
-            "clicks": 820,
-            "orders": 28,
-            "revenue": 21000
-          },
-          "March": {
-            "clicks": 790,
-            "orders": 26,
-            "revenue": 18800
-          },
-          "April": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "May": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "June": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "July": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "August": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "September": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "October": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "November": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "December": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          }
         }
       },
       "bankingInfo": {
@@ -332,68 +270,6 @@
             "orders": 0,
             "revenue": 0
           }
-        },
-        "2026": {
-          "January": {
-            "clicks": 420,
-            "orders": 10,
-            "revenue": 7200
-          },
-          "February": {
-            "clicks": 445,
-            "orders": 11,
-            "revenue": 7850
-          },
-          "March": {
-            "clicks": 410,
-            "orders": 9,
-            "revenue": 6950
-          },
-          "April": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "May": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "June": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "July": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "August": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "September": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "October": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "November": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "December": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          }
         }
       },
       "bankingInfo": {
@@ -514,68 +390,6 @@
             "clicks": 607,
             "orders": 14,
             "revenue": 12506
-          },
-          "September": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "October": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "November": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "December": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          }
-        },
-        "2026": {
-          "January": {
-            "clicks": 650,
-            "orders": 16,
-            "revenue": 12000
-          },
-          "February": {
-            "clicks": 675,
-            "orders": 17,
-            "revenue": 12800
-          },
-          "March": {
-            "clicks": 620,
-            "orders": 15,
-            "revenue": 11500
-          },
-          "April": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "May": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "June": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "July": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
-          },
-          "August": {
-            "clicks": 0,
-            "orders": 0,
-            "revenue": 0
           },
           "September": {
             "clicks": 0,

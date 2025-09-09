@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Pagination Styling</title>
+    <link rel="stylesheet" href="src/css/main.css">
+    <style>
+        .test-container {
+            max-width: 200px;
+            border: 2px solid red;
+            margin: 20px;
+            padding: 10px;
+        }
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-title">Test: 200px width container</div>
+        <div class="pagination-bar">
+            <div class="rows-select">
+                <label for="test-rows-per-page">Rows per page</label>
+                <select id="test-rows-per-page" class="bel-form-control bel-form-select">
+                    <option>5</option>
+                    <option selected>10</option>
+                    <option>20</option>
+                </select>
+            </div>
+            <div class="pagination-controls">
+                <span class="text-muted">1-10 of 50</span>
+                <button class="bel-btn secondary">‹</button>
+                <button class="bel-btn secondary">›</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-container" style="max-width: 150px;">
+        <div class="test-title">Test: 150px width container</div>
+        <div class="pagination-bar">
+            <div class="rows-select">
+                <label for="test-rows-per-page-2">Rows per page</label>
+                <select id="test-rows-per-page-2" class="bel-form-control bel-form-select">
+                    <option>5</option>
+                    <option selected>10</option>
+                    <option>20</option>
+                </select>
+            </div>
+            <div class="pagination-controls">
+                <span class="text-muted">1-10 of 50</span>
+                <button class="bel-btn secondary">‹</button>
+                <button class="bel-btn secondary">›</button>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin: 20px; padding: 20px; border: 1px solid #ccc;">
+        <h3>CSS Properties Applied:</h3>
+        <ul>
+            <li><strong>.pagination-bar</strong>: flex-wrap: nowrap; display: flex;</li>
+            <li><strong>.rows-select</strong>: white-space: nowrap; display: inline-flex;</li>
+            <li><strong>.rows-select label</strong>: white-space: nowrap; flex-shrink: 0;</li>
+        </ul>
+        <p>The text "Rows per page" should NOT wrap to a new line even in narrow containers.</p>
+    </div>
+</body>
+</html>

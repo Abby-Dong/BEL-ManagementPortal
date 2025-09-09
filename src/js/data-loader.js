@@ -125,7 +125,7 @@ class DataLoader {
                 productAnalysis: { categoryData: {}, topProducts: [] }
             },
             'data/payouts.json': {
-                payouts: { payoutDayMessage: "Payout Day: 5th of each month", history: [] }
+                belPayoutHistory: []
             },
             'data/orders.json': {
                 orders: { history: [] }

@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (notificationList) {
                 notificationList.innerHTML = APP_DATA.header.notifications.map(n => `
                     <li class="bel-notification-item">
-                        <div class="title"><span class="tag ${n.type}">${n.tagText}</span>${n.title}</div>
+                        <div class="title"><span class="bel-badge ${n.type}">${n.tagText}</span>${n.title}</div>
                         ${n.details ? `<div class="details" style="font-size: 0.85em; color: #666; margin-top: 4px;">${n.details}</div>` : ''}
                         <div class="date">${n.date}</div>
                     </li>
@@ -673,8 +673,11 @@ document.addEventListener('DOMContentLoaded', () => {
         init() {
             this.setupYearSelector();
             this.renderSummaryStats();
-            this.renderPerformanceTable();
-            this.renderTopProducts();
+            // Use default filters for initial render
+            const defaultYear = window.selectedDashboardYear || this.getSelectedYear();
+            const defaultRegion = window.selectedDashboardRegion || 'all';
+            this.renderPerformanceTable(defaultYear, defaultRegion);
+            this.renderTopProducts(defaultYear, defaultRegion);
             this.renderTop10Leaderboard();
             this.initializeCharts();
             this.setupViewSwitcher();
@@ -844,7 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
         /**
          * Apply both year and region filters
          */
-        applyFilters(selectedYear, selectedRegion) {
+    applyFilters(selectedYear, selectedRegion) {
             // Store selected filters
             window.selectedDashboardYear = selectedYear;
             window.selectedDashboardRegion = selectedRegion;
@@ -852,8 +855,35 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update all dashboard components with filters
             this.renderSummaryStats(selectedYear, selectedRegion);
             this.renderPerformanceTable(selectedYear, selectedRegion);
+            this.renderTopProducts(selectedYear, selectedRegion);
             this.renderTop10Leaderboard(selectedYear, selectedRegion);
+            
+            // Always initialize charts first
             this.initializeCharts(selectedYear, selectedRegion);
+            
+            // Check which view is currently visible and force update (use computed style for reliability)
+            const chartView = document.getElementById('performance-chart-view');
+            const tableView = document.getElementById('performance-table-view');
+            const isChartVisible = chartView ? getComputedStyle(chartView).display !== 'none' : false;
+            const isTableVisible = tableView ? getComputedStyle(tableView).display !== 'none' : false;
+
+            // Always force chart refresh if chart view is visible
+            if (isChartVisible) {
+                console.log('Force updating Performance Chart with filters:', selectedYear, selectedRegion);
+                // Force refresh both Pie Chart and Performance Chart
+                setTimeout(() => {
+                    this.initializePieChart(selectedYear, selectedRegion);
+                    this.initializePerformanceChart(selectedYear, selectedRegion);
+                    // Ensure chart layout recalculates after DOM/style changes
+                    try { window.performanceChart && window.performanceChart.resize(); } catch (e) {}
+                }, 60);
+            }
+
+            // If table view is visible, ensure it's updated too
+            if (isTableVisible) {
+                console.log('Force updating Performance Table with filters:', selectedYear, selectedRegion);
+                this.renderPerformanceTable(selectedYear, selectedRegion);
+            }
             
             // Update BEL table to reflect header filters
             AccountManagement.updateBelDataForHeaderFilters(selectedYear, selectedRegion);
@@ -1147,7 +1177,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!levelStats[level]) return;
                 
                 // Calculate yearly cumulative data
-                const yearlyData = AccountManagement.calculateYearlyData(leader, selectedYear);
+                const yearlyData = (selectedYear === 'all')
+                    ? AccountManagement.calculateTotalPerformance(leader)
+                    : AccountManagement.calculateYearlyData(leader, selectedYear);
                 
                 levelStats[level].clicks += yearlyData.clicks;
                 levelStats[level].orders += yearlyData.orders;
@@ -1206,7 +1238,7 @@ document.addEventListener('DOMContentLoaded', () => {
          * Update Dashboard region filters with disabled options for regions that have no data
          */
         updateDashboardRegionFilters() {
-            // Update the region filter in the Top 10 BEL Performance Leaderboard section
+            // Update the region filter in the Top 10 Performance Leaderboard section
             const dashboardRegionSelect = document.getElementById('f-region');
             if (dashboardRegionSelect) {
                 this.updateRegionSelectWithDisabledOptions(dashboardRegionSelect);
@@ -1263,11 +1295,83 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         },
 
-        renderTopProducts() {
+        // Build Top Products list from category data with Year/Region awareness
+        getTopProductsFor(year = null, region = null) {
+            const categoryData = this.getCategoryDataFor(year, region);
+            const productTotals = new Map(); // product -> {units, price, totalRevenue}
+
+            Object.values(categoryData).forEach(products => {
+                (products || []).forEach(p => {
+                    const productName = p.product;
+                    const units = p.units || 0;
+                    const price = p.price || 0; // 直接從產品數據中讀取價格
+                    
+                    if (productTotals.has(productName)) {
+                        const existing = productTotals.get(productName);
+                        existing.units += units;
+                        existing.totalRevenue += (price * units);
+                        // 使用最新的價格（假設同一產品在不同地區價格相同）
+                        if (price > 0) existing.price = price;
+                    } else {
+                        productTotals.set(productName, {
+                            units: units,
+                            price: price,
+                            totalRevenue: price * units
+                        });
+                    }
+                });
+            });
+
+            // 備用：如果產品數據中沒有價格，則從靜態數據中讀取
+            const topProductsStatic = APP_DATA?.dashboard?.productAnalysis?.topProducts || [];
+            const staticPriceMap = new Map();
+            topProductsStatic.forEach(item => {
+                const priceNum = typeof item.price === 'string'
+                    ? parseFloat(item.price.replace(/[^0-9.]/g, ''))
+                    : (item.price || 0);
+                staticPriceMap.set(item.product, priceNum);
+            });
+
+            // Convert to array and sort by units desc
+            const list = Array.from(productTotals.entries())
+                .map(([product, data]) => {
+                    let price = data.price;
+                    let totalRevenue = data.totalRevenue;
+                    
+                    // 如果沒有價格，嘗試從靜態數據獲取
+                    if (!price && staticPriceMap.has(product)) {
+                        price = staticPriceMap.get(product);
+                        totalRevenue = price * data.units;
+                    }
+                    
+                    return {
+                        product,
+                        units: data.units,
+                        price: price,
+                        totalRevenue: totalRevenue
+                    };
+                })
+                .sort((a, b) => b.units - a.units) // 按銷量排序
+                .slice(0, 20)
+                .map((item, idx) => ({
+                    rank: idx + 1,
+                    product: item.product,
+                    price: item.price > 0 ? `$${item.price.toLocaleString()}` : '-',
+                    units: item.units.toLocaleString(),
+                    total: item.totalRevenue > 0 ? `$${item.totalRevenue.toLocaleString()}` : '-'
+                }));
+
+            return list;
+        },
+
+        renderTopProducts(year = null, region = null) {
             const tableBody = document.querySelector('.product-sales-grid .scrollable-table-container tbody');
             if (!tableBody) return;
             
-            tableBody.innerHTML = APP_DATA.dashboard.productAnalysis.topProducts.map(product => `
+            // Use filtered top products computed from category data
+            const items = this.getTopProductsFor(year, region);
+            
+            tableBody.innerHTML = items.map(product => `
                 <tr>
                     <td>${product.rank}</td>
                     <td>${product.product}</td>
@@ -1285,7 +1389,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         /**
-         * Render Top 10 BEL Performance Leaderboard with header filter support
+         * Render Top 10 Performance Leaderboard with header filter support
          * @param {string} year - Year to filter by (defaults to current selected year)
          * @param {string} region - Region to filter by (defaults to current selected region)
          */
@@ -1383,14 +1487,23 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         initializeCharts(year = null, region = null) {
+            console.log('Initializing all charts with filters:', year, region);
+            
+            // Force refresh Level Distribution Pie Chart
             this.initializePieChart(year, region);
-            this.initializeProductCategoryChart();
+            
+            // Initialize Product Category Chart with current filters
+            this.initializeProductCategoryChart(year, region);
+            
+            // Force refresh Performance Chart
             this.initializePerformanceChart(year, region);
         },
 
         initializePieChart(year = null, region = null) {
+            console.log('Initializing Level Distribution Pie Chart with filters:', year, region);
             const pieCtx = document.getElementById('level-pie-chart');
             if (pieCtx && window.Chart) {
+                console.log('Pie Chart canvas found, updating data...');
                 // Calculate real-time level distribution from BEL profiles
                 const levelCounts = this.calculateLevelDistribution(year, region);
                 
@@ -1472,36 +1585,131 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         },
 
-        initializeProductCategoryChart() {
+        // Resolve category/product units by year/region with sensible fallbacks
+        getCategoryDataFor(year = null, region = null) {
+            const selectedYear = year || this.getSelectedYear();
+            const selectedRegion = region || window.selectedDashboardRegion || 'all';
+            const analysis = APP_DATA?.dashboard?.productAnalysis || {};
+            const byYR = analysis.categoryDataByYearRegion || null;
+
+            // Helper to merge multiple categoryData objects
+            const mergeCategoryData = (dataObjects) => {
+                const result = {};
+                dataObjects.forEach(dataObj => {
+                    if (!dataObj) return;
+                    Object.entries(dataObj).forEach(([category, products]) => {
+                        if (!result[category]) result[category] = [];
+                        (products || []).forEach(p => {
+                            const idx = result[category].findIndex(x => x.product === p.product);
+                            if (idx >= 0) {
+                                // 合併數量，保持價格
+                                result[category][idx].units += (p.units || 0);
+                                // 如果當前產品有價格，使用它（假設同一產品在不同地區價格相同）
+                                if (p.price && p.price > 0) {
+                                    result[category][idx].price = p.price;
+                                }
+                            } else {
+                                // 添加新產品，保留所有字段
+                                result[category].push({ 
+                                    product: p.product, 
+                                    units: p.units || 0,
+                                    price: p.price || 0
+                                });
+                            }
+                        });
+                    });
+                });
+                return result;
+            };
+
+            if (byYR) {
+                // Exact match first
+                const exact = byYR?.[selectedYear]?.[selectedRegion];
+                if (exact) return exact;
+
+                // All years for a specific region
+                if (selectedYear === 'all' && selectedRegion !== 'all') {
+                    const allYears = Object.values(byYR).map(regMap => regMap?.[selectedRegion]).filter(Boolean);
+                    if (allYears.length) return mergeCategoryData(allYears);
+                }
+
+                // All regions for a specific year
+                if (selectedRegion === 'all' && selectedYear !== 'all') {
+                    const regMap = byYR?.[selectedYear] || {};
+                    const allRegions = Object.values(regMap).filter(Boolean);
+                    if (allRegions.length) return mergeCategoryData(allRegions);
+                }
+
+                // Both all -> merge everything
+                if (selectedYear === 'all' && selectedRegion === 'all') {
+                    const everything = [];
+                    Object.values(byYR).forEach(regMap => {
+                        Object.values(regMap || {}).forEach(cat => { if (cat) everything.push(cat); });
+                    });
+                    if (everything.length) return mergeCategoryData(everything);
+                }
+
+                // Fallback
+                const fallback = byYR?.all?.all;
+                if (fallback) return fallback;
+            }
+
+            // Legacy flat data
+            return analysis.categoryData || {};
+        },
+
+        initializeProductCategoryChart(year = null, region = null) {
             const productCategoryCanvas = document.getElementById('product-category-chart');
             if (productCategoryCanvas && window.Chart) {
-                const categoryData = APP_DATA.dashboard.productAnalysis.categoryData;
-                const allProducts = new Set();
-                Object.values(categoryData).forEach(products => {
-                    products.forEach(p => allProducts.add(p.product));
-                });
-                const productList = Array.from(allProducts);
-                const blueShades = ['#003160', '#004280', '#336899', '#80a0bf', '#dfebf7'];
+                // Destroy existing instance if present to avoid overlay/duplication
+                if (window.productCategoryChart) {
+                    try { window.productCategoryChart.destroy(); } catch (e) {}
+                }
                 
-                const datasets = productList.map((product, index) => {
-                    const data = Object.keys(categoryData).map(category => {
-                        const productInCategory = categoryData[category].find(p => p.product === product);
-                        return productInCategory ? productInCategory.units : 0;
-                    });
-                    return {
-                        label: product,
-                        data: data,
-                        backgroundColor: blueShades[index % blueShades.length],
-                        borderColor: blueShades[index % blueShades.length],
-                        borderWidth: 1
+                // Get category data and calculate total units and revenue for each category
+                const categoryData = this.getCategoryDataFor(year, region);
+                const categoryStats = {};
+                
+                // Calculate total units and revenue for each category
+                Object.keys(categoryData).forEach(category => {
+                    const products = categoryData[category];
+                    const totalUnits = products.reduce((sum, p) => sum + (p.units || 0), 0);
+                    const totalRevenue = products.reduce((sum, p) => sum + ((p.units || 0) * (p.price || 0)), 0);
+                    
+                    categoryStats[category] = {
+                        units: totalUnits,
+                        revenue: totalRevenue
                     };
                 });
+                
+                // Sort categories by total units and take top 5
+                const sortedCategories = Object.entries(categoryStats)
+                    .sort(([,a], [,b]) => b.units - a.units)
+                    .slice(0, 5);
+                
+                const labels = sortedCategories.map(([category]) => category);
+                const data = sortedCategories.map(([, stats]) => stats.units);
+                
+                // Store category stats for tooltip access
+                const categoryStatsMap = {};
+                sortedCategories.forEach(([category, stats]) => {
+                    categoryStatsMap[category] = stats;
+                });
+                
+                // Use gradient blue colors for the bars
+                const blueShades = ['#003160', '#004280', '#336899', '#5a84b3', '#80a0bf'];
 
-                new Chart(productCategoryCanvas, {
+                window.productCategoryChart = new Chart(productCategoryCanvas, {
                     type: 'bar',
                     data: {
-                        labels: Object.keys(categoryData),
-                        datasets: datasets
+                        labels: labels,
+                        datasets: [{
+                            label: 'Qty',
+                            data: data,
+                            backgroundColor: blueShades,
+                            borderColor: blueShades,
+                            borderWidth: 1
+                        }]
                     },
                     options: {
                         responsive: true,
@@ -1509,37 +1717,57 @@ document.addEventListener('DOMContentLoaded', () => {
                         indexAxis: 'y',
                         plugins: {
                             legend: {
-                                display: true,
-                                position: 'bottom',
-                                labels: {
-                                    boxWidth: 12,
-                                    padding: 8,
-                                    font: { size: 11 }
-                                }
+                                display: false
                             },
                             tooltip: {
                                 callbacks: {
                                     title: (tooltipItems) => tooltipItems[0].label,
-                                    label: (context) => `${context.dataset.label}: ${context.parsed.x} units`,
-                                    afterBody: (tooltipItems) => {
-                                        const categoryIndex = tooltipItems[0].dataIndex;
-                                        const category = Object.keys(categoryData)[categoryIndex];
-                                        const products = categoryData[category];
-                                        const total = products.reduce((sum, p) => sum + p.units, 0);
-                                        return `Total: ${total} units`;
+                                    label: (context) => {
+                                        const category = context.label;
+                                        const stats = categoryStatsMap[category];
+                                        if (stats) {
+                                            return [
+                                                `Qty: ${stats.units.toLocaleString()}`,
+                                                `Total: $${stats.revenue.toLocaleString()}`
+                                            ];
+                                        }
+                                        return `Qty: ${context.parsed.x.toLocaleString()}`;
                                     }
                                 }
                             }
                         },
                         scales: {
                             x: {
-                                stacked: true,
                                 beginAtZero: true,
-                                title: { display: true, text: 'Units Sold' }
+                                title: { 
+                                    display: true, 
+                                    text: 'Qty',
+                                    font: {
+                                        size: 12,
+                                        weight: 'bold'
+                                    }
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toLocaleString();
+                                    }
+                                }
                             },
                             y: {
-                                stacked: true,
-                                title: { display: true, text: 'Product Categories' }
+                                title: { 
+                                    display: true, 
+                                    text: 'Product Categories',
+                                    font: {
+                                        size: 12,
+                                        weight: 'bold'
+                                    }
+                                },
+                                ticks: {
+                                    maxRotation: 0,
+                                    font: {
+                                        size: 11
+                                    }
+                                }
                             }
                         }
                     }
@@ -1548,8 +1776,10 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         initializePerformanceChart(year = null, region = null) {
+            console.log('Initializing Performance Chart with filters:', year, region);
             const performanceCtx = document.getElementById('performance-percentage-chart');
             if (performanceCtx && window.Chart) {
+                console.log('Performance Chart canvas found, updating data...');
                 // Use dynamic calculation instead of static data
                 const performanceData = this.calculatePerformanceByLevel(year, region);
                 
@@ -1739,23 +1969,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (viewType === 'table') {
                         tableView?.style.setProperty('display', 'block');
                         chartView?.style.setProperty('display', 'none');
+                        
+                        // Re-render performance table with current filters
+                        const selectedYear = window.selectedDashboardYear || this.getSelectedYear();
+                        const selectedRegion = window.selectedDashboardRegion || 'all';
+                        this.renderPerformanceTable(selectedYear, selectedRegion);
                     } else {
                         tableView?.style.setProperty('display', 'none');
                         chartView?.style.setProperty('display', 'block');
                         
-                        // Initialize performance chart if not already done
+                        // Initialize performance chart with current filters
                         setTimeout(() => {
                             if (chartView?.style.display !== 'none') {
-                                this.initializePerformanceChart();
+                                const selectedYear = window.selectedDashboardYear || this.getSelectedYear();
+                                const selectedRegion = window.selectedDashboardRegion || 'all';
+                                this.initializePerformanceChart(selectedYear, selectedRegion);
                             }
                         }, 100);
                     }
                 });
             });
 
-            // Initialize chart view by default
+            // Initialize chart view by default with current filters
             setTimeout(() => {
-                this.initializePerformanceChart();
+                const selectedYear = window.selectedDashboardYear || this.getSelectedYear();
+                const selectedRegion = window.selectedDashboardRegion || 'all';
+                this.initializePerformanceChart(selectedYear, selectedRegion);
             }, 100);
         }
     };
@@ -2493,7 +2732,7 @@ document.addEventListener('DOMContentLoaded', () => {
          * @param {string} selectedYear - Year to filter by (or 'all' for all years)
          * @param {string} selectedRegion - Region to filter by (or 'all' for all regions)
          */
-        updateBelDataForHeaderFilters(selectedYear, selectedRegion) {
+    updateBelDataForHeaderFilters(selectedYear, selectedRegion) {
             // 根據 Referral ID 的前兩碼確定國碼
             const getCountryCode = (id) => {
                 const prefix = id.substring(1, 3); // 取 K 後面的兩位
@@ -2537,8 +2776,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Update BEL data with year-specific calculations
             this.belData = dataToProcess.map(leader => {
-                // Calculate yearly cumulative data based on selected year
-                const yearlyData = this.calculateYearlyData(leader, selectedYear);
+                // Calculate performance based on selected year
+                const yearlyData = (selectedYear === 'all')
+                    ? this.calculateTotalPerformance(leader)
+                    : this.calculateYearlyData(leader, selectedYear);
                 
                 const countryCode = getCountryCode(leader.id);
                 const countryName = getCountryName(countryCode);
@@ -2587,6 +2828,30 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.modal?.addEventListener('click', (e) => {
                 if (e.target === ui.modal) this.closeModal();
             });
+
+            // Handle year selector changes
+            const yearSelector = document.getElementById('year-selector');
+            if (yearSelector) {
+                yearSelector.addEventListener('change', (e) => {
+                    const selectedYear = e.target.value;
+                    const record = this.getBelRecordById(appState.currentReferralId);
+                    if (record) {
+                        this.updatePerformanceMetrics(record);
+                    }
+                });
+            }
+
+            // Handle payout year selector changes
+            const payoutYearSelector = document.getElementById('payout-year-selector');
+            if (payoutYearSelector) {
+                payoutYearSelector.addEventListener('change', (e) => {
+                    const selectedYear = parseInt(e.target.value);
+                    const record = this.getBelRecordById(appState.currentReferralId);
+                    if (record) {
+                        this.updatePayoutInformationByYear(record, selectedYear);
+                    }
+                });
+            }
 
             // Handle Referral ID link clicks
             document.addEventListener('click', (e) => {
@@ -2789,6 +3054,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update Banking Information
             this.updateBankingInformation(record);
             
+            // Update Payout Information
+            this.updatePayoutInformation(record);
+            
             // Update Customer Insights
             this.updateCustomerInsights(record);
         },
@@ -2908,6 +3176,239 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
+        updatePayoutInformation(record) {
+            if (!record || !APP_DATA.payouts) return;
+            
+            // Find BEL's payout history
+            const belPayout = APP_DATA.payouts.belPayoutHistory.find(bel => bel.belId === record.id);
+            
+            if (!belPayout) {
+                console.log(`No payout history found for BEL ID: ${record.id}`);
+                // Clear payout table if no data found
+                const tbody = document.querySelector('#payout-history-tbody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No payout history available</td></tr>';
+                }
+                return;
+            }
+            
+            // Populate year selector dynamically based on available data
+            this.populatePayoutYearSelector(belPayout.payoutHistory);
+            
+            // Get the selected year from payout year selector, default to current year (2025)
+            const payoutYearSelector = document.getElementById('payout-year-selector');
+            const selectedYear = payoutYearSelector ? parseInt(payoutYearSelector.value) : 2025;
+            
+            this.updatePayoutInformationByYear(record, selectedYear);
+        },
+
+        populatePayoutYearSelector(payoutHistory) {
+            const payoutYearSelector = document.getElementById('payout-year-selector');
+            if (!payoutYearSelector || !payoutHistory) return;
+            
+            // Get unique years from payout history
+            const availableYears = [...new Set(payoutHistory.map(payout => payout.year))].sort((a, b) => b - a);
+            
+            // Store current selected value to preserve it if possible
+            const currentValue = payoutYearSelector.value;
+            
+            // Clear existing options
+            payoutYearSelector.innerHTML = '';
+            
+            // Add years as options
+            availableYears.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                
+                // Set as selected if it was previously selected, or default to 2025
+                if ((currentValue && currentValue == year) || (!currentValue && year === 2025)) {
+                    option.selected = true;
+                }
+                
+                payoutYearSelector.appendChild(option);
+            });
+            
+            // If no years available, add a default option
+            if (availableYears.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'No data available';
+                option.disabled = true;
+                payoutYearSelector.appendChild(option);
+            }
+        },
+
+        updatePayoutInformationByYear(record, year) {
+            if (!record || !APP_DATA.payouts) return;
+            
+            // Find BEL's payout history
+            const belPayout = APP_DATA.payouts.belPayoutHistory.find(bel => bel.belId === record.id);
+            
+            if (!belPayout) {
+                console.log(`No payout history found for BEL ID: ${record.id}`);
+                // Clear payout table if no data found
+                const tbody = document.querySelector('#payout-history-tbody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No payout history available</td></tr>';
+                }
+                // Clear summary cards
+                this.updatePayoutSummaryCards({ totalGross: 0, totalWht: 0, totalNet: 0, pendingAmount: 0 });
+                return;
+            }
+            
+            // Calculate payout summary for selected year
+            const payoutSummary = this.calculatePayoutSummaryByYear(belPayout.payoutHistory, year);
+            
+            // Update payout summary cards
+            this.updatePayoutSummaryCards(payoutSummary);
+            
+            // Update payout history table
+            this.updatePayoutHistoryTable(belPayout.payoutHistory, year);
+        },
+
+        calculatePayoutSummaryByYear(payoutHistory, year) {
+            if (!payoutHistory || !Array.isArray(payoutHistory)) {
+                return { totalGross: 0, totalWht: 0, totalNet: 0, pendingAmount: 0, recentPayouts: [] };
+            }
+            
+            // Filter payouts for the selected year
+            const yearPayouts = payoutHistory.filter(payout => payout.year === year);
+            
+            const totalGross = yearPayouts.reduce((sum, payout) => sum + payout.grossPayout, 0);
+            const totalWht = yearPayouts.reduce((sum, payout) => sum + payout.wht, 0);
+            const totalNet = yearPayouts.reduce((sum, payout) => sum + payout.netPayout, 0);
+            
+            // Get the most recent 10 payouts for the selected year
+            const recentPayouts = yearPayouts
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 10);
+            
+            // Calculate pending amount (To be payout) based on selected year
+            let pendingAmount = 0;
+            const currentYear = new Date().getFullYear();
+            
+            if (year === currentYear) {
+                // For current year (2025), get previous month's revenue from belProfiles.json
+                pendingAmount = this.calculateCurrentYearToBePayout();
+            }
+            // For past years, pendingAmount remains 0 (no "to be payout")
+            
+            return {
+                totalGross,
+                totalWht,
+                totalNet,
+                pendingAmount,
+                recentPayouts,
+                year
+            };
+        },
+
+        calculatePayoutSummary(payoutHistory) {
+            // This is the old function, now delegates to the year-specific version
+            return this.calculatePayoutSummaryByYear(payoutHistory, 2025);
+        },
+
+        calculateCurrentYearToBePayout() {
+            // Get current BEL's previous month revenue from belProfiles.json
+            const currentBelId = this.getCurrentBelId();
+            if (!currentBelId) return 0;
+
+            // Find the BEL data in APP_DATA.leaderboard
+            const belData = APP_DATA.leaderboard?.find(bel => bel.id === currentBelId);
+            if (!belData || !belData.monthlyData) return 0;
+
+            const currentYear = new Date().getFullYear();
+            const currentMonth = new Date().getMonth(); // 0-based (0=January, 8=September)
+            
+            // Get previous month name
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            let prevMonthIndex = currentMonth - 1;
+            let targetYear = currentYear;
+            
+            // Handle January case (previous month is December of previous year)
+            if (prevMonthIndex < 0) {
+                prevMonthIndex = 11; // December
+                targetYear = currentYear - 1;
+            }
+            
+            const prevMonthName = monthNames[prevMonthIndex];
+            
+            // Get the revenue from the previous month
+            if (belData.monthlyData[targetYear] && belData.monthlyData[targetYear][prevMonthName]) {
+                const monthData = belData.monthlyData[targetYear][prevMonthName];
+                return monthData.revenue || 0;
+            }
+            
+            return 0;
+        },
+
+        getCurrentBelId() {
+            // Get the current BEL ID from the modal context
+            const modal = document.querySelector('#belModal');
+            if (!modal) return null;
+            
+            const belIdElement = modal.querySelector('#bel-modal-id');
+            return belIdElement ? belIdElement.textContent.trim() : null;
+        },
+
+        updatePayoutSummaryCards(summary) {
+            // Update "Total Gross Amount" card
+            const totalGrossCard = document.querySelector('#total-gross-amount');
+            if (totalGrossCard) {
+                totalGrossCard.textContent = `$${summary.totalGross.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+            
+            // Update "WHT" card 
+            const totalWhtCard = document.querySelector('#total-wht-amount');
+            if (totalWhtCard) {
+                totalWhtCard.textContent = `-$${summary.totalWht.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+            
+            // Update "Total Net Amount" card
+            const totalNetCard = document.querySelector('#total-net-amount');
+            if (totalNetCard) {
+                totalNetCard.textContent = `$${summary.totalNet.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+        },
+
+        updatePayoutHistoryTable(payoutHistory, year = null) {
+            const tbody = document.querySelector('#payout-history-tbody');
+            if (!tbody) return;
+            
+            if (!payoutHistory || !Array.isArray(payoutHistory)) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No payout history available</td></tr>';
+                return;
+            }
+            
+            // Filter by year if specified, otherwise show all
+            let filteredPayouts = payoutHistory;
+            if (year !== null) {
+                filteredPayouts = payoutHistory.filter(payout => payout.year === year);
+            }
+            
+            if (filteredPayouts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No payout history available for ${year || 'selected period'}</td></tr>`;
+                return;
+            }
+            
+            // Sort payouts by date (most recent first) - show all records
+            const sortedPayouts = filteredPayouts
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            tbody.innerHTML = sortedPayouts.map(payout => `
+                <tr>
+                    <td>${payout.date}</td>
+                    <td>$${payout.grossPayout.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                    <td>$${payout.wht.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                    <td>$${payout.netPayout.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                    <td><span class="bel-badge ${payout.status.toLowerCase()}">${payout.status}</span></td>
+                </tr>
+            `).join('');
+        },
+
         updateCustomerInsights(record) {
             if (!record) return;
             
@@ -2927,7 +3428,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         .reduce((sum, sale) => sum + sale.totalRevenue, 0);
                     
                     return `
-                        <span class="tag hot-selling" title="${category}: $${categoryRevenue.toLocaleString()} revenue">
+                        <span class="bel-badge hot-selling" title="${category}: $${categoryRevenue.toLocaleString()} revenue">
                             ${category}
                         </span>
                     `;
@@ -3429,9 +3930,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             this.showCustomAlert(`Saved changes for ${record.name}.`, 'success');
             
-            // Update both Account Management and Dashboard
+            // Update both Account Management and Dashboard with current filters
             AccountManagement.renderTable();
-            Dashboard.renderPerformanceTable();
+            const selectedYear = window.selectedDashboardYear || Dashboard.getSelectedYear();
+            const selectedRegion = window.selectedDashboardRegion || 'all';
+            Dashboard.renderPerformanceTable(selectedYear, selectedRegion);
             
             // Update Account Management cards if currently on that page
             const currentSection = document.querySelector('.content-section.active')?.id;
@@ -3515,13 +4018,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h3><i class="fas fa-exclamation-triangle" style="color: #f39800;"></i> Banking Information Update</h3>
                     </div>
                     <div class="custom-modal-body">
-                        <div style="margin-bottom: 20px;">
+                        <div>
                             <label for="change-reason" style="font-weight: bold; display: block; margin-bottom: 8px;">Reason for Change:</label>
                             <textarea id="change-reason" placeholder="Please provide a reason for this banking information change..." 
                                 style="width: 100%; min-height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; resize: vertical;"></textarea>
                         </div>
                         
-                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 15px; margin-bottom: 20px;">
+                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 15px; ">
                             <div style="display: flex; align-items: flex-start; gap: 10px;">
                                 <input type="checkbox" id="confirm-accuracy" style="margin-top: 2px;">
                                 <label for="confirm-accuracy" style="font-size: 0.9rem; line-height: 1.4;">
@@ -3824,6 +4327,7 @@ document.addEventListener('DOMContentLoaded', () => {
        ======================================================================== */
     const ContentManager = {
         payoutModalEl: null,
+        belPayoutModalEl: null,
         supportModalEl: null,
         announcementModalEl: null,
         imageModalEl: null,
@@ -4288,7 +4792,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <!-- Name and level pill -->
                             <div class="flex items-center space-x-2">
                                 <h2 class="bel-acct-mgmt-text-xl-var flex-1 whitespace-nowrap overflow-hidden text-ellipsis">${account.name}</h2>
-                                <span class="bel-acct-mgmt-level-${account.level.toLowerCase()}">
+                                <span class="bel-badge ${account.level.toLowerCase()}">
                                     ${account.level}
                                 </span>
                             </div>
@@ -4474,7 +4978,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 row.setAttribute('data-account-id', account.referralId);
                 
                 row.innerHTML = `
-                    <td><a href="#" class="bel-id-link">${account.referralId}</a></td>
+                    <td><a href="#" class="referral-id-link" data-referral-id="${account.referralId}">${account.referralId}</a></td>
                     <td>${account.name}</td>
                     <td><span class="bel-badge ${account.level.toLowerCase()}">${account.level}</span></td>
                     <td style="text-align: right;">${account.clicks.toLocaleString()}</td>
@@ -4614,11 +5118,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const accountRows = document.querySelectorAll('#account-list-table tbody tr[data-account-id]');
             accountRows.forEach(row => {
                 row.addEventListener('click', (e) => {
-                    // 允許點擊連結正常工作，但防止ID連結觸發模態框
-                    if (e.target.closest('a.bel-id-link')) return;
+                    // 如果點擊的是 referral ID 連結，打開 BEL 詳情模態框
+                    if (e.target.closest('a.referral-id-link')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const referralId = e.target.closest('a.referral-id-link').getAttribute('data-referral-id');
+                        const accountData = APP_DATA.belProfiles.leaderboard.find(account => account.id === referralId);
+                        if (accountData) {
+                            BELModal.openModal(accountData.id);
+                        }
+                        return;
+                    }
                     
+                    // 否則，點擊行的其他部分也會打開模態框
                     const accountId = row.getAttribute('data-account-id');
-                    // 觸發現有的BEL詳情模態框
                     const accountData = APP_DATA.belProfiles.leaderboard.find(account => account.id === accountId);
                     if (accountData) {
                         BELModal.openModal(accountData.id);
@@ -4636,15 +5149,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="bel-panel" id="payouts-history-panel">
                     <div class="panel-header">
                         <h3 style="margin:0;">Payout History 
-                            <span class="bel-badge approved" style="margin-left:4px;">${APP_DATA.payouts.payoutDayMessage}</span>
+                            <span class="bel-badge approved" style="margin-left:4px;">Monthly payout on 12th</span>
                         </h3>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label for="payout-year-select" style="font-size: 14px; color: var(--ds-color-gray-70);">Year:</label>
+                            <select id="payout-year-select" class="bel-form-control bel-form-select" style="min-width: 80px;">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
                     </div>
                     <div class="scrollable-table-container">
                         <table class="bel-table" id="payout-history-table">
                             <thead>
                                 <tr>
-                                    <th data-sortable data-type="string">Payout Date</th>
-                                    <th data-sortable data-type="number">Payout Total</th>
+                                    <th data-sortable data-type="string">Payout Month</th>
+                                    <th data-sortable data-type="number">Total Amount</th>
                                     <th data-sortable data-type="number">BEL Count</th>
                                     <th>View Detail</th>
                                 </tr>
@@ -4676,7 +5195,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="pagination-bar">
                         <div class="rows-select">
                             <label for="order-rows-per-page-payout">Rows per page</label>
-                            <select id="order-rows-per-page-payout" class="bel-select bel-select--small">>
+                            <select id="order-rows-per-page-payout" class="bel-form-control bel-form-select">
                                 <option>5</option>
                                 <option selected>10</option>
                                 <option>20</option>
@@ -4696,7 +5215,8 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             // Render data after DOM injection
-            setTimeout(() => {
+            setTimeout(async () => {
+                await this.loadPayoutData(); // Ensure payout data is loaded first
                 this.renderPayoutHistory();
                 this.renderOrdersInPayout();
                 this.setupOrdersPaginationForPayout();
@@ -4783,7 +5303,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <thead>
                                 <tr>
                                     <th data-sortable data-type="string">Created</th>
-                                    <th data-sortable data-type="string">Category</th>
+                                    <th data-sortable data-type="string">Level</th>
                                     <th data-sortable data-type="string">Title</th>
                                     <th data-sortable data-type="string">Body</th>
                                     <th data-sortable data-type="string">Link</th>
@@ -4801,20 +5321,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 0);
         },
 
-        renderPayoutHistory() {
+        async renderPayoutHistory(selectedYear = null) {
             const tableBody = document.querySelector('#payout-history-table tbody');
             if (!tableBody) return;
             
-            const payouts = APP_DATA.payouts.history;
-            tableBody.innerHTML = payouts.map(payout => `
+            // Ensure payout data is loaded
+            await this.loadPayoutData();
+            
+            // Initialize year selector if not already done
+            this.initializePayoutYearSelector();
+            
+            // Get selected year from selector if not provided
+            if (selectedYear === null) {
+                const yearSelect = document.getElementById('payout-year-select');
+                selectedYear = yearSelect ? yearSelect.value : null;
+            }
+            
+            // Calculate monthly statistics from payouts.json
+            const monthlyStats = this.calculateMonthlyPayoutStats(selectedYear);
+            
+            tableBody.innerHTML = monthlyStats.map(monthData => `
                 <tr>
-                    <td>${payout.date}</td>
-                    <td>${utils.formatMoney(payout.total, 2)}</td>
-                    <td>${payout.belCount}</td>
+                    <td>${monthData.monthYear}</td>
+                    <td>${utils.formatMoney(monthData.totalAmount, 2)}</td>
+                    <td>${monthData.belCount}</td>
                     <td>
-                        <button class="bel-btn-s secondary payout-view-btn" data-payout-date="${payout.date}">
+                        <a href="#" class="referral-id-link payout-view-btn" data-payout-month="${monthData.key}">
                             <i class="fas fa-eye"></i> View Detail
-                        </button>
+                        </a>
                     </td>
                 </tr>
             `).join('');
@@ -4824,6 +5358,123 @@ document.addEventListener('DOMContentLoaded', () => {
             if (payoutTable) {
                 TableUtils.makeTableSortable(payoutTable);
             }
+        },
+
+        calculateMonthlyPayoutStats(selectedYear = null) {
+            // Load payout data from payouts.json if not already loaded
+            if (!window.PAYOUT_DATA) {
+                this.loadPayoutData();
+            }
+            
+            if (!window.PAYOUT_DATA || !window.PAYOUT_DATA.belPayoutHistory) {
+                return [];
+            }
+
+            const monthlyMap = new Map();
+            
+            // Process all BEL payout records
+            window.PAYOUT_DATA.belPayoutHistory.forEach(bel => {
+                bel.payoutHistory.forEach(payout => {
+                    // Filter by selected year if specified
+                    if (selectedYear && payout.year !== parseInt(selectedYear)) {
+                        return;
+                    }
+                    
+                    const key = `${payout.year}-${String(payout.month).padStart(2, '0')}`;
+                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    const monthYear = `${monthNames[payout.month - 1]} ${payout.year}`;
+                    
+                    if (!monthlyMap.has(key)) {
+                        monthlyMap.set(key, {
+                            key: key,
+                            monthYear: monthYear,
+                            year: payout.year,
+                            month: payout.month,
+                            totalAmount: 0,
+                            belCount: 0,
+                            payouts: []
+                        });
+                    }
+                    
+                    const monthData = monthlyMap.get(key);
+                    monthData.totalAmount += payout.grossPayout;
+                    monthData.belCount++;
+                    monthData.payouts.push({
+                        ...payout,
+                        belId: bel.belId,
+                        belName: bel.belName,
+                        belRegion: bel.belRegion
+                    });
+                });
+            });
+            
+            // Convert to array and sort by year/month descending
+            return Array.from(monthlyMap.values())
+                .sort((a, b) => {
+                    if (a.year !== b.year) return b.year - a.year;
+                    return b.month - a.month;
+                });
+        },
+
+        async loadPayoutData() {
+            try {
+                const response = await fetch('/data/payouts.json');
+                if (response.ok) {
+                    window.PAYOUT_DATA = await response.json();
+                } else {
+                    console.error('Failed to load payouts.json');
+                    window.PAYOUT_DATA = { belPayoutHistory: [] };
+                }
+            } catch (error) {
+                console.error('Error loading payouts.json:', error);
+                window.PAYOUT_DATA = { belPayoutHistory: [] };
+            }
+        },
+
+        initializePayoutYearSelector() {
+            const yearSelect = document.getElementById('payout-year-select');
+            if (!yearSelect || yearSelect.children.length > 0) return; // Already initialized
+            
+            if (!window.PAYOUT_DATA || !window.PAYOUT_DATA.belPayoutHistory) return;
+            
+            // Get all unique years from payout data
+            const years = new Set();
+            window.PAYOUT_DATA.belPayoutHistory.forEach(bel => {
+                bel.payoutHistory.forEach(payout => {
+                    years.add(payout.year);
+                });
+            });
+            
+            // Sort years in descending order
+            const sortedYears = Array.from(years).sort((a, b) => b - a);
+            
+            // Add "All Years" option first
+            const allOption = document.createElement('option');
+            allOption.value = '';
+            allOption.textContent = 'All Years';
+            yearSelect.appendChild(allOption);
+            
+            // Add year options
+            sortedYears.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            });
+            
+            // Set default to current year if available, otherwise "All Years"
+            const currentYear = new Date().getFullYear();
+            if (sortedYears.includes(currentYear)) {
+                yearSelect.value = currentYear;
+            } else {
+                yearSelect.value = '';
+            }
+            
+            // Add event listener for year selection changes
+            yearSelect.addEventListener('change', () => {
+                this.renderPayoutHistory(yearSelect.value);
+            });
         },
 
         renderOrdersInPayout() {
@@ -5018,7 +5669,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="pagination-bar" style="margin-top: 16px;">
                                 <div class="rows-select">
                                     <label for="history-modal-rows-per-page">Rows per page</label>
-                                    <select id="history-modal-rows-per-page" class="bel-select bel-select--small">>
+                                    <select id="history-modal-rows-per-page" class="bel-form-control bel-form-select">
                                         <option>5</option>
                                         <option selected>10</option>
                                         <option>20</option>
@@ -5157,16 +5808,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         getCategoryBadgeClass(category) {
             switch(category) {
-                case 'System':
-                    return 'system-badge';
-                case 'Policy Update':
-                    return 'policy-update-badge';
-                case 'Payout Reminder':
-                    return 'payout-reminder-badge';
-                case 'Campaign Launch':
-                    return 'campaign-launch-badge';
-                case 'Important':
-                    return 'important-badge';
+                case 'All':
+                    return 'admin';
+                case 'Builder':
+                    return 'builder';
+                case 'Enabler':
+                    return 'enabler';
+                case 'Exploder':
+                    return 'exploder';
+                case 'Leader':
+                    return 'leader';
                 default:
                     return 'secondary-color';
             }
@@ -5174,16 +5825,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         getNotificationTagClass(category) {
             switch(category) {
-                case 'System':
-                    return 'system';
-                case 'Policy Update':
-                    return 'policy';
-                case 'Payout Reminder':
-                    return 'payout';
-                case 'Campaign Launch':
-                    return 'campaign';
-                case 'Important':
-                    return 'important';
+                case 'All':
+                    return 'admin';
+                case 'Builder':
+                    return 'builder';
+                case 'Enabler':
+                    return 'enabler';
+                case 'Exploder':
+                    return 'exploder';
+                case 'Leader':
+                    return 'leader';
                 default:
                     return '';
             }
@@ -5266,6 +5917,107 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             return this.payoutModalEl;
+        },
+
+        async openBelPayoutModal(payoutMonth) {
+            // Load payout data if not already loaded
+            await this.loadPayoutData();
+            
+            const monthlyStats = this.calculateMonthlyPayoutStats();
+            const monthData = monthlyStats.find(m => m.key === payoutMonth);
+            
+            if (!monthData) {
+                console.error('Month data not found for:', payoutMonth);
+                return;
+            }
+
+            const modal = this.ensureBelPayoutModal();
+            
+            // Update modal header
+            modal.querySelector('#bel-payout-modal-date').textContent = `Payout Month: ${monthData.monthYear}`;
+            modal.querySelector('#bel-payout-modal-total').textContent = `Total Amount: ${utils.formatMoney(monthData.totalAmount, 2)}`;
+            modal.querySelector('#bel-payout-modal-count').textContent = `BEL Count: ${monthData.belCount}`;
+
+            // Fill the table with BEL payout records
+            const tbody = modal.querySelector('#bel-payout-detail-table tbody');
+            tbody.innerHTML = monthData.payouts.map(payout => `
+                <tr data-payout-id="${payout.payoutId}">
+                    <td>${payout.payoutId}</td>
+                    <td><a href="#" class="referral-id-link" data-referral-id="${payout.belId}">${payout.belId}</a></td>
+                    <td>${payout.belName}</td>
+                    <td>${payout.belRegion}</td>
+                    <td>${payout.date}</td>
+                    <td>${utils.formatMoney(payout.grossPayout, 2)}</td>
+                    <td>${utils.formatMoney(payout.wht, 2)}</td>
+                    <td><strong>${utils.formatMoney(payout.netPayout, 2)}</strong></td>
+                    <td>
+                        <span class="bel-badge ${payout.status === 'Completed' ? 'completed' : 'danger'}">${payout.status}</span>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Make table sortable
+            const table = modal.querySelector('#bel-payout-detail-table');
+            if (table) {
+                TableUtils.makeTableSortable(table);
+            }
+
+            modal.style.zIndex = this.getNextModalZIndex();
+            modal.classList.add('show');
+        },
+
+        ensureBelPayoutModal() {
+            if (this.belPayoutModalEl) return this.belPayoutModalEl;
+            
+            const wrap = document.createElement('div');
+            wrap.className = 'modal-overlay';
+            wrap.id = 'bel-payout-modal';
+            wrap.innerHTML = `
+                <div class="modal-content" style="max-width: 1200px;">
+                    <div class="modal-header">
+                        <div style="flex: 1;">
+                            <h3 style="margin:0;">BEL Payout Details</h3>
+                            <div style="display: flex; gap: 20px; margin-top: 8px; font-size: 0.9rem; color: #666;">
+                                <span id="bel-payout-modal-date"></span>
+                                <span id="bel-payout-modal-total"></span>
+                                <span id="bel-payout-modal-count"></span>
+                            </div>
+                        </div>
+                        <button class="close-button" aria-label="Close">&times;</button>
+                    </div>
+                    
+                    <div class="modal-body" style="padding: 20px;">
+                        <div class="scrollable-table-container" style="max-height: 500px;">
+                            <table class="bel-table" id="bel-payout-detail-table">
+                                <thead>
+                                    <tr>
+                                        <th data-sortable data-type="string">Payout ID</th>
+                                        <th data-sortable data-type="string">BEL ID</th>
+                                        <th data-sortable data-type="string">BEL Name</th>
+                                        <th data-sortable data-type="string">Region</th>
+                                        <th data-sortable data-type="string">Date</th>
+                                        <th data-sortable data-type="number">Gross Payout</th>
+                                        <th data-sortable data-type="number">WHT</th>
+                                        <th data-sortable data-type="number">Net Payout</th>
+                                        <th data-sortable data-type="string">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(wrap);
+            this.belPayoutModalEl = wrap;
+
+            const close = () => this.belPayoutModalEl.classList.remove('show');
+            this.belPayoutModalEl.querySelector('.close-button')?.addEventListener('click', close);
+            this.belPayoutModalEl.addEventListener('click', (e) => { 
+                if (e.target === this.belPayoutModalEl) close(); 
+            });
+
+            return this.belPayoutModalEl;
         },
 
         openPayoutModal(payoutDate) {
@@ -5494,13 +6246,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="modal-body-grid" style="grid-template-columns: 1fr;">
                         <div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
-                                <label>Category</label>
+                                <label>Level</label>
                                 <select id="ann-category" class="bel-form-control bel-form-select">
-                                    <option>System</option>
-                                    <option>Policy Update</option>
-                                    <option>Payout Reminder</option>
-                                    <option>Campaign Launch</option>
-                                    <option>Important</option>
+                                    <option>All</option>
+                                    <option>Builder</option>
+                                    <option>Enabler</option>
+                                    <option>Exploder</option>
+                                    <option>Leader</option>
                                 </select>
                             </div>
                             <div class="bel-form-group" style="margin-bottom:12px;">
@@ -5605,7 +6357,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         li.className = 'bel-notification-item';
                         const tagClass = this.getNotificationTagClass(cat);
                         li.innerHTML = `
-                            <div class="title"><span class="tag ${tagClass}">${cat}</span>${title}</div>
+                            <div class="title"><span class="bel-badge ${tagClass}">${cat}</span>${title}</div>
                             <div class="date">${new Date().toISOString().slice(0,10)}</div>
                         `;
                         list.prepend(li);
@@ -5631,11 +6383,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setupEventListeners() {
             // Event delegation for payout view buttons
-            document.addEventListener('click', (e) => {
+            document.addEventListener('click', async (e) => {
                 const payoutBtn = e.target.closest('.payout-view-btn');
                 if (payoutBtn) {
-                    const payoutDate = payoutBtn.getAttribute('data-payout-date');
-                    this.openPayoutModal(payoutDate);
+                    const payoutMonth = payoutBtn.getAttribute('data-payout-month');
+                    if (payoutMonth) {
+                        await this.openBelPayoutModal(payoutMonth);
+                    } else {
+                        // Fallback for old data-payout-date format
+                        const payoutDate = payoutBtn.getAttribute('data-payout-date');
+                        this.openPayoutModal(payoutDate);
+                    }
                     return;
                 }
 
@@ -5752,69 +6510,71 @@ document.addEventListener('DOMContentLoaded', () => {
             wrap.className = 'modal-overlay';
             wrap.id = 'asset-form-modal';
             wrap.innerHTML = `
-                <div class="modal-content" style="max-width:560px;">
+                <div class="modal-content" style="max-width:800px;">
                     <div class="modal-header">
                         <h3 style="margin:0;" id="asset-form-title">Add Asset</h3>
                         <button class="close-button" aria-label="Close">&times;</button>
                     </div>
-                    <div class="modal-body-grid" style="grid-template-columns: 1fr;">
-                        <form id="asset-form">
-                            <div class="bel-form-group" style="margin-bottom:12px;">
-                                <label>Category</label>
-                                <select id="asset-category" class="bel-form-control bel-form-select" required>
-                                    <option value="">Select a category</option>
-                                    <option value="IoTMart Campaign">IoTMart Campaign</option>
-                                    <option value="Advantech Resource Website">Advantech Resource Website</option>
-                                </select>
-                            </div>
-                            <div class="bel-form-group" style="margin-bottom:12px;">
-                                <label>Title</label>
-                                <input type="text" id="asset-title" class="bel-form-control bel-form-input" maxlength="25" required />
-                            </div>
-                            <div class="bel-form-group" style="margin-bottom:12px;">
-                                <label>Subtitle</label>
-                                <input type="text" id="asset-subtitle" class="bel-form-control bel-form-input" maxlength="60" required />
-                            </div>
-                            <div class="bel-form-group" style="margin-bottom:12px;">
-                                <label>Page Link URL</label>
-                                <input type="url" id="asset-url" class="bel-form-control bel-form-input" placeholder="https://example.com/..." required />
-                            </div>
-                            <div class="bel-form-group" style="margin-bottom:12px;">
-                                <label>Picture <span style="color: var(--ds-color-gray-70); font-size: 0.9em;">(Recommended: 1200 × 740 pixels)</span></label>
-                                <div class="picture-upload-area" style="border: 2px dashed var(--bel-border-color); border-radius: 4px; padding: 20px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease;" onclick="document.getElementById('asset-picture').click();">
-                                    <div class="upload-icon" style="font-size: 48px; color: #ccc; margin-bottom: 10px;">
+                    <div class="modal-body-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start;">
+                        <!-- Left Column: Data Fields -->
+                        <div class="form-data-column">
+                            <form id="asset-form">
+                                <div class="bel-form-group" style="margin-bottom:4px;">
+                                    <label>Category</label>
+                                    <select id="asset-category" class="bel-form-control bel-form-select" required>
+                                        <option value="">Select a category</option>
+                                        <option value="IoTMart Campaign">IoTMart Campaign</option>
+                                        <option value="Advantech Resource Website">Advantech Resource Website</option>
+                                    </select>
+                                </div>
+                                <div class="bel-form-group" style="margin-bottom:4px;">
+                                    <label>Title</label>
+                                    <input type="text" id="asset-title" class="bel-form-control bel-form-input" maxlength="25" required />
+                                </div>
+                                <div class="bel-form-group" style="margin-bottom:4px;">
+                                    <label>Subtitle</label>
+                                    <input type="text" id="asset-subtitle" class="bel-form-control bel-form-input" maxlength="60" required />
+                                </div>
+                                <div class="bel-form-group" style="margin-bottom:4px;">
+                                    <label>Page Link URL</label>
+                                    <input type="url" id="asset-url" class="bel-form-control bel-form-input" placeholder="https://example.com/..." required />
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Right Column: Picture Upload -->
+                        <div class="form-picture-column">
+                            <div class="bel-form-group">
+                                <label>Picture <span style="color: var(--ds-color-gray-60); font-size: 0.9em;">(Recommended: 1200 × 740 pixels)</span></label>
+                                <div class="picture-upload-area" style="border: 2px dashed var(--bel-border-color); border-radius: 4px; padding: 32px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.3s ease; min-height: 200px; display: flex; flex-direction: column; justify-content: center;" onclick="document.getElementById('asset-picture').click();">
+                                    <div class="upload-icon" style="font-size: 48px; color: #ccc; margin-bottom: 12px;">
                                         <i class="fas fa-cloud-upload-alt"></i>
                                     </div>
-                                    <div class="upload-text" style="color: var(--ds-color-gray-70); margin-bottom: 8px;">
-                                        <strong>Click to upload picture</strong> or drag and drop
+                                    <div class="upload-text" style="color: var(--ds-color-gray-70); margin-bottom: 8px; font-weight: 600;">
+                                        Click to upload picture
                                     </div>
-                                    <div class="upload-dimensions" style="color: #999; font-size: 0.9em;">
-                                        Recommended dimensions: 1200 × 740 pixels
+                                    <div class="upload-text-secondary" style="color: var(--ds-color-gray-60); margin-bottom: 8px; font-size: 0.9em;">
+                                        or drag and drop
+                                    </div>
+                                    <div class="upload-dimensions" style="color: var(--ds-color-gray-70); font-size: 0.85em;">
+                                        Recommended: 1200 × 740 pixels
                                     </div>
                                     <input type="file" id="asset-picture" accept="image/*" style="display: none;" />
                                 </div>
-                                <div id="picture-preview" style="margin-top: 10px; display: none;">
-                                    <div class="preview-image-container" style="position: relative; cursor: pointer;" onclick="document.getElementById('asset-picture').click();">
-                                        <img id="preview-image" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--bel-border-color);" />
-                                        <div class="image-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); color: white; display: none; flex-direction: column; justify-content: center; align-items: center; border-radius: 4px; opacity: 0; transition: opacity 0.3s ease;">
+                                <div id="picture-preview" style=" display: none;">
+                                    <div class="preview-image-container" style="position: relative; cursor: pointer; border-radius: 4px; overflow: hidden;" onclick="document.getElementById('asset-picture').click();">
+                                        <img id="preview-image" style="width: 100%; height: auto; display: block; border: 1px solid var(--bel-border-color);" />
+                                        <div class="image-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); color: white; display: none; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease;">
                                             <i class="fas fa-camera" style="font-size: 24px; margin-bottom: 8px;"></i>
                                             <div>Click to change picture</div>
                                         </div>
                                     </div>
-                                    <div id="picture-info" style="margin-top: 8px; color: var(--ds-color-gray-70); font-size: 0.9em;"></div>
-                                    <div class="picture-actions" style="margin-top: 8px; display: flex; gap: 8px;">
-                                        <button type="button" class="bel-btn secondary" style="padding: 4px 8px; font-size: 0.8em;" onclick="document.getElementById('asset-picture').click()">
-                                            <i class="fas fa-upload"></i> Change Picture
-                                        </button>
-                                        <button type="button" class="bel-btn secondary" style="padding: 4px 8px; font-size: 0.8em;" onclick="removePicture()">
-                                            <i class="fas fa-trash"></i> Remove Picture
-                                        </button>
-                                    </div>
+                                    <div id="picture-info" style="color: var(--ds-color-gray-40); font-size:12px; text-align: right;"></div>
                                 </div>
                             </div>
-                        </form>
-                        <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:8px;">
-                            <button class="bel-btn primary" id="asset-save-btn">Save</button>
+                        </div>
+                        <div class="modal-actions" style="grid-column: 1 / -1; display:flex; justify-content:flex-end; gap:8px;">
+                            <button class="bel-btn primary" id="asset-save-btn">Save Asset</button>
                             <button class="bel-btn secondary" id="asset-cancel-btn">Cancel</button>
                         </div>
                     </div>

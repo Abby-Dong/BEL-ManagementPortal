@@ -227,7 +227,7 @@ const APP_DATA = {
   payoutsAndOrders: {
     // 支付與訂單管理數據
     payouts: {
-      payoutDayMessage: "Payout Day: 5th of each month",
+      payoutDayMessage: "Payout Day: 12th of each month",
       history: [
         { date: "2025-08-05", total: 15420.50, belCount: 45, details: [...] }
         // ...支付歷史記錄
